@@ -1,0 +1,14 @@
+# GitHub MCP — code operations (search repos, read files, create PRs, manage issues)
+# MCP server: https://github.com/github/github-mcp-server
+# Install: npm install -g @modelcontextprotocol/server-github
+
+name: github
+description: GitHub MCP for repository operations, file management, and PR workflows
+transport: stdio
+command: npx
+args:
+  - "@modelcontextprotocol/server-github"
+env:
+  GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+toolset: ops_tools
+enabled: false  # set enabled: true and set GITHUB_PERSONAL_ACCESS_TOKEN env var to activate

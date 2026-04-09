@@ -1,0 +1,14 @@
+# Firecrawl MCP — web scraping, crawling, and search
+# MCP server: https://github.com/mendableai/firecrawl-mcp-server
+# Install: npm install -g firecrawl-mcp
+
+name: firecrawl
+description: Firecrawl MCP for deep web scraping, site crawling, and web search
+transport: stdio
+command: npx
+args:
+  - firecrawl-mcp
+env:
+  FIRECRAWL_API_KEY: "${FIRECRAWL_API_KEY}"
+toolset: research_tools
+enabled: false  # set enabled: true and set FIRECRAWL_API_KEY env var to activate

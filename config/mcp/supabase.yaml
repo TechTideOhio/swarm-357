@@ -1,0 +1,16 @@
+# Supabase MCP — database operations (SQL queries, schema management, storage)
+# MCP server: https://github.com/supabase-community/supabase-mcp
+# Install: npm install -g @supabase/mcp-server-supabase
+
+name: supabase
+description: Supabase MCP for database queries, schema management, and storage operations
+transport: stdio
+command: npx
+args:
+  - "@supabase/mcp-server-supabase"
+  - "--project-ref"
+  - "${SUPABASE_PROJECT_REF}"
+env:
+  SUPABASE_ACCESS_TOKEN: "${SUPABASE_ACCESS_TOKEN}"
+toolset: ops_tools
+enabled: false  # set enabled: true and configure SUPABASE_* env vars to activate

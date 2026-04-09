@@ -1,0 +1,96 @@
+# TechTide Swarm 357 — Compact Agent Roster
+#
+# This format defines roles with counts. Individual agent configs are
+# generated at runtime by Swarm._expand_compact_roster().
+#
+# The legacy 357-entry format (config/swarm.yaml) still works — Swarm
+# auto-detects which format is in use.
+#
+# Layer totals: management=10 sales=62 support=55 marketing=68
+#               seo=47 research=58 operations=57 → 357
+
+swarm:
+  version: "2.0"
+  total_agents: 357
+  daily_budget_usd: 2500.0
+
+  layer_budgets:
+    management: {daily_limit_usd: 200.0, model_preference: opus}
+    sales:      {daily_limit_usd: 500.0, model_preference: sonnet}
+    support:    {daily_limit_usd: 300.0, model_preference: haiku}
+    marketing:  {daily_limit_usd: 500.0, model_preference: sonnet}
+    seo:        {daily_limit_usd: 200.0, model_preference: haiku}
+    research:   {daily_limit_usd: 400.0, model_preference: sonnet}
+    operations: {daily_limit_usd: 400.0, model_preference: sonnet}
+
+layers:
+  management:
+    roles:
+      conductor:          {count: 1, model: opus, budget_usd: 10.0, tools: [WebSearch, Read, Write]}
+      chief_strategist:   {count: 1, model: opus, budget_usd:  8.0, tools: [WebSearch, Read, Write]}
+      memory_curator:     {count: 1, model: sonnet, budget_usd: 3.0, tools: [Read, Write]}
+      pattern_promoter:   {count: 1, model: sonnet, budget_usd: 3.0, tools: [Read, Write]}
+      skill_extractor:    {count: 1, model: sonnet, budget_usd: 3.0, tools: [Read, Write]}
+      routing_optimizer:  {count: 1, model: sonnet, budget_usd: 3.0, tools: [Read, Write]}
+      dream_runner:       {count: 1, model: sonnet, budget_usd: 3.0, tools: [Read, Write]}
+      qa_auditor:         {count: 1, model: sonnet, budget_usd: 3.0, tools: [Read, Write, WebSearch]}
+      health_monitor:     {count: 1, model: haiku, budget_usd: 1.0, tools: [Read]}
+      cost_controller:    {count: 1, model: haiku, budget_usd: 1.0, tools: [Read]}
+    soul: templates/soul/management/conductor.md
+
+  sales:
+    roles:
+      crm_operator:          {count: 12, model: haiku,  budget_usd: 0.5, tools: [Read, Write]}
+      outreach_specialist:   {count: 15, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
+      prospect_researcher:   {count: 12, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
+      sdr:                   {count: 10, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
+      funnel_analyst:        {count:  8, model: sonnet, budget_usd: 1.0, tools: [Read, Write]}
+      deal_closer:           {count:  5, model: opus,   budget_usd: 5.0, tools: [WebSearch, Read, Write]}
+    soul: templates/soul/sales/outreach-specialist.md
+    soul_overrides:
+      crm_operator: templates/soul/sales/crm-operator.md
+
+  support:
+    roles:
+      tier1_resolver:      {count: 25, model: haiku,  budget_usd: 0.25, tools: [Read, Write]}
+      tier2_resolver:      {count: 15, model: sonnet, budget_usd: 1.0,  tools: [WebSearch, Read, Write]}
+      kb_maintainer:       {count:  8, model: sonnet, budget_usd: 1.0,  tools: [Read, Write]}
+      escalation_handler:  {count:  5, model: sonnet, budget_usd: 1.5,  tools: [WebSearch, Read, Write]}
+      csat_analyst:        {count:  2, model: haiku,  budget_usd: 0.25, tools: [Read, Write]}
+    soul: templates/soul/support/tier1-resolver.md
+
+  marketing:
+    roles:
+      content_strategist:      {count: 15, model: sonnet, budget_usd: 1.5, tools: [WebSearch, Read, Write]}
+      social_media_manager:    {count: 15, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
+      ad_copywriter:           {count: 12, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
+      email_campaign_manager:  {count: 10, model: sonnet, budget_usd: 1.0, tools: [Read, Write]}
+      brand_guardian:           {count:  8, model: sonnet, budget_usd: 1.0, tools: [Read, Write]}
+      campaign_analyst:         {count:  8, model: haiku,  budget_usd: 0.5, tools: [Read, Write]}
+    soul: templates/soul/marketing/content-strategist.md
+
+  seo:
+    roles:
+      keyword_researcher:      {count: 18, model: haiku,  budget_usd: 0.5, tools: [WebSearch, Read, Write]}
+      technical_seo_auditor:   {count: 12, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
+      link_building_specialist: {count: 10, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
+      aeo_optimizer:            {count:  7, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
+    soul: templates/soul/seo/keyword-researcher.md
+
+  research:
+    roles:
+      market_analyst:        {count: 20, model: sonnet, budget_usd: 3.0, tools: [WebSearch, Read, Write]}
+      competitor_analyst:    {count: 15, model: sonnet, budget_usd: 2.0, tools: [WebSearch, Read, Write]}
+      product_researcher:    {count: 12, model: sonnet, budget_usd: 2.0, tools: [WebSearch, Read, Write]}
+      research_synthesizer:  {count:  6, model: opus,   budget_usd: 8.0, tools: [WebSearch, Read, Write]}
+      trend_watcher:         {count:  5, model: haiku,  budget_usd: 0.5, tools: [WebSearch, Read, Write]}
+    soul: templates/soul/research/market-analyst.md
+
+  operations:
+    roles:
+      project_coordinator:  {count: 20, model: sonnet, budget_usd: 1.0,  tools: [Read, Write, Bash]}
+      finance_reporter:     {count: 12, model: sonnet, budget_usd: 1.5,  tools: [Read, Write]}
+      infra_agent:          {count: 10, model: sonnet, budget_usd: 1.0,  tools: [Read, Write, Bash]}
+      automation_builder:   {count: 10, model: sonnet, budget_usd: 1.5,  tools: [Read, Write, Bash]}
+      data_quality_agent:   {count:  5, model: haiku,  budget_usd: 0.25, tools: [Read, Write]}
+    soul: templates/soul/operations/project-coordinator.md

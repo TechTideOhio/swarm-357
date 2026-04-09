@@ -1,0 +1,17 @@
+[package]
+name = "memvid-swarm-bridge"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85.0"
+description = "CLI bridge from Python Swarm to memvid-core (.mv2) for put/search/verify."
+license = "Apache-2.0"
+publish = false
+
+[[bin]]
+name = "memvid-swarm-bridge"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+memvid-core = { path = "../../.repos and items/memvid-main/memvid-main", default-features = true }
+serde_json = "1"
