@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a1a"/>
+      <stop offset="50%" style="stop-color:#0f0f2e"/>
+      <stop offset="100%" style="stop-color:#0a0a1a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED"/>
+      <stop offset="50%" style="stop-color:#06B6D4"/>
+      <stop offset="100%" style="stop-color:#10B981"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0.1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="300" fill="url(#bg)"/>
+
+  <!-- Decorative wave -->
+  <path d="M0,250 Q150,200 300,230 T600,210 T900,240 T1200,220 V300 H0 Z" fill="url(#wave)"/>
+  <path d="M0,270 Q200,240 400,260 T800,245 T1200,265 V300 H0 Z" fill="url(#wave)" opacity="0.5"/>
+
+  <!-- Decorative circles -->
+  <circle cx="1050" cy="80" r="120" fill="#7C3AED" opacity="0.06"/>
+  <circle cx="1100" cy="120" r="80" fill="#06B6D4" opacity="0.08"/>
+  <circle cx="150" cy="250" r="100" fill="#10B981" opacity="0.05"/>
+
+  <!-- Grid dots -->
+  <g fill="#ffffff" opacity="0.05">
+    <circle cx="50" cy="50" r="1.5"/>
+    <circle cx="100" cy="50" r="1.5"/>
+    <circle cx="150" cy="50" r="1.5"/>
+    <circle cx="200" cy="50" r="1.5"/>
+    <circle cx="50" cy="100" r="1.5"/>
+    <circle cx="100" cy="100" r="1.5"/>
+    <circle cx="150" cy="100" r="1.5"/>
+    <circle cx="200" cy="100" r="1.5"/>
+  </g>
+
+  <!-- Main title -->
+  <text x="600" y="95" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="58" font-weight="900" fill="white" letter-spacing="-1">
+    TECHTIDE SWARM
+  </text>
+
+  <!-- 357 with gradient -->
+  <text x="600" y="165" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="900" fill="url(#accent)" letter-spacing="-2">
+    357
+  </text>
+
+  <!-- Subtitle -->
+  <text x="600" y="210" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#94A3B8" letter-spacing="4">
+    CLAUDE AI AGENTS · 6 BUSINESS LAYERS · FULL OBSERVABILITY
+  </text>
+
+  <!-- Bottom badges -->
+  <text x="600" y="255" text-anchor="middle" font-family="monospace" font-size="13" fill="#64748B">
+    Claude Agent SDK · Opik/Comet · Self-Healing Memory · ULTRAPLAN · 23-Point Security
+  </text>
+
+  <!-- Accent line -->
+  <rect x="250" y="220" width="700" height="2" rx="1" fill="url(#accent)" opacity="0.4"/>
+</svg>

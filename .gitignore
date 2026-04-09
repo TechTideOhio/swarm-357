@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Virtual environments
+venv/
+.venv/
+
+# IDE / editor
+.cursor/hooks/state/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Next.js build artifacts
+.ui_landin_sample/minimal/.next/
+.ui_landin_sample/minimal/node_modules/
+
+# Rust build
+packages/memvid-swarm-bridge/target/
+.repos and items/memvid-main/memvid-main/target/
+
+# Swarm runtime state (generated at runtime, not source)
+.swarm/topics/
+.swarm/telemetry.jsonl
+.swarm/MEMORY.md
+.swarm/*.mv2
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.local
+
+# Quarantined legacy files
+_quarantine/
+
+# Git worktrees
+.worktrees/

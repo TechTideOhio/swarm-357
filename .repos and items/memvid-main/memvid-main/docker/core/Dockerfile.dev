@@ -1,0 +1,31 @@
+# Development Dockerfile for Memvid Core
+FROM rust:1.92-slim-trixie AS builder
+
+# Install development dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    pkg-config \
+    libssl-dev \
+    ca-certificates \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy dependency files
+COPY Cargo.toml Cargo.lock ./
+COPY rust-toolchain.toml ./
+
+# Install cargo-watch for development (optional)
+RUN cargo install cargo-watch --locked || true
+
+# Copy source code
+COPY . .
+
+# Set environment variables
+ENV RUST_LOG=debug
+ENV CARGO_TARGET_DIR=/app/target
+
+# Default command (can be overridden)
+CMD ["/bin/bash"]

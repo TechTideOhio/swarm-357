@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/TechTideOhio/swarm-357#readme
+    about: Full README, architecture overview, and quickstart
+  - name: Discussions
+    url: https://github.com/TechTideOhio/swarm-357/discussions
+    about: Ask questions and share ideas

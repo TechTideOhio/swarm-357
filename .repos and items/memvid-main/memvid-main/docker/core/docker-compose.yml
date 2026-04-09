@@ -1,0 +1,46 @@
+services:
+  # Development environment
+  dev:
+    build:
+      context: ../..
+      dockerfile: docker/core/Dockerfile.dev
+    volumes:
+      - ../../:/app
+      - cargo-cache:/usr/local/cargo/registry
+      - target-cache:/app/target
+    environment:
+      - RUST_LOG=debug
+      - CARGO_TARGET_DIR=/app/target
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+  # Test runner
+  test:
+    build:
+      context: ../..
+      dockerfile: docker/core/Dockerfile.test
+    volumes:
+      - ../../:/app
+      - cargo-cache:/usr/local/cargo/registry
+      - target-cache:/app/target
+    environment:
+      - RUST_BACKTRACE=1
+      - RUST_LOG=info
+    command: cargo test --features lex,pdf_extract -- --nocapture
+
+  # Build release
+  build:
+    build:
+      context: ../..
+      dockerfile: docker/core/Dockerfile
+      target: builder
+    volumes:
+      - ../../:/app
+      - cargo-cache:/usr/local/cargo/registry
+      - target-cache:/app/target
+    command: cargo build --release --features lex,pdf_extract
+
+volumes:
+  cargo-cache:
+  target-cache:

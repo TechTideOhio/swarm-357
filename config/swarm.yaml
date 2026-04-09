@@ -1,0 +1,3475 @@
+swarm:
+  version: '1.0'
+  total_agents: 357
+  daily_budget_usd: 2500.0
+  layer_budgets:
+    management:
+      daily_limit_usd: 200.0
+      model_preference: opus
+    sales:
+      daily_limit_usd: 500.0
+      model_preference: sonnet
+    support:
+      daily_limit_usd: 300.0
+      model_preference: haiku
+    marketing:
+      daily_limit_usd: 500.0
+      model_preference: sonnet
+    seo:
+      daily_limit_usd: 200.0
+      model_preference: haiku
+    research:
+      daily_limit_usd: 400.0
+      model_preference: sonnet
+    operations:
+      daily_limit_usd: 400.0
+      model_preference: sonnet
+agents:
+- name: management-conductor
+  layer: management
+  role: conductor
+  soul: templates/soul/management/conductor.md
+  model: opus
+  budget_usd: 10.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: management-strategist-001
+  layer: management
+  role: chief_strategist
+  soul: templates/soul/management/chief-strategist.md
+  model: opus
+  budget_usd: 8.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: management-memory-curator
+  layer: management
+  role: memory_curator
+  soul: templates/soul/management/memory-curator.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - Read
+  - Write
+- name: management-pattern-promoter
+  layer: management
+  role: pattern_promoter
+  soul: templates/soul/management/pattern-promoter.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - Read
+  - Write
+- name: management-skill-extractor
+  layer: management
+  role: skill_extractor
+  soul: templates/soul/management/skill-extractor.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - Read
+  - Write
+- name: management-cost-controller
+  layer: management
+  role: cost_controller
+  soul: templates/soul/management/cost-controller.md
+  model: haiku
+  budget_usd: 1.0
+  tools:
+  - Read
+- name: management-health-monitor
+  layer: management
+  role: health_monitor
+  soul: templates/soul/management/health-monitor.md
+  model: haiku
+  budget_usd: 1.0
+  tools:
+  - Read
+- name: management-routing-optimizer
+  layer: management
+  role: routing_optimizer
+  soul: templates/soul/management/routing-optimizer.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - Read
+  - Write
+- name: management-dream-runner
+  layer: management
+  role: dream_runner
+  soul: templates/soul/management/dream-runner.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - Read
+  - Write
+- name: management-qa-auditor
+  layer: management
+  role: qa_auditor
+  soul: templates/soul/management/qa-auditor.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - Read
+  - Write
+  - WebSearch
+- name: sales-crm-operator-001
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-002
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-003
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-004
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-005
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-006
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-007
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-008
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-009
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-010
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-011
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-crm-operator-012
+  layer: sales
+  role: crm_operator
+  soul: templates/soul/sales/crm-operator.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: sales-outreach-specialist-001
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-002
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-003
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-004
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-005
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-006
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-007
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-008
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-009
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-010
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-011
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-012
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-013
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-014
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-outreach-specialist-015
+  layer: sales
+  role: outreach_specialist
+  soul: templates/soul/sales/outreach-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-001
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-002
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-003
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-004
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-005
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-006
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-007
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-008
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-009
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-010
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-011
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-prospect-researcher-012
+  layer: sales
+  role: prospect_researcher
+  soul: templates/soul/sales/prospect-researcher.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-001
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-002
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-003
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-004
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-005
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-006
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-007
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-008
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-009
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-sdr-010
+  layer: sales
+  role: sdr
+  soul: templates/soul/sales/sdr.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-funnel-analyst-001
+  layer: sales
+  role: funnel_analyst
+  soul: templates/soul/sales/funnel-analyst.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: sales-funnel-analyst-002
+  layer: sales
+  role: funnel_analyst
+  soul: templates/soul/sales/funnel-analyst.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: sales-funnel-analyst-003
+  layer: sales
+  role: funnel_analyst
+  soul: templates/soul/sales/funnel-analyst.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: sales-funnel-analyst-004
+  layer: sales
+  role: funnel_analyst
+  soul: templates/soul/sales/funnel-analyst.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: sales-funnel-analyst-005
+  layer: sales
+  role: funnel_analyst
+  soul: templates/soul/sales/funnel-analyst.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: sales-funnel-analyst-006
+  layer: sales
+  role: funnel_analyst
+  soul: templates/soul/sales/funnel-analyst.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: sales-funnel-analyst-007
+  layer: sales
+  role: funnel_analyst
+  soul: templates/soul/sales/funnel-analyst.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: sales-funnel-analyst-008
+  layer: sales
+  role: funnel_analyst
+  soul: templates/soul/sales/funnel-analyst.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: sales-deal-closer-001
+  layer: sales
+  role: deal_closer
+  soul: templates/soul/sales/deal-closer.md
+  model: opus
+  budget_usd: 5.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-deal-closer-002
+  layer: sales
+  role: deal_closer
+  soul: templates/soul/sales/deal-closer.md
+  model: opus
+  budget_usd: 5.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-deal-closer-003
+  layer: sales
+  role: deal_closer
+  soul: templates/soul/sales/deal-closer.md
+  model: opus
+  budget_usd: 5.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-deal-closer-004
+  layer: sales
+  role: deal_closer
+  soul: templates/soul/sales/deal-closer.md
+  model: opus
+  budget_usd: 5.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: sales-deal-closer-005
+  layer: sales
+  role: deal_closer
+  soul: templates/soul/sales/deal-closer.md
+  model: opus
+  budget_usd: 5.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier1-resolver-001
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-002
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-003
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-004
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-005
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-006
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-007
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-008
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-009
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-010
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-011
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-012
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-013
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-014
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-015
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-016
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-017
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-018
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-019
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-020
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-021
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-022
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-023
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-024
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier1-resolver-025
+  layer: support
+  role: tier1_resolver
+  soul: templates/soul/support/tier1-resolver.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-tier2-resolver-001
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-002
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-003
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-004
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-005
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-006
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-007
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-008
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-009
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-010
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-011
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-012
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-013
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-014
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-tier2-resolver-015
+  layer: support
+  role: tier2_resolver
+  soul: templates/soul/support/tier2-resolver.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-kb-maintainer-001
+  layer: support
+  role: kb_maintainer
+  soul: templates/soul/support/kb-maintainer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: support-kb-maintainer-002
+  layer: support
+  role: kb_maintainer
+  soul: templates/soul/support/kb-maintainer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: support-kb-maintainer-003
+  layer: support
+  role: kb_maintainer
+  soul: templates/soul/support/kb-maintainer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: support-kb-maintainer-004
+  layer: support
+  role: kb_maintainer
+  soul: templates/soul/support/kb-maintainer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: support-kb-maintainer-005
+  layer: support
+  role: kb_maintainer
+  soul: templates/soul/support/kb-maintainer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: support-kb-maintainer-006
+  layer: support
+  role: kb_maintainer
+  soul: templates/soul/support/kb-maintainer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: support-kb-maintainer-007
+  layer: support
+  role: kb_maintainer
+  soul: templates/soul/support/kb-maintainer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: support-kb-maintainer-008
+  layer: support
+  role: kb_maintainer
+  soul: templates/soul/support/kb-maintainer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: support-escalation-handler-001
+  layer: support
+  role: escalation_handler
+  soul: templates/soul/support/escalation-handler.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-escalation-handler-002
+  layer: support
+  role: escalation_handler
+  soul: templates/soul/support/escalation-handler.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-escalation-handler-003
+  layer: support
+  role: escalation_handler
+  soul: templates/soul/support/escalation-handler.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-escalation-handler-004
+  layer: support
+  role: escalation_handler
+  soul: templates/soul/support/escalation-handler.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-escalation-handler-005
+  layer: support
+  role: escalation_handler
+  soul: templates/soul/support/escalation-handler.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: support-csat-analyst-001
+  layer: support
+  role: csat_analyst
+  soul: templates/soul/support/csat-analyst.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: support-csat-analyst-002
+  layer: support
+  role: csat_analyst
+  soul: templates/soul/support/csat-analyst.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: marketing-content-strategist-001
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-002
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-003
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-004
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-005
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-006
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-007
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-008
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-009
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-010
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-011
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-012
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-013
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-014
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-content-strategist-015
+  layer: marketing
+  role: content_strategist
+  soul: templates/soul/marketing/content-strategist.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-social-manager-001
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-social-manager-002
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-social-manager-003
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-social-manager-004
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-social-manager-005
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-social-manager-006
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-social-manager-007
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-social-manager-008
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-social-manager-009
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-social-manager-010
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-social-manager-011
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-social-manager-012
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-social-manager-013
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-social-manager-014
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-social-manager-015
+  layer: marketing
+  role: social_media_manager
+  soul: templates/soul/marketing/social-media-manager.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-ad-copywriter-001
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-002
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-003
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-004
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-005
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-006
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-007
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-008
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-009
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-010
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-011
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-ad-copywriter-012
+  layer: marketing
+  role: ad_copywriter
+  soul: templates/soul/marketing/ad-copywriter.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: marketing-email-manager-001
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-email-manager-002
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-email-manager-003
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-email-manager-004
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-email-manager-005
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-email-manager-006
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-email-manager-007
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-email-manager-008
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-email-manager-009
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-email-manager-010
+  layer: marketing
+  role: email_campaign_manager
+  soul: templates/soul/marketing/email-campaign-manager.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-brand-guardian-001
+  layer: marketing
+  role: brand_guardian
+  soul: templates/soul/marketing/brand-guardian.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-brand-guardian-002
+  layer: marketing
+  role: brand_guardian
+  soul: templates/soul/marketing/brand-guardian.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-brand-guardian-003
+  layer: marketing
+  role: brand_guardian
+  soul: templates/soul/marketing/brand-guardian.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-brand-guardian-004
+  layer: marketing
+  role: brand_guardian
+  soul: templates/soul/marketing/brand-guardian.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-brand-guardian-005
+  layer: marketing
+  role: brand_guardian
+  soul: templates/soul/marketing/brand-guardian.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-brand-guardian-006
+  layer: marketing
+  role: brand_guardian
+  soul: templates/soul/marketing/brand-guardian.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-brand-guardian-007
+  layer: marketing
+  role: brand_guardian
+  soul: templates/soul/marketing/brand-guardian.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-brand-guardian-008
+  layer: marketing
+  role: brand_guardian
+  soul: templates/soul/marketing/brand-guardian.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+- name: marketing-campaign-analyst-001
+  layer: marketing
+  role: campaign_analyst
+  soul: templates/soul/marketing/campaign-analyst.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-campaign-analyst-002
+  layer: marketing
+  role: campaign_analyst
+  soul: templates/soul/marketing/campaign-analyst.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-campaign-analyst-003
+  layer: marketing
+  role: campaign_analyst
+  soul: templates/soul/marketing/campaign-analyst.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-campaign-analyst-004
+  layer: marketing
+  role: campaign_analyst
+  soul: templates/soul/marketing/campaign-analyst.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-campaign-analyst-005
+  layer: marketing
+  role: campaign_analyst
+  soul: templates/soul/marketing/campaign-analyst.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-campaign-analyst-006
+  layer: marketing
+  role: campaign_analyst
+  soul: templates/soul/marketing/campaign-analyst.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-campaign-analyst-007
+  layer: marketing
+  role: campaign_analyst
+  soul: templates/soul/marketing/campaign-analyst.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: marketing-campaign-analyst-008
+  layer: marketing
+  role: campaign_analyst
+  soul: templates/soul/marketing/campaign-analyst.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: seo-keyword-researcher-001
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-002
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-003
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-004
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-005
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-006
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-007
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-008
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-009
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-010
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-011
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-012
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-013
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-014
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-015
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-016
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-017
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-keyword-researcher-018
+  layer: seo
+  role: keyword_researcher
+  soul: templates/soul/seo/keyword-researcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-001
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-002
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-003
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-004
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-005
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-006
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-007
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-008
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-009
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-010
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-011
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-technical-auditor-012
+  layer: seo
+  role: technical_seo_auditor
+  soul: templates/soul/seo/technical-seo-auditor.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-001
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-002
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-003
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-004
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-005
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-006
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-007
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-008
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-009
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-link-builder-010
+  layer: seo
+  role: link_building_specialist
+  soul: templates/soul/seo/link-building-specialist.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-aeo-optimizer-001
+  layer: seo
+  role: aeo_optimizer
+  soul: templates/soul/seo/aeo-optimizer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-aeo-optimizer-002
+  layer: seo
+  role: aeo_optimizer
+  soul: templates/soul/seo/aeo-optimizer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-aeo-optimizer-003
+  layer: seo
+  role: aeo_optimizer
+  soul: templates/soul/seo/aeo-optimizer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-aeo-optimizer-004
+  layer: seo
+  role: aeo_optimizer
+  soul: templates/soul/seo/aeo-optimizer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-aeo-optimizer-005
+  layer: seo
+  role: aeo_optimizer
+  soul: templates/soul/seo/aeo-optimizer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-aeo-optimizer-006
+  layer: seo
+  role: aeo_optimizer
+  soul: templates/soul/seo/aeo-optimizer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: seo-aeo-optimizer-007
+  layer: seo
+  role: aeo_optimizer
+  soul: templates/soul/seo/aeo-optimizer.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-001
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-002
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-003
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-004
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-005
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-006
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-007
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-008
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-009
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-010
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-011
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-012
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-013
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-014
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-015
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-016
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-017
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-018
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-019
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-market-analyst-020
+  layer: research
+  role: market_analyst
+  soul: templates/soul/research/market-analyst.md
+  model: sonnet
+  budget_usd: 3.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-001
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-002
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-003
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-004
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-005
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-006
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-007
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-008
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-009
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-010
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-011
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-012
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-013
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-014
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-competitor-analyst-015
+  layer: research
+  role: competitor_analyst
+  soul: templates/soul/research/competitor-analyst.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-001
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-002
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-003
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-004
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-005
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-006
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-007
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-008
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-009
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-010
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-011
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-product-researcher-012
+  layer: research
+  role: product_researcher
+  soul: templates/soul/research/product-researcher.md
+  model: sonnet
+  budget_usd: 2.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-synthesizer-001
+  layer: research
+  role: research_synthesizer
+  soul: templates/soul/research/research-synthesizer.md
+  model: opus
+  budget_usd: 8.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-synthesizer-002
+  layer: research
+  role: research_synthesizer
+  soul: templates/soul/research/research-synthesizer.md
+  model: opus
+  budget_usd: 8.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-synthesizer-003
+  layer: research
+  role: research_synthesizer
+  soul: templates/soul/research/research-synthesizer.md
+  model: opus
+  budget_usd: 8.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-synthesizer-004
+  layer: research
+  role: research_synthesizer
+  soul: templates/soul/research/research-synthesizer.md
+  model: opus
+  budget_usd: 8.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-synthesizer-005
+  layer: research
+  role: research_synthesizer
+  soul: templates/soul/research/research-synthesizer.md
+  model: opus
+  budget_usd: 8.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-synthesizer-006
+  layer: research
+  role: research_synthesizer
+  soul: templates/soul/research/research-synthesizer.md
+  model: opus
+  budget_usd: 8.0
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-trend-watcher-001
+  layer: research
+  role: trend_watcher
+  soul: templates/soul/research/trend-watcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-trend-watcher-002
+  layer: research
+  role: trend_watcher
+  soul: templates/soul/research/trend-watcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-trend-watcher-003
+  layer: research
+  role: trend_watcher
+  soul: templates/soul/research/trend-watcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-trend-watcher-004
+  layer: research
+  role: trend_watcher
+  soul: templates/soul/research/trend-watcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: research-trend-watcher-005
+  layer: research
+  role: trend_watcher
+  soul: templates/soul/research/trend-watcher.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - WebSearch
+  - Read
+  - Write
+- name: operations-project-coordinator-001
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-002
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-003
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-004
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-005
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-006
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-007
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-008
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-009
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-010
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-011
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-012
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-013
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-014
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-015
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-016
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-017
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-018
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-019
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-project-coordinator-020
+  layer: operations
+  role: project_coordinator
+  soul: templates/soul/operations/project-coordinator.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-finance-reporter-001
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-002
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-003
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-004
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-005
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-006
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-007
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-008
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-009
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-010
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-011
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-finance-reporter-012
+  layer: operations
+  role: finance_reporter
+  soul: templates/soul/operations/finance-reporter.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+- name: operations-infra-agent-001
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-infra-agent-002
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-infra-agent-003
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-infra-agent-004
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-infra-agent-005
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: sonnet
+  budget_usd: 1.0
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-infra-agent-006
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: operations-infra-agent-007
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: operations-infra-agent-008
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: operations-infra-agent-009
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: operations-infra-agent-010
+  layer: operations
+  role: infra_agent
+  soul: templates/soul/operations/infra-agent.md
+  model: haiku
+  budget_usd: 0.5
+  tools:
+  - Read
+  - Write
+- name: operations-automation-builder-001
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-automation-builder-002
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-automation-builder-003
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-automation-builder-004
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-automation-builder-005
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-automation-builder-006
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-automation-builder-007
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-automation-builder-008
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-automation-builder-009
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-automation-builder-010
+  layer: operations
+  role: automation_builder
+  soul: templates/soul/operations/automation-builder.md
+  model: sonnet
+  budget_usd: 1.5
+  tools:
+  - Read
+  - Write
+  - Bash
+- name: operations-data-quality-001
+  layer: operations
+  role: data_quality_agent
+  soul: templates/soul/operations/data-quality-agent.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: operations-data-quality-002
+  layer: operations
+  role: data_quality_agent
+  soul: templates/soul/operations/data-quality-agent.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: operations-data-quality-003
+  layer: operations
+  role: data_quality_agent
+  soul: templates/soul/operations/data-quality-agent.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: operations-data-quality-004
+  layer: operations
+  role: data_quality_agent
+  soul: templates/soul/operations/data-quality-agent.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write
+- name: operations-data-quality-005
+  layer: operations
+  role: data_quality_agent
+  soul: templates/soul/operations/data-quality-agent.md
+  model: haiku
+  budget_usd: 0.25
+  tools:
+  - Read
+  - Write

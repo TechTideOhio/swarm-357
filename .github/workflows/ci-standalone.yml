@@ -1,0 +1,76 @@
+# Standalone CI - use this when swarm357 is extracted as its own repo.
+# For monorepo usage, see swarm357-ci.yml.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install techtide-swarm
+        run: pip install -e "packages/techtide-swarm[dev]"
+      - name: Ruff lint
+        run: ruff check packages/techtide-swarm/src
+      - name: MyPy type check
+        working-directory: packages/techtide-swarm
+        run: mypy src
+      - name: Pytest
+        run: python -m pytest packages/techtide-swarm/tests -v
+
+  roster:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pyyaml
+        run: pip install pyyaml
+      - name: Validate 357-agent roster
+        run: python scripts/generate_roster.py --fix-counts
+
+  build-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install build
+        run: pip install build
+      - name: Build wheel + sdist
+        working-directory: packages/techtide-swarm
+        run: python -m build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: packages/techtide-swarm/dist/
+
+  rust-bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.85.0"
+      - name: Cargo build memvid-swarm-bridge
+        working-directory: packages/memvid-swarm-bridge
+        run: cargo build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install techtide-swarm (for bridge tests)
+        run: pip install -e "packages/techtide-swarm[dev]"
+      - name: Run bridge integration tests
+        env:
+          MEMVID_SWARM_BRIDGE: ${{ github.workspace }}/packages/memvid-swarm-bridge/target/debug/memvid-swarm-bridge
+        run: python -m pytest packages/techtide-swarm/tests/test_bridge_integration.py -v

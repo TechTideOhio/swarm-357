@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+.github
+
+# Rust
+target/
+
+# Documentation
+*.md
+docs/
+CHANGELOG.md
+SECURITY.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker/
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Test artifacts
+*.log
+*.tmp
+
+# Build artifacts
+*.o
+*.so
+*.dylib
+*.dll

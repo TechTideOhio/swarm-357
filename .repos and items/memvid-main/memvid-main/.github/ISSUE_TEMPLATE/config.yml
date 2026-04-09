@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/memvid/memvid/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: Documentation
+    url: https://docs.memvid.com
+    about: Read the official documentation
+  - name: Discord Community
+    url: https://discord.gg/2mynS7fcK7
+    about: Join our Discord for real-time chat

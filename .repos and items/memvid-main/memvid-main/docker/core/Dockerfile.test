@@ -1,0 +1,23 @@
+# Test Dockerfile for Memvid Core
+FROM rust:1.92-slim-trixie AS builder
+
+# Install test dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    pkg-config \
+    libssl-dev \
+    ca-certificates \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy everything
+COPY . .
+
+# Set environment variables for testing
+ENV RUST_BACKTRACE=1
+ENV RUST_LOG=info
+ENV CARGO_TARGET_DIR=/app/target
+
+# Run tests with default features
+CMD ["cargo", "test", "--features", "lex,pdf_extract", "--", "--nocapture"]
