@@ -313,8 +313,80 @@ async def _demo_live() -> None:
     console.print(f"\n[bold]Pipeline complete. Total cost: [yellow]${total_cost:.4f}[/yellow][/bold]\n")
 
 
+def _build_status_dict(config_path: str = "config/swarm.yaml") -> dict[str, Any]:
+    """Build machine-readable status payload for `swarm status --json`."""
+    import json as _j
+    from collections import Counter
+
+    layers_order = [
+        "management",
+        "sales",
+        "support",
+        "marketing",
+        "seo",
+        "research",
+        "operations",
+    ]
+    layer_counts: Counter[str] = Counter()
+    layer_models: dict[str, str] = {}
+    try:
+        import yaml
+
+        raw = yaml.safe_load(Path(config_path).read_text(encoding="utf-8")) or {}
+        agents = raw.get("agents", [])
+        if agents:
+            layer_counts = Counter(a["layer"] for a in agents)
+        else:
+            # Compact roster: sum role counts per layer
+            for name, layer in (raw.get("layers") or {}).items():
+                roles = (layer or {}).get("roles") or {}
+                layer_counts[name] = sum(int(r.get("count", 0)) for r in roles.values())
+        layer_models = {
+            n: c.get("model_preference", "sonnet")
+            for n, c in (raw.get("swarm") or {}).get("layer_budgets", {}).items()
+        }
+    except Exception:
+        pass
+
+    layer_has_errors: set[str] = set()
+    try:
+        from techtide_swarm.telemetry import TELEMETRY_FILE
+
+        if TELEMETRY_FILE.exists():
+            with open(TELEMETRY_FILE, "r", encoding="utf-8") as f:
+                for line in f:
+                    try:
+                        e = _j.loads(line)
+                    except Exception:
+                        continue
+                    if e.get("type") == "agent_run" and e.get("status") == "error":
+                        layer_has_errors.add(e.get("layer", ""))
+    except Exception:
+        pass
+
+    layers = [
+        {
+            "name": n,
+            "agent_count": layer_counts.get(n, 0),
+            "model": layer_models.get(n, "sonnet"),
+            "status": "degraded" if n in layer_has_errors else "healthy",
+        }
+        for n in layers_order
+    ]
+    return {
+        "layers": layers,
+        "total_agents": sum(layer["agent_count"] for layer in layers),
+        "healthy_layers": sum(1 for layer in layers if layer["status"] == "healthy"),
+    }
+
+
 def cmd_status(args: argparse.Namespace) -> None:
     """Show swarm health dashboard."""
+    if getattr(args, "json", False):
+        import json as _j
+
+        print(_j.dumps(_build_status_dict(), indent=2))
+        return
     print_banner()
     console.print("\n[bold]📊 Swarm Status Dashboard[/bold]\n")
     
@@ -1021,7 +1093,11 @@ def main() -> None:
 
     subparsers.add_parser("init", help="Initialize a new swarm project")
     subparsers.add_parser("demo", help="Run the 60-second demo")
-    subparsers.add_parser("status", help="Show swarm health dashboard")
+    status_parser = subparsers.add_parser("status", help="Show swarm health dashboard")
+    status_parser.add_argument(
+        "--json", action="store_true", default=False,
+        help="Output machine-readable JSON instead of Rich table (CI-friendly)",
+    )
     subparsers.add_parser("cost", help="Show cost report")
 
     run_parser = subparsers.add_parser("run", help="Run a task across the swarm")
