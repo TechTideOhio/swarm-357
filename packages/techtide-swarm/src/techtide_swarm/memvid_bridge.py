@@ -41,12 +41,19 @@ class MemvidBridge:
     def _run(self, args: list[str], *, stdin: bytes | None = None) -> subprocess.CompletedProcess[str]:
         if not self._bridge:
             raise MemvidBridgeError("memvid-swarm-bridge not found; build packages/memvid-swarm-bridge")
-        return subprocess.run(
+        # Run in binary mode so we can stream raw bytes to stdin (e.g. `put`),
+        # then decode stdout/stderr ourselves to keep the str-typed contract.
+        proc = subprocess.run(
             [str(self._bridge), *args],
             input=stdin,
             capture_output=True,
-            text=True,
             check=False,
+        )
+        return subprocess.CompletedProcess(
+            args=proc.args,
+            returncode=proc.returncode,
+            stdout=proc.stdout.decode("utf-8", errors="replace"),
+            stderr=proc.stderr.decode("utf-8", errors="replace"),
         )
 
     def create(self) -> None:
