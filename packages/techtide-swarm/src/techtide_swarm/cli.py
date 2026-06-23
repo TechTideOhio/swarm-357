@@ -25,8 +25,14 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, cast
 
-# Rich imports for beautiful terminal output
+if TYPE_CHECKING:
+    from rich.console import Console
+
+# Rich imports for beautiful terminal output. `rich` is a hard dependency, so
+# this import succeeds in any correctly installed environment; the fallback is a
+# defensive guard for partial installs.
 try:
     from rich.console import Console
     from rich.panel import Panel
@@ -41,10 +47,10 @@ try:
     from rich.tree import Tree
     from rich import box
     HAS_RICH = True
-except ImportError:
+except ImportError:  # pragma: no cover - rich is a declared dependency
     HAS_RICH = False
 
-console = Console() if HAS_RICH else None
+console: Console = Console() if HAS_RICH else cast("Console", None)
 
 # ──────────────────────────────────────────────
 # ASCII Banner
@@ -69,7 +75,7 @@ BANNER_PLAIN = """
 """
 
 
-def print_banner():
+def print_banner() -> None:
     if HAS_RICH:
         try:
             console.print(BANNER)
@@ -83,7 +89,7 @@ def print_banner():
 # Commands
 # ──────────────────────────────────────────────
 
-def cmd_init(args):
+def cmd_init(args: argparse.Namespace) -> None:
     """Initialize a new swarm project in the current directory."""
     print_banner()
     console.print("\n[bold green]⚡ Initializing TechTide Swarm 357...[/bold green]\n")
@@ -137,7 +143,7 @@ def cmd_init(args):
     console.print("  3. Run [bold]swarm run 'your task'[/bold] to execute across the swarm\n")
 
 
-def cmd_demo(args):
+def cmd_demo(args: argparse.Namespace) -> None:
     """Run the demo — live with API key, architecture overview without."""
     print_banner()
 
@@ -153,7 +159,7 @@ def cmd_demo(args):
         _demo_simulation()
 
 
-def _demo_simulation():
+def _demo_simulation() -> None:
     """Show architecture + run real parallel stub pipeline — clearly labeled as simulation."""
     # Architecture tree
     tree = Tree("[bold]Swarm 357 Architecture[/bold]")
@@ -175,7 +181,7 @@ def _demo_simulation():
     # Run a real 3-agent parallel stub pipeline using asyncio.gather — proves architecture works
     console.print("[bold]Running 3-agent parallel stub pipeline[/bold] [dim](no API key — stub mode)[/dim]\n")
 
-    async def _run_stub_pipeline() -> list:
+    async def _run_stub_pipeline() -> list[Any]:
         from techtide_swarm import Agent, AgentConfig
         from techtide_swarm.core.types import LayerType
 
@@ -227,7 +233,7 @@ def _demo_simulation():
     console.print("  3. [cyan]swarm run 'your task' --layer research[/cyan]   (58 agents in parallel)\n")
 
 
-async def _demo_live():
+async def _demo_live() -> None:
     """Live 3-layer pipeline: Research -> Marketing -> SEO. Three real API calls."""
     from techtide_swarm import Agent, AgentConfig
     from techtide_swarm.core.types import LayerType
@@ -285,7 +291,7 @@ async def _demo_live():
     console.print(f"\n[bold]Pipeline complete. Total cost: [yellow]${total_cost:.4f}[/yellow][/bold]\n")
 
 
-def cmd_status(args):
+def cmd_status(args: argparse.Namespace) -> None:
     """Show swarm health dashboard."""
     print_banner()
     console.print("\n[bold]📊 Swarm Status Dashboard[/bold]\n")
@@ -333,7 +339,7 @@ def cmd_status(args):
     except Exception as e:
         console.print(f"[red]Error loading telemetry: {e}[/red]")
 
-def cmd_cost(args):
+def cmd_cost(args: argparse.Namespace) -> None:
     """Show cost report."""
     print_banner()
     console.print("\n[bold]💰 Cost Report[/bold]\n")
@@ -349,7 +355,7 @@ def cmd_cost(args):
         console.print(f"[red]Error loading cost data: {e}[/red]")
 
 
-def cmd_migrate(args):
+def cmd_migrate(args: argparse.Namespace) -> None:
     """Migrate .swarm/topics/ flat files into a Memvid .mv2 store."""
     print_banner()
     console.print("\n[bold]🔄 Migrating flat memory to Memvid .mv2[/bold]\n")
@@ -372,7 +378,7 @@ def cmd_migrate(args):
         console.print("[dim]Build packages/memvid-swarm-bridge and ensure it is on PATH.[/dim]")
 
 
-def cmd_boot(args):
+def cmd_boot(args: argparse.Namespace) -> None:
     """Boot all 357 agents — load roster, register budgets, validate soul files."""
     print_banner()
     console.print("\n[bold]⚡ Booting Swarm 357...[/bold]\n")
@@ -434,7 +440,7 @@ def cmd_boot(args):
         sys.exit(1)
 
 
-def cmd_run(args):
+def cmd_run(args: argparse.Namespace) -> None:
     """Run a task across the swarm or a single layer."""
     print_banner()
 
@@ -518,7 +524,7 @@ def cmd_run(args):
         sys.exit(1)
 
 
-def cmd_dream(args):
+def cmd_dream(args: argparse.Namespace) -> None:
     """Trigger a memory consolidation cycle."""
     print_banner()
     console.print("\n[bold]💤 Dream Cycle — Memory Consolidation[/bold]\n")
@@ -577,7 +583,7 @@ def cmd_dream(args):
         sys.exit(1)
 
 
-def cmd_plan(args):
+def cmd_plan(args: argparse.Namespace) -> None:
     """ULTRAPLAN: deep Opus planning session."""
     print_banner()
 
@@ -637,7 +643,7 @@ def cmd_plan(args):
         sys.exit(1)
 
 
-def cmd_agent(args):
+def cmd_agent(args: argparse.Namespace) -> None:
     """List agents or inspect/run a specific agent."""
     print_banner()
 
@@ -740,14 +746,22 @@ def cmd_agent(args):
         sys.exit(1)
 
 
-def cmd_eval(args):
+def cmd_eval(args: argparse.Namespace) -> None:
     """Run the evaluation harness."""
     print_banner()
     console.print("\n[bold]Evaluation Harness[/bold]\n")
 
     try:
         sys.path.insert(0, str(Path.cwd()))
-        from evals.run_evals import run_all_evals, load_baseline, compare_to_baseline, EVAL_TASKS
+        # The eval harness lives in the repo's top-level evals/ package, loaded
+        # dynamically at runtime (see sys.path.insert above); it is not part of
+        # this installable package and has no importable stub at type-check time.
+        from evals.run_evals import (  # type: ignore[import-not-found]
+            run_all_evals,
+            load_baseline,
+            compare_to_baseline,
+            EVAL_TASKS,
+        )
 
         save = getattr(args, "save_baseline", False)
         use_swarm = getattr(args, "swarm", False)
@@ -807,7 +821,7 @@ def cmd_eval(args):
         sys.exit(1)
 
 
-def cmd_serve(args) -> None:
+def cmd_serve(args: argparse.Namespace) -> None:
     """Start the FastAPI HTTP server."""
     try:
         import uvicorn
@@ -834,14 +848,14 @@ def cmd_serve(args) -> None:
     )
 
 
-def cmd_mcp_list(args):
+def cmd_mcp_list(args: argparse.Namespace) -> None:
     """List all configured MCP servers from config/mcp/."""
     import yaml as _yaml
     from pathlib import Path as _Path
 
     config_dir = getattr(args, "config_dir", "config/mcp")
     config_path = _Path(config_dir)
-    all_raw: list[dict] = []
+    all_raw: list[dict[str, Any]] = []
     if config_path.is_dir():
         for f in sorted(config_path.glob("*.yaml")):
             try:
@@ -896,7 +910,7 @@ def cmd_mcp_list(args):
     )
 
 
-def cmd_mcp_connect(args):
+def cmd_mcp_connect(args: argparse.Namespace) -> None:
     """Connect to an MCP server and show which tools were registered."""
     import yaml as _yaml
     from pathlib import Path as _Path
@@ -957,7 +971,7 @@ def cmd_mcp_connect(args):
         sys.exit(1)
 
 
-def cmd_mcp(args):
+def cmd_mcp(args: argparse.Namespace) -> None:
     """MCP server management dispatcher."""
     print_banner()
     mcp_command = getattr(args, "mcp_command", None)
@@ -973,7 +987,7 @@ def cmd_mcp(args):
 # Main Entry Point
 # ──────────────────────────────────────────────
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         prog="swarm",
         description="TechTide Swarm 357 — 357 Claude AI Agents, One Swarm",

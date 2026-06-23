@@ -6,7 +6,7 @@ import asyncio
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -118,7 +118,7 @@ class Swarm:
         """Return the flat agent roster regardless of config format."""
         if self._is_compact:
             return self._expand_compact_roster()
-        return self._raw.get("agents", [])
+        return cast("list[dict[str, Any]]", self._raw.get("agents", []))
 
     def _agents_for_layer(self, layer: str) -> list[AgentConfig]:
         """Return AgentConfig objects for all agents in a given layer."""

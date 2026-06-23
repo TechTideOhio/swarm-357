@@ -23,7 +23,7 @@ class SwarmStore:
         key = os.environ.get("SUPABASE_SERVICE_KEY", "")
         if url and key:
             try:
-                from supabase import create_client  # type: ignore[import-untyped]
+                from supabase import create_client
                 self._client = create_client(url, key)
             except ImportError:
                 logger.warning(
