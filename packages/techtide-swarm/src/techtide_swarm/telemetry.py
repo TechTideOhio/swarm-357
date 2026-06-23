@@ -40,7 +40,7 @@ def get_total_cost() -> float:
 
 def get_layer_stats() -> dict[str, dict[str, Any]]:
     """Aggregate stats by layer."""
-    stats = {}
+    stats: dict[str, dict[str, Any]] = {}
     if not TELEMETRY_FILE.exists():
         return stats
     

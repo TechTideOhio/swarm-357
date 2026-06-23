@@ -86,7 +86,7 @@ class Agent:
             model_id = self._model_id(self.config.model)
             system_prompt = self._load_system_prompt()
             
-            messages = [{"role": "user", "content": task}]
+            messages: list[dict[str, Any]] = [{"role": "user", "content": task}]
             tools = get_anthropic_tools(self.config.tools)
             
             total_cost = 0.0

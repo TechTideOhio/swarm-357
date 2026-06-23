@@ -24,7 +24,7 @@ import subprocess
 import threading
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import httpx
 import yaml
@@ -167,7 +167,7 @@ class StdioMCPClient:
     def list_tools(self) -> list[dict[str, Any]]:
         """Return the tool definitions from the MCP server."""
         resp = self._send("tools/list", {})
-        return resp.get("result", {}).get("tools", [])
+        return cast("list[dict[str, Any]]", resp.get("result", {}).get("tools", []))
 
     def call_tool(self, name: str, arguments: dict[str, Any]) -> str:
         """Call a named tool and return its output as a plain string."""
@@ -226,7 +226,7 @@ class HttpMCPClient:
     def list_tools(self) -> list[dict[str, Any]]:
         """Return the tool definitions from the MCP server."""
         resp = self._send("tools/list", {})
-        return resp.get("result", {}).get("tools", [])
+        return cast("list[dict[str, Any]]", resp.get("result", {}).get("tools", []))
 
     def call_tool(self, name: str, arguments: dict[str, Any]) -> str:
         """Call a named tool and return its output as a plain string."""

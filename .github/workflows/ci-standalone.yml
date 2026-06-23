@@ -61,7 +61,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: "1.85.0"
+          toolchain: "stable"
       - name: Cargo build memvid-swarm-bridge
         working-directory: packages/memvid-swarm-bridge
         run: cargo build
