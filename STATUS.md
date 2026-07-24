@@ -14,7 +14,7 @@ Feature maturity levels:
 | `AgentConfig` — Pydantic config model | **Stable** | Validated via Pydantic v2 |
 | `Swarm` — multi-agent orchestration | **Beta** | Conductor-routes-to-roles pipeline. Sequential execution. |
 | `Swarm.execute_layer()` — layer-level parallel execution | **Beta** | `asyncio.gather` with semaphore-based concurrency cap |
-| `CostController` — per-layer budget tracking | **Beta** | In-memory tracking; model downgrade signal at 80% utilization |
+| `CostController` — per-layer budget tracking | **Beta** | In-memory tracking via `record_spend`; model downgrade at 80% utilization |
 | Per-agent `budget_limit_usd` enforcement | **Beta** | Enforced after each model turn (stops before further tool rounds when over budget) |
 | `MemoryManager` — flat-file memory | **Stable** | `.swarm/topics/*.json` share/recall with substring matching |
 | `MemoryManager` — Memvid `.mv2` backend | **Beta** | Requires `memvid-swarm-bridge` binary (Rust) |

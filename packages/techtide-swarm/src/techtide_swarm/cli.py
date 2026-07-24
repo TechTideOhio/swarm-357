@@ -420,7 +420,7 @@ def cmd_boot(args: argparse.Namespace) -> None:
         asyncio.run(swarm.boot())
 
         raw = yaml.safe_load(Path(config_path).read_text(encoding="utf-8")) or {}
-        agents = raw.get("agents", [])
+        agents = swarm._get_roster()
         layer_budgets = raw.get("swarm", {}).get("layer_budgets", {})
 
         from collections import Counter
@@ -580,14 +580,17 @@ def cmd_dream(args: argparse.Namespace) -> None:
         report = asyncio.run(mem.run_dream_cycle())
 
         if isinstance(report, dict):
-            dream_num = report.get("dream_number", "?")
-            console.print(f"[bold green]Dream cycle #{dream_num} complete.[/bold green]\n")
-            for phase, data in report.get("phases", {}).items():
-                console.print(f"  [cyan]{phase}:[/cyan] {data}")
+            console.print("[bold green]Dream cycle complete.[/bold green]\n")
             contradictions = report.get("contradictions_found", 0)
-            pruned = report.get("pointers_pruned", 0)
-            console.print(f"\n  Contradictions found: {contradictions}")
-            console.print(f"  Pointers pruned: {pruned}")
+            duplicates = report.get("duplicates_found", 0)
+            total_entries = report.get("total_entries", 0)
+            total_interactions = report.get("total_interactions", 0)
+            console.print(f"  Contradictions found: {contradictions}")
+            console.print(f"  Duplicates found: {duplicates}")
+            console.print(f"  Shared entries: {total_entries}")
+            console.print(f"  Interactions: {total_interactions}")
+            for note in report.get("llm_remediation_notes") or []:
+                console.print(f"  [cyan]LLM note:[/cyan] {note}")
         else:
             console.print(f"[dim]{report}[/dim]")
 
@@ -677,14 +680,14 @@ def cmd_agent(args: argparse.Namespace) -> None:
     info_flag = getattr(args, "info", False)
 
     try:
-        import yaml
-
         if not Path(config_path).is_file():
             console.print(f"[red]Config not found: {config_path}[/red]")
             sys.exit(1)
 
-        raw = yaml.safe_load(Path(config_path).read_text(encoding="utf-8")) or {}
-        agents = raw.get("agents", [])
+        from techtide_swarm import Swarm
+
+        swarm = Swarm.from_config(config_path)
+        agents = swarm._get_roster()
 
         if list_flag or (not agent_id and not run_task):
             if layer_filter:
