@@ -179,15 +179,29 @@ class ToolRegistry:
     # Dispatch
     # ------------------------------------------------------------------
 
-    def execute_tool(self, name: str, input_data: dict[str, Any]) -> str:
+    def execute_tool(self, name: str, input_data: dict[str, Any] | Any) -> str:
         """Execute a tool by name.
 
         Resolves in order:
         1. Direct registry key  (e.g. ``"Bash"``)
         2. Handler function name (e.g. ``"run_bash"``) — backward-compat with
            the old flat-dict registry that used snake_case Anthropic names.
+
+        Model payloads are normalized (aliases, coercion, unknown-key filter)
+        before the handler runs so OpenRouter / Claude key drift does not crash.
         """
+        from techtide_swarm.tools.input_normalize import (
+            filter_handler_kwargs,
+            normalize_tool_input,
+        )
+
         entry = self._tools.get(name)
+        if entry is None:
+            # Case-insensitive schema name match
+            for key, e in self._tools.items():
+                if key.lower() == str(name).lower():
+                    entry = e
+                    break
         if entry is None:
             # Backward-compat: look up by handler function name
             for e in self._tools.values():
@@ -197,7 +211,24 @@ class ToolRegistry:
         if entry is None:
             return json.dumps({"error": f"Unknown tool: {name}"})
         try:
-            return str(entry.handler(**input_data))
+            kwargs = normalize_tool_input(entry.name, input_data)
+            # Also normalize using the caller's name (write_file vs Write)
+            if name != entry.name:
+                alt = normalize_tool_input(str(name), input_data)
+                for k, v in alt.items():
+                    kwargs.setdefault(k, v)
+            kwargs = filter_handler_kwargs(entry.handler, kwargs)
+            return str(entry.handler(**kwargs))
+        except TypeError as exc:
+            # Missing/extra args after normalization — return actionable error
+            logger.warning("Tool %s arity/type error: %s | input=%s", name, exc, input_data)
+            return json.dumps(
+                {
+                    "error": f"Tool execution failed: {type(exc).__name__}: {exc}",
+                    "tool": entry.name,
+                    "hint": "Check required parameters in the tool schema.",
+                }
+            )
         except Exception as exc:
             logger.exception("Tool %s dispatch error: %s", name, exc)
             return json.dumps({"error": f"Tool execution failed: {type(exc).__name__}: {exc}"})

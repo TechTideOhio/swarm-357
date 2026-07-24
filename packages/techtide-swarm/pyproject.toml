@@ -4,11 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "techtide-swarm"
-version = "0.1.0"
+version = "0.2.0"
 description = "TechTide Swarm 357 — layered orchestration, durable memory bridge, and observability hooks."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
+license-files = ["LICENSE"]
 authors = [{ name = "TechTide AI", email = "ai@techtide.ai" }]
 keywords = ["claude", "ai", "agents", "swarm", "anthropic", "llm", "orchestration", "multi-agent", "ai-agents"]
 classifiers = [
@@ -41,6 +42,7 @@ dev = [
   "mypy>=1.13",
   "types-PyYAML>=6.0",
   "build>=1.0",
+  "twine>=5.0",
 ]
 web = [
   "exa-py>=1.0",
@@ -53,7 +55,7 @@ supabase = [
 [project.urls]
 Homepage = "https://github.com/TechTideOhio/swarm-357"
 Repository = "https://github.com/TechTideOhio/swarm-357"
-Documentation = "https://github.com/TechTideOhio/swarm-357#readme"
+Documentation = "https://github.com/TechTideOhio/swarm-357/blob/main/docs/EVALS.md"
 Changelog = "https://github.com/TechTideOhio/swarm-357/blob/main/CHANGELOG.md"
 "Bug Tracker" = "https://github.com/TechTideOhio/swarm-357/issues"
 
@@ -64,7 +66,12 @@ swarm = "techtide_swarm.cli:main"
 packages = ["src/techtide_swarm"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/techtide_swarm", "README.md", "pyproject.toml"]
+include = [
+  "src/techtide_swarm",
+  "README.md",
+  "pyproject.toml",
+  "LICENSE",
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

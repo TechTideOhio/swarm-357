@@ -62,3 +62,7 @@ _quarantine/
 .repos and items/**/*.jpeg
 .repos and items/**/*.webp
 .repos and items/**/*.gif
+
+# Eval run artifacts
+evals/results/
+

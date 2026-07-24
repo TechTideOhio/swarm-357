@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Swarm 357 architecture">
+  <title>Swarm 357 architecture</title>
+  <rect width="960" height="540" fill="#fafafa"/>
+  <text x="40" y="40" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700" fill="#0a0a0a">Swarm 357 Architecture</text>
+  <text x="40" y="64" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#737373">357 roles · 6 business layers · management meta-agents</text>
+
+  <!-- Management -->
+  <rect x="280" y="90" width="400" height="56" rx="10" fill="#0a0a0a"/>
+  <text x="480" y="116" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700" fill="#ffd900">Management (10)</text>
+  <text x="480" y="134" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#a3a3a3">Conductor · UltraPlan · memory curation</text>
+
+  <!-- connector -->
+  <line x1="480" y1="146" x2="480" y2="176" stroke="#0a0a0a" stroke-width="2"/>
+
+  <!-- six layers -->
+  <g font-family="ui-sans-serif, system-ui, sans-serif">
+    <rect x="40" y="180" width="140" height="70" rx="8" fill="#fff" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="110" y="210" text-anchor="middle" font-size="13" font-weight="700" fill="#0a0a0a">Sales</text>
+    <text x="110" y="230" text-anchor="middle" font-size="12" fill="#737373">62 agents</text>
+
+    <rect x="195" y="180" width="140" height="70" rx="8" fill="#fff" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="265" y="210" text-anchor="middle" font-size="13" font-weight="700" fill="#0a0a0a">Support</text>
+    <text x="265" y="230" text-anchor="middle" font-size="12" fill="#737373">55 agents</text>
+
+    <rect x="350" y="180" width="140" height="70" rx="8" fill="#fff" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="420" y="210" text-anchor="middle" font-size="13" font-weight="700" fill="#0a0a0a">Marketing</text>
+    <text x="420" y="230" text-anchor="middle" font-size="12" fill="#737373">68 agents</text>
+
+    <rect x="505" y="180" width="140" height="70" rx="8" fill="#fff" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="575" y="210" text-anchor="middle" font-size="13" font-weight="700" fill="#0a0a0a">SEO</text>
+    <text x="575" y="230" text-anchor="middle" font-size="12" fill="#737373">47 agents</text>
+
+    <rect x="660" y="180" width="140" height="70" rx="8" fill="#fff" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="730" y="210" text-anchor="middle" font-size="13" font-weight="700" fill="#0a0a0a">Research</text>
+    <text x="730" y="230" text-anchor="middle" font-size="12" fill="#737373">58 agents</text>
+
+    <rect x="815" y="180" width="105" height="70" rx="8" fill="#fff" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="867" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#0a0a0a">Ops</text>
+    <text x="867" y="230" text-anchor="middle" font-size="12" fill="#737373">57</text>
+  </g>
+
+  <!-- fan-out lines -->
+  <g stroke="#0a0a0a" stroke-width="1.5" opacity="0.35">
+    <line x1="480" y1="176" x2="110" y2="180"/>
+    <line x1="480" y1="176" x2="265" y2="180"/>
+    <line x1="480" y1="176" x2="420" y2="180"/>
+    <line x1="480" y1="176" x2="575" y2="180"/>
+    <line x1="480" y1="176" x2="730" y2="180"/>
+    <line x1="480" y1="176" x2="867" y2="180"/>
+  </g>
+
+  <!-- Memory plane -->
+  <rect x="40" y="290" width="430" height="100" rx="10" fill="#fffbeb" stroke="#ffd900" stroke-width="2"/>
+  <text x="60" y="318" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700" fill="#0a0a0a">Memory plane</text>
+  <text x="60" y="342" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">.swarm/topics/ flat store · Memvid .mv2 capsules</text>
+  <text x="60" y="364" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">share / recall / dream cycle · WAL crash-safe</text>
+
+  <!-- Cost plane -->
+  <rect x="490" y="290" width="430" height="100" rx="10" fill="#f5f5f5" stroke="#e5e5e5" stroke-width="2"/>
+  <text x="510" y="318" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700" fill="#0a0a0a">Cost plane</text>
+  <text x="510" y="342" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">CostController · per-agent budget_limit_usd</text>
+  <text x="510" y="364" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">layer daily caps · 80% model downgrade</text>
+
+  <!-- Tools / security -->
+  <rect x="40" y="420" width="880" height="80" rx="10" fill="#0a0a0a"/>
+  <text x="60" y="450" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700" fill="#ffd900">Runtime surface</text>
+  <text x="60" y="474" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#d4d4d4">CLI (swarm) · FastAPI HTTP · ToolRegistry (Read/Write/Bash/Web) · BashSecurityGate (13 patterns) · input_normalize · telemetry.jsonl</text>
+</svg>

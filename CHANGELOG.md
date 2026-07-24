@@ -2,6 +2,36 @@
 
 All notable changes to TechTide Swarm 357 are documented here.
 
+## [0.2.0] — 2026-07-24
+
+### Added
+
+- OpenRouter provider support via [`llm.py`](packages/techtide-swarm/src/techtide_swarm/llm.py) (`OPENROUTER_API_KEY`, `ANTHROPIC_BASE_URL`).
+- Tool input normalization ([`tools/input_normalize.py`](packages/techtide-swarm/src/techtide_swarm/tools/input_normalize.py)) — alias coercion (`file_path` → `path`), JSON string inputs, unknown-kwarg filtering.
+- Eval harness v2: LLM judge, `$5` hard budget, checkpoint/resume, burn passes, baseline compare ([`evals/run_evals.py`](evals/run_evals.py)).
+- Generated eval reporting: [`scripts/render_eval_assets.py`](scripts/render_eval_assets.py), [`docs/EVALS.md`](docs/EVALS.md), [`docs/assets/eval-results.svg`](docs/assets/eval-results.svg).
+- Brand + architecture assets under [`docs/assets/`](docs/assets/) (logo, banner, architecture, request lifecycle).
+- Landing `/about` route; OG image + PWA icons; TLDR template chrome removed.
+- Wheel bundles `config/swarm-compact.yaml` + `templates/soul/` for self-contained `pip install techtide-swarm`.
+- `__version__` on package; `/api/health` reports dynamic version.
+- Community docs: [`SECURITY.md`](SECURITY.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md), [`RELEASE.md`](RELEASE.md).
+- CI: Docker `/api/health` agents==357 smoke; Next.js typecheck + build; GitHub Release on `v*` tags.
+
+### Fixed
+
+- `write_file` / Write tool arity and clearer schema when models omit `content`.
+- Conductor routing runs text-only (`tools=[]`, `max_turns=2`) to avoid tool-call stalls.
+- Agent multi-turn serialization skips thinking blocks; preserves cost on error.
+- Eval keyword scoring coerces non-string YAML keywords (e.g. bare `401`).
+- Resume re-runs prior `error` checkpoint tasks after harness fixes.
+- Landing metadata/sitemap no longer point at `example.com` / TLDR branding.
+
+### Changed
+
+- Package version **0.1.0 → 0.2.0**.
+- Root README rewritten with badges, diagrams, and generated eval numbers (25-task catalog; not “5 tasks”).
+- Package README expanded for PyPI (API, CLI, HTTP routes, env vars).
+
 ## [0.1.0] — 2026-07-24
 
 ### Added
@@ -15,7 +45,6 @@ All notable changes to TechTide Swarm 357 are documented here.
 - `scripts/generate_roster.py --compact` to validate `config/swarm-compact.yaml` expansion to 357 agents.
 - HTTP API protections: optional `SWARM_API_KEY` / `X-SWARM-API-KEY` on POST routes; per-IP rate limiting (`SWARM_RATE_LIMIT_PER_MINUTE`); hard cap on `budget_usd` via `SWARM_MAX_RUN_BUDGET_USD`.
 - Docker-friendly config resolution: `SWARM_CONFIG_PATH` or `/app/config/swarm-compact.yaml`.
-- CI: Docker build + `/api/health` assert `agents == 357`.
 - Railway deployment notes: [docs/DEPLOY_RAILWAY.md](docs/DEPLOY_RAILWAY.md).
 
 ### Fixed

@@ -1,0 +1,304 @@
+# Swarm 357 evaluation catalog
+# Modes: single (one agent) | swarm (full pipeline)
+# Rubrics are scored 0-1 by the LLM judge.
+
+tasks:
+  # ── Research ──────────────────────────────────────────────
+  - id: research-trends-2026
+    layer: research
+    mode: single
+    description: >
+      Research the AI agent automation market and summarize the top 3 trends
+      for 2026. Include one concrete example or vendor per trend.
+    keywords: [agent, automation, trend]
+    min_output_length: 200
+    rubric: >
+      Must name exactly three trends, explain each briefly, and give a concrete
+      example. Penalize vague buzzwords without substance.
+
+  - id: research-competitor-matrix
+    layer: research
+    mode: single
+    description: >
+      Build a competitive matrix for AI agent orchestration platforms.
+      Compare at least 4 competitors across pricing model, agent count/scale,
+      memory approach, and target buyer. Present as a markdown table plus a
+      2-sentence recommendation for a mid-market SaaS buyer.
+    keywords: [competitor, pricing, memory, agent]
+    min_output_length: 300
+    rubric: >
+      Table must have ≥4 named competitors and ≥4 comparison dimensions.
+      Recommendation must be specific to mid-market SaaS.
+
+  - id: research-buyer-personas
+    layer: research
+    mode: single
+    description: >
+      Define 3 buyer personas for an AI swarm orchestration product sold to
+      B2B companies. For each: title, pains, success metrics, and objections.
+    keywords: [persona, buyer, pain, objection]
+    min_output_length: 250
+    rubric: >
+      Three distinct personas with title, pains, metrics, and objections each.
+
+  # ── Sales ─────────────────────────────────────────────────
+  - id: sales-cto-outreach
+    layer: sales
+    mode: single
+    description: >
+      Draft a short cold outreach email to a CTO about AI-powered customer
+      support automation. Include subject line, 120-word body, and CTA.
+    keywords: [cto, support, automation, subject]
+    min_output_length: 150
+    rubric: >
+      Must include subject, concise body under ~150 words, clear CTA, no hype.
+
+  - id: sales-discovery-script
+    layer: sales
+    mode: single
+    description: >
+      Write a 10-question discovery call script for qualifying a company that
+      wants to automate GTM with multi-agent AI. Group questions into: current
+      state, pain, budget/authority, timeline.
+    keywords: [discovery, budget, timeline, pain]
+    min_output_length: 250
+    rubric: >
+      Exactly ~10 questions covering current state, pain, BANT/authority, timeline.
+
+  - id: sales-objection-handling
+    layer: sales
+    mode: single
+    description: >
+      Provide rebuttals for these objections: (1) 'We already have Zapier',
+      (2) 'Agents will hallucinate and hurt brand', (3) 'Too expensive vs hiring
+      one SDR'. Give a 2-3 sentence reply for each.
+    keywords: [zapier, hallucinat, cost, sdr]
+    min_output_length: 200
+    rubric: >
+      Three labeled rebuttals that acknowledge concern and differentiate clearly.
+
+  # ── Support ───────────────────────────────────────────────
+  - id: support-cost-controls-faq
+    layer: support
+    mode: single
+    description: >
+      Create an FAQ entry: 'How does Swarm 357 handle cost controls across
+      agent layers?' Cover per-agent budgets, layer caps, and 80% downgrade.
+    keywords: [cost, budget, layer, downgrade]
+    min_output_length: 180
+    rubric: >
+      Mentions per-agent budget, layer limits, and model downgrade behavior.
+
+  - id: support-incident-triage
+    layer: support
+    mode: single
+    description: >
+      A customer reports that POST /api/swarm/run returns HTTP 401 Unauthorized
+      and the landing page "Try it live" form fails. Write a Tier-1 triage
+      checklist with exactly 5 numbered steps and a clear escalate-when rule.
+      Mention checking the X-SWARM-API-KEY header and SWARM_API_KEY server env.
+    keywords: ["401", header, escalate, key]
+    min_output_length: 180
+    rubric: >
+      Five actionable steps including API key / header checks and clear escalate criteria.
+
+  - id: support-onboarding-reply
+    layer: support
+    mode: single
+    description: >
+      Reply to a new user who installed techtide-swarm via pip and asks how to
+      run their first live task safely under a $1 budget.
+    keywords: [pip, budget, swarm run, api]
+    min_output_length: 150
+    rubric: >
+      Mentions API key setup, budget flag/limit, and a concrete first command.
+
+  # ── Marketing ─────────────────────────────────────────────
+  - id: marketing-blog-intro
+    layer: marketing
+    mode: single
+    description: >
+      Write a 3-paragraph blog introduction about benefits of layered agent
+      architectures for business automation. Audience: technical founders.
+    keywords: [layer, agent, business, automation]
+    min_output_length: 250
+    rubric: >
+      Three paragraphs, technical-founder tone, concrete benefit not fluff.
+
+  - id: marketing-launch-tweet-thread
+    layer: marketing
+    mode: single
+    description: >
+      Write a 6-tweet launch thread for Swarm 357 open-core. Include a hook,
+      architecture one-liner, cost control point, memory point, install command,
+      and CTA to GitHub.
+    keywords: [swarm, pip install, github, cost]
+    min_output_length: 300
+    rubric: >
+      Six numbered tweets covering hook, architecture, cost, memory, install, CTA.
+
+  - id: marketing-positioning
+    layer: marketing
+    mode: single
+    description: >
+      Write a one-page positioning brief: category, ICP, primary promise,
+      differentiators vs CrewAI/AutoGen, and anti-positioning (who it's not for).
+    keywords: [icp, differentiat, crewai, autogen]
+    min_output_length: 250
+    rubric: >
+      Clear ICP, promise, ≥2 differentiators vs named competitors, and anti-ICP.
+
+  # ── SEO ───────────────────────────────────────────────────
+  - id: seo-keyword-list
+    layer: seo
+    mode: single
+    description: >
+      List 8 high-intent SEO keywords for an AI agent orchestration platform
+      targeting enterprise buyers. For each: keyword, intent, and suggested
+      page type (landing, docs, comparison).
+    keywords: [keyword, enterprise, agent, intent]
+    min_output_length: 250
+    rubric: >
+      Eight keywords with intent + page type; mostly commercial/enterprise intent.
+
+  - id: seo-aeo-brief
+    layer: seo
+    mode: single
+    description: >
+      Create an AEO (answer engine optimization) brief for the query
+      'best open source multi-agent framework for business ops'. Include
+      target answer, citations to include, and FAQ schema topics.
+    keywords: [aeo, answer, faq, citation]
+    min_output_length: 200
+    rubric: >
+      Includes target answer, citation plan, and FAQ topics suitable for schema.
+
+  - id: seo-comparison-outline
+    layer: seo
+    mode: single
+    description: >
+      Outline a comparison page: Swarm 357 vs CrewAI. H1, 6 H2s, and bullet
+      points under each H2 focused on ranking for 'crewai alternative'.
+    keywords: [crewai, alternative, comparison, h2]
+    min_output_length: 220
+    rubric: >
+      Has H1, six H2s, and bullets that map to comparison search intent.
+
+  # ── Operations ────────────────────────────────────────────
+  - id: ops-runbook-dream
+    layer: operations
+    mode: single
+    description: >
+      Write an ops runbook for weekly `swarm dream` memory consolidation:
+      prechecks, command, success signals, failure modes, and rollback.
+    keywords: [dream, memory, runbook, failure]
+    min_output_length: 220
+    rubric: >
+      Covers prechecks, command, success criteria, failures, and rollback.
+
+  - id: ops-cost-alert-policy
+    layer: operations
+    mode: single
+    description: >
+      Design a cost-alert policy for a Swarm 357 deployment with $25/run cap
+      and $2500/day org ceiling. Specify thresholds, owners, and automated actions.
+    keywords: [alert, budget, threshold, owner]
+    min_output_length: 200
+    rubric: >
+      Multiple thresholds with owners and automated actions; mentions run and day caps.
+
+  - id: ops-railway-healthcheck
+    layer: operations
+    mode: single
+    description: >
+      Write a Railway deploy verification checklist for Swarm 357 backend +
+      landing: health endpoint expectations, agent count, CORS, and write-key auth.
+    keywords: [health, agents, cors, api key]
+    min_output_length: 180
+    rubric: >
+      Checks /api/health agents count, CORS origins, and write-key 401/200 behavior.
+
+  # ── Management / cross-layer ──────────────────────────────
+  - id: mgmt-ultraplan-gtm
+    layer: management
+    mode: single
+    description: >
+      Produce a 5-phase ULTRAPLAN for launching a GTM campaign for an AI
+      training product using a multi-agent swarm. Include owners by layer and
+      a kill-criteria budget.
+    keywords: [phase, gtm, budget, layer]
+    min_output_length: 300
+    rubric: >
+      Five phases, layer owners, and explicit kill/budget criteria.
+
+  - id: mgmt-risk-register
+    layer: management
+    mode: single
+    description: >
+      Create a risk register (table) for operating 357 agents in production:
+      at least 6 risks with likelihood, impact, and mitigation.
+    keywords: [risk, mitigation, likelihood, impact]
+    min_output_length: 250
+    rubric: >
+      ≥6 risks in a table with likelihood, impact, mitigation each.
+
+  # ── Full swarm pipeline (higher cost / realism) ───────────
+  - id: swarm-gtm-campaign
+    layer: management
+    mode: swarm
+    budget_usd: 1.0
+    description: >
+      Launch a GTM campaign for an AI training product. Coordinate research,
+      messaging, SEO keywords, outreach sequence, and a one-week execution plan.
+    keywords: [gtm, campaign, keyword, outreach, plan]
+    min_output_length: 400
+    rubric: >
+      Covers research insight, messaging, SEO/keywords, outreach, and weekly plan.
+
+  - id: swarm-support-playbook
+    layer: support
+    mode: swarm
+    budget_usd: 0.75
+    description: >
+      Build a Tier-1 support playbook for Swarm 357 API auth failures, rate
+      limits, and budget-cap errors. Include customer-facing replies and internal runbooks.
+    keywords: ["401", "429", budget, playbook]
+    min_output_length: 350
+    rubric: >
+      Covers 401, rate limit, and budget errors with customer + internal guidance.
+
+  - id: swarm-content-seo-pack
+    layer: marketing
+    mode: swarm
+    budget_usd: 1.0
+    description: >
+      Produce a content+SEO pack for 'open source AI agent swarm': blog outline,
+      10 keywords, comparison angle vs CrewAI, and a LinkedIn post.
+    keywords: [keyword, blog, crewai, linkedin]
+    min_output_length: 400
+    rubric: >
+      Includes outline, ≥8 keywords, comparison angle, and LinkedIn post draft.
+
+  - id: swarm-ops-hardening
+    layer: operations
+    mode: swarm
+    budget_usd: 0.75
+    description: >
+      Propose a production hardening plan for Swarm 357 on Railway + Supabase:
+      secrets, RLS posture, health checks, cost caps, and on-call alerts.
+    keywords: [railway, supabase, rls, alert, budget]
+    min_output_length: 350
+    rubric: >
+      Addresses secrets, RLS, health checks, cost caps, and alerting/on-call.
+
+  - id: swarm-sales-enablement
+    layer: sales
+    mode: swarm
+    budget_usd: 1.0
+    description: >
+      Create a sales enablement kit for Swarm 357: ICP one-pager, discovery
+      questions, objection sheet, and a 3-email sequence for technical founders.
+    keywords: [icp, discovery, objection, email]
+    min_output_length: 400
+    rubric: >
+      Includes ICP, discovery questions, objections, and a 3-email sequence.

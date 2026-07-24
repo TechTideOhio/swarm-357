@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" role="img" aria-label="TechTide Swarm 357">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#171717"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffd900" stop-opacity="0.15"/>
+      <stop offset="50%" stop-color="#ffd900" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffd900" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <!-- layer rails -->
+  <g stroke="#ffd900" stroke-width="1.5" opacity="0.25">
+    <line x1="80" y1="90" x2="1200" y2="90"/>
+    <line x1="80" y1="130" x2="1200" y2="130"/>
+    <line x1="80" y1="170" x2="1200" y2="170"/>
+    <line x1="80" y1="210" x2="1200" y2="210"/>
+    <line x1="80" y1="250" x2="1200" y2="250"/>
+  </g>
+  <rect x="0" y="278" width="1280" height="4" fill="url(#accent)"/>
+  <!-- mark -->
+  <g transform="translate(72,96)">
+    <rect width="96" height="96" rx="20" fill="#111"/>
+    <g fill="none" stroke="#ffd900" stroke-width="3" stroke-linecap="round">
+      <path d="M18 28h60" opacity="0.4"/>
+      <path d="M22 40h52" opacity="0.55"/>
+      <path d="M26 52h44" opacity="0.75"/>
+      <path d="M30 64h36"/>
+    </g>
+    <g fill="#ffd900">
+      <circle cx="28" cy="28" r="3.5"/>
+      <circle cx="68" cy="28" r="3.5"/>
+      <circle cx="40" cy="52" r="3.5"/>
+      <circle cx="56" cy="52" r="3.5"/>
+      <circle cx="48" cy="64" r="4.5"/>
+    </g>
+  </g>
+  <text x="200" y="145" font-family="ui-sans-serif, system-ui, Segoe UI, sans-serif" font-size="64" font-weight="800" fill="#fafafa" letter-spacing="-0.03em">Swarm 357</text>
+  <text x="200" y="190" font-family="ui-sans-serif, system-ui, Segoe UI, sans-serif" font-size="24" font-weight="500" fill="#a3a3a3">Layered agents. Durable memory. Observable runs.</text>
+  <text x="200" y="240" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#ffd900">357 roles · 6 business layers · Apache-2.0</text>
+</svg>
