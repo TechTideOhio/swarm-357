@@ -83,7 +83,7 @@ fn run() -> Result<(), String> {
             query,
             top_k,
         } => {
-            let mem = Memvid::open(&path).map_err(|e| e.to_string())?;
+            let mut mem = Memvid::open(&path).map_err(|e| e.to_string())?;
             let request = SearchRequest {
                 query,
                 top_k,

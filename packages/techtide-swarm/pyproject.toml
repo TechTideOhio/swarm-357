@@ -84,3 +84,10 @@ packages = ["techtide_swarm"]
 [[tool.mypy.overrides]]
 module = "techtide_swarm.cli"
 ignore_errors = true
+
+# Optional external integrations that ship no type stubs. These are only
+# imported when the corresponding extras ([web], [supabase]) are installed,
+# so allow missing imports for them without weakening type checking elsewhere.
+[[tool.mypy.overrides]]
+module = ["supabase", "exa_py", "firecrawl"]
+ignore_missing_imports = true
