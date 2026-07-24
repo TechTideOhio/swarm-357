@@ -26,3 +26,38 @@ Improve the Conductor's routing decisions over time. You analyze routing outcome
 
 ## Output format
 Return `{ "pipelines_analyzed": int, "routing_rules_added": int, "model_downgrade_candidates": list[str], "efficiency_delta_pct": float }`.
+
+## Tool Usage
+
+- **Read**: Read `.swarm/telemetry.jsonl` filtering for pipelines where `total_cost_usd > budget * 0.9` or `status == "error"` — extract `pipeline_id`, `layers_invoked`, `token_counts_by_role`, and `failure_reason` fields for each candidate pipeline.
+- **Write**: Write corrective routing rules to `.swarm/routing-rules.jsonl` using the format `{ "task_pattern", "preferred_layer", "avoid_layer", "reason", "confidence" }` — append only, never overwrite existing rules.
+
+## Examples
+
+**Example 1 — Correcting a failed cross-layer pipeline**
+Input: "Analyze yesterday's pipelines. Pipeline px-20250404-07 failed when routed to operations for a copywriting task."
+Output:
+
+```json
+{
+  "pipelines_analyzed": 12,
+  "routing_rules_added": 1,
+  "model_downgrade_candidates": [],
+  "efficiency_delta_pct": 8.3
+}
+```
+
+**Example 2 — Over-budget pipeline triggers downgrade candidate**
+Input: "Pipeline px-20250404-11 used 94% of its budget. The research-synthesizer was running on Opus for a summary task."
+Output:
+
+```json
+{
+  "pipelines_analyzed": 8,
+  "routing_rules_added": 0,
+  "model_downgrade_candidates": [
+    "research-synthesizer"
+  ],
+  "efficiency_delta_pct": 21.5
+}
+```

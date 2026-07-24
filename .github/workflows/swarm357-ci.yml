@@ -40,8 +40,23 @@ jobs:
           python-version: "3.12"
       - name: Install pyyaml
         run: pip install pyyaml
-      - name: Validate 357-agent roster
-        run: python scripts/generate_roster.py --fix-counts
+      - name: Validate 357-agent roster (flat + compact ship path)
+        run: |
+          python scripts/generate_roster.py --fix-counts
+          python scripts/generate_roster.py --compact --fix-counts
+
+  docker-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Docker build and /api/health agents==357
+        working-directory: Apps/swarm357
+        run: |
+          docker build -t swarm357-ci -f Dockerfile .
+          cid=$(docker run -d -p 18000:8000 swarm357-ci)
+          sleep 4
+          python -c "import json,urllib.request; u=urllib.request.urlopen('http://127.0.0.1:18000/api/health'); d=json.load(u); assert d.get('status')=='ok' and d.get('agents')==357, d"
+          docker stop "$cid"
 
   next:
     runs-on: ubuntu-latest

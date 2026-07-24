@@ -37,6 +37,16 @@ layers:
       health_monitor:     {count: 1, model: haiku, budget_usd: 1.0, tools: [Read]}
       cost_controller:    {count: 1, model: haiku, budget_usd: 1.0, tools: [Read]}
     soul: templates/soul/management/conductor.md
+    soul_overrides:
+      chief_strategist:  templates/soul/management/chief-strategist.md
+      memory_curator:    templates/soul/management/memory-curator.md
+      pattern_promoter:  templates/soul/management/pattern-promoter.md
+      skill_extractor:   templates/soul/management/skill-extractor.md
+      routing_optimizer: templates/soul/management/routing-optimizer.md
+      dream_runner:      templates/soul/management/dream-runner.md
+      qa_auditor:        templates/soul/management/qa-auditor.md
+      health_monitor:    templates/soul/management/health-monitor.md
+      cost_controller:   templates/soul/management/cost-controller.md
 
   sales:
     roles:
@@ -48,7 +58,11 @@ layers:
       deal_closer:           {count:  5, model: opus,   budget_usd: 5.0, tools: [WebSearch, Read, Write]}
     soul: templates/soul/sales/outreach-specialist.md
     soul_overrides:
-      crm_operator: templates/soul/sales/crm-operator.md
+      crm_operator:        templates/soul/sales/crm-operator.md
+      prospect_researcher: templates/soul/sales/prospect-researcher.md
+      sdr:                 templates/soul/sales/sdr.md
+      funnel_analyst:      templates/soul/sales/funnel-analyst.md
+      deal_closer:         templates/soul/sales/deal-closer.md
 
   support:
     roles:
@@ -58,6 +72,11 @@ layers:
       escalation_handler:  {count:  5, model: sonnet, budget_usd: 1.5,  tools: [WebSearch, Read, Write]}
       csat_analyst:        {count:  2, model: haiku,  budget_usd: 0.25, tools: [Read, Write]}
     soul: templates/soul/support/tier1-resolver.md
+    soul_overrides:
+      tier2_resolver:     templates/soul/support/tier2-resolver.md
+      kb_maintainer:      templates/soul/support/kb-maintainer.md
+      escalation_handler: templates/soul/support/escalation-handler.md
+      csat_analyst:       templates/soul/support/csat-analyst.md
 
   marketing:
     roles:
@@ -68,6 +87,12 @@ layers:
       brand_guardian:           {count:  8, model: sonnet, budget_usd: 1.0, tools: [Read, Write]}
       campaign_analyst:         {count:  8, model: haiku,  budget_usd: 0.5, tools: [Read, Write]}
     soul: templates/soul/marketing/content-strategist.md
+    soul_overrides:
+      social_media_manager:   templates/soul/marketing/social-media-manager.md
+      ad_copywriter:           templates/soul/marketing/ad-copywriter.md
+      email_campaign_manager:  templates/soul/marketing/email-campaign-manager.md
+      brand_guardian:          templates/soul/marketing/brand-guardian.md
+      campaign_analyst:        templates/soul/marketing/campaign-analyst.md
 
   seo:
     roles:
@@ -76,6 +101,10 @@ layers:
       link_building_specialist: {count: 10, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
       aeo_optimizer:            {count:  7, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write]}
     soul: templates/soul/seo/keyword-researcher.md
+    soul_overrides:
+      technical_seo_auditor:    templates/soul/seo/technical-seo-auditor.md
+      link_building_specialist: templates/soul/seo/link-building-specialist.md
+      aeo_optimizer:             templates/soul/seo/aeo-optimizer.md
 
   research:
     roles:
@@ -85,6 +114,11 @@ layers:
       research_synthesizer:  {count:  6, model: opus,   budget_usd: 8.0, tools: [WebSearch, Read, Write]}
       trend_watcher:         {count:  5, model: haiku,  budget_usd: 0.5, tools: [WebSearch, Read, Write]}
     soul: templates/soul/research/market-analyst.md
+    soul_overrides:
+      competitor_analyst:   templates/soul/research/competitor-analyst.md
+      product_researcher:   templates/soul/research/product-researcher.md
+      research_synthesizer: templates/soul/research/research-synthesizer.md
+      trend_watcher:        templates/soul/research/trend-watcher.md
 
   operations:
     roles:
@@ -94,3 +128,8 @@ layers:
       automation_builder:   {count: 10, model: sonnet, budget_usd: 1.5,  tools: [Read, Write, Bash]}
       data_quality_agent:   {count:  5, model: haiku,  budget_usd: 0.25, tools: [Read, Write]}
     soul: templates/soul/operations/project-coordinator.md
+    soul_overrides:
+      finance_reporter:   templates/soul/operations/finance-reporter.md
+      infra_agent:        templates/soul/operations/infra-agent.md
+      automation_builder: templates/soul/operations/automation-builder.md
+      data_quality_agent: templates/soul/operations/data-quality-agent.md

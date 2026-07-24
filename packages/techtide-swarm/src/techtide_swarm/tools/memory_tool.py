@@ -12,19 +12,19 @@ import logging
 import os
 from pathlib import Path
 
+from techtide_swarm.memory import MemoryManager
 from techtide_swarm.tools.registry import registry
 
 logger = logging.getLogger(__name__)
 
 # Lazy singleton — created on first call so tests can override the cwd.
-_memory_manager: object | None = None
+_memory_manager: MemoryManager | None = None
 
 
-def _get_mm():  # type: ignore[return]
+def _get_mm() -> MemoryManager:
     """Return (or create) the process-level MemoryManager singleton."""
     global _memory_manager  # noqa: PLW0603
     if _memory_manager is None:
-        from techtide_swarm.memory import MemoryManager
         _memory_manager = MemoryManager(swarm_root=Path(os.getcwd()))
     return _memory_manager
 

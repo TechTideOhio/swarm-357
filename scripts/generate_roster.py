@@ -12,11 +12,13 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from typing import Any
 
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ROSTER_PATH = REPO_ROOT / "config" / "swarm.yaml"
+COMPACT_PATH = REPO_ROOT / "config" / "swarm-compact.yaml"
 
 EXPECTED_COUNTS: dict[str, int] = {
     "management": 10,
@@ -38,7 +40,44 @@ def load_roster() -> list[dict]:
     return data.get("agents", [])
 
 
-def validate(agents: list[dict], layer_filter: str | None = None) -> bool:
+def expand_compact_roster(raw: dict[str, Any]) -> list[dict[str, Any]]:
+    """Mirror Swarm._expand_compact_roster() — keep in sync with techtide_swarm.swarm.Swarm."""
+    layers = raw.get("layers", {})
+    agents: list[dict[str, Any]] = []
+    for layer_name, layer_cfg in layers.items():
+        default_soul = layer_cfg.get("soul", "")
+        soul_overrides = layer_cfg.get("soul_overrides", {})
+        for role_name, role_cfg in layer_cfg.get("roles", {}).items():
+            count = int(role_cfg.get("count", 1))
+            soul = soul_overrides.get(role_name, default_soul)
+            for i in range(1, count + 1):
+                agents.append({
+                    "name": f"{layer_name}-{role_name.replace('_', '-')}-{i:03d}",
+                    "layer": layer_name,
+                    "role": role_name,
+                    "soul": soul,
+                    "model": role_cfg.get("model", "sonnet"),
+                    "budget_usd": role_cfg.get("budget_usd", 1.0),
+                    "tools": role_cfg.get("tools", ["Read", "Write"]),
+                })
+    return agents
+
+
+def load_compact_roster() -> list[dict]:
+    """Load config/swarm-compact.yaml and return expanded flat agents list."""
+    if not COMPACT_PATH.is_file():
+        print(f"ERROR: {COMPACT_PATH} not found", file=sys.stderr)
+        sys.exit(1)
+    raw = yaml.safe_load(COMPACT_PATH.read_text(encoding="utf-8")) or {}
+    return expand_compact_roster(raw)
+
+
+def validate(
+    agents: list[dict],
+    layer_filter: str | None = None,
+    *,
+    check_role_soul_uniqueness: bool = True,
+) -> bool:
     filtered = agents if layer_filter is None else [a for a in agents if a["layer"] == layer_filter]
 
     by_layer: dict[str, list[dict]] = {}
@@ -110,25 +149,51 @@ def validate(agents: list[dict], layer_filter: str | None = None) -> bool:
     for role, soul in role_to_soul.items():
         soul_to_roles[soul].append(role)
     shared_souls = {s: r for s, r in soul_to_roles.items() if len(r) > 1}
-    if shared_souls:
-        print(f"\nSHARED SOUL FILES (different roles reusing same soul — each role must be unique):")
-        for soul, roles in shared_souls.items():
-            print(f"  {soul}: {roles}")
-        ok = False
+    if check_role_soul_uniqueness:
+        if shared_souls:
+            print(
+                "\nSHARED SOUL FILES (different roles reusing same soul — "
+                "each role must be unique in flat roster):"
+            )
+            for soul, roles in shared_souls.items():
+                print(f"  {soul}: {roles}")
+            ok = False
+        else:
+            print(
+                f"Soul uniqueness: {len(role_to_soul)} unique roles, "
+                f"{len(soul_to_roles)} unique soul files. OK."
+            )
     else:
-        print(f"Soul uniqueness: {len(role_to_soul)} unique roles, {len(soul_to_roles)} unique soul files. OK.")
+        print("(Compact mode: skipped per-role soul uniqueness — instances may share soul files.)")
 
     return ok
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Validate config/swarm.yaml roster")
+    parser = argparse.ArgumentParser(description="Validate swarm roster (flat or compact)")
     parser.add_argument("--layer", help="Filter output to one layer")
     parser.add_argument("--fix-counts", action="store_true", help="Exit non-zero if counts wrong")
+    parser.add_argument(
+        "--compact",
+        action="store_true",
+        help="Validate config/swarm-compact.yaml expanded roster (Docker/API default)",
+    )
     args = parser.parse_args()
 
-    agents = load_roster()
-    ok = validate(agents, layer_filter=args.layer)
+    if args.compact:
+        agents = load_compact_roster()
+        ok = validate(
+            agents,
+            layer_filter=args.layer,
+            check_role_soul_uniqueness=False,
+        )
+    else:
+        agents = load_roster()
+        ok = validate(
+            agents,
+            layer_filter=args.layer,
+            check_role_soul_uniqueness=True,
+        )
 
     if args.fix_counts and not ok:
         sys.exit(1)

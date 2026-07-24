@@ -1,0 +1,180 @@
+"use client";
+
+import { motion } from "motion/react";
+import { TryItLive } from "./try-it-live";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import DitherCursor from "./dither-cursor";
+import RotatingCards, { type Card } from "./rotating-cards";
+
+const headlineText = "Run Your Business on Agents";
+
+const cardData = [
+  { label: "Sales Outreach" },
+  { label: "Support Tier-1" },
+  { label: "Content Strategy" },
+  { label: "SEO Clusters" },
+  { label: "Market Research" },
+  { label: "Project Ops" },
+  { label: "Memvid Memory" },
+  { label: "Cost Controls" },
+  { label: "Bash Security" },
+  { label: "Dream Cycles" },
+  { label: "Eval Harness" },
+];
+
+const carouselCards: Card[] = cardData.map((card, index) => ({
+  id: index + 1,
+  content: (
+    <div className="flex h-full flex-col items-center justify-center p-4">
+      <div className="px-1 pt-3 text-center">
+        <span className="text-sm font-medium">{card.label}</span>
+      </div>
+    </div>
+  ),
+}));
+
+export function Hero(): ReactNode {
+  const sectionRef = useRef<HTMLElement>(null);
+  const headlineRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+  const [opacity, setOpacity] = useState(0);
+  const [isMobile, setIsMobile] = useState(true);
+  const opacityRef = useRef(0);
+  const animationRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    const headline = headlineRef.current;
+    if (!headline) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        setIsVisible(entry.isIntersecting);
+        if (entry.isIntersecting) setShouldRender(true);
+      },
+      { threshold: 0, rootMargin: "-10% 0px -10% 0px" }
+    );
+
+    observer.observe(headline);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const targetOpacity = isVisible ? 1 : 0;
+
+    const animate = () => {
+      const diff = targetOpacity - opacityRef.current;
+      const step = diff * 0.02;
+
+      if (Math.abs(diff) > 0.001) {
+        opacityRef.current += step;
+        setOpacity(opacityRef.current);
+        animationRef.current = requestAnimationFrame(animate);
+      } else {
+        opacityRef.current = targetOpacity;
+        setOpacity(targetOpacity);
+        if (targetOpacity === 0) setShouldRender(false);
+      }
+    };
+
+    if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [isVisible]);
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative flex min-h-dvh flex-col items-center justify-start overflow-hidden px-6 pt-40 sm:pt-82"
+    >
+      {!isMobile && shouldRender && (
+        <DitherCursor opacity={opacity} />
+      )}
+      <div ref={headlineRef} className="relative z-10 mx-auto md:text-center">
+        <h1 className="mb-8 text-5xl font-medium tracking-tighter md:text-8xl lg:text-8xl">
+          {headlineText.split("").map((char, index) => (
+            <motion.span
+              key={index}
+              initial={{ opacity: 0, filter: "blur(10px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              transition={{
+                duration: 0.4,
+                delay: index * 0.03,
+                ease: "easeOut",
+              }}
+              className="inline-block"
+              style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+            >
+              {char}
+            </motion.span>
+          ))}
+        </h1>
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 0.8,
+            delay: 0.8,
+            ease: "easeOut",
+          }}
+          className="text-muted-foreground mx-auto mt-6 max-w-xl text-2xl leading-12 tracking-tight md:text-3xl"
+        >
+          <span className="text-foreground bg-foreground/5 inline-block rounded-md px-2 py-0.5 leading-10">
+            357 agents
+          </span>{" "}
+          across{" "}
+          <span className="text-foreground bg-foreground/5 inline-block rounded-full px-4 py-0.5 leading-10">
+            6 layers
+          </span>{" "}
+          with{" "}
+          <span className="text-foreground bg-foreground/5 inline-block rounded-md px-2 py-0.5 leading-10">
+            portable memory
+          </span>{" "}
+          and honest cost controls.
+        </motion.p>
+      </div>
+
+      {/* Carousel */}
+      <div
+        className="relative -mx-6 mt-2 h-100 w-screen overflow-hidden sm:h-125 md:h-137.5 lg:h-150 xl:h-175"
+        style={{
+          maskImage:
+            "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+        }}
+      >
+        <div className="absolute left-1/2 top-25 -translate-x-1/2 sm:top-30 lg:top-35 xl:top-40">
+          <div className="origin-top scale-[0.6] lg:scale-[0.7] xl:scale-100">
+            <RotatingCards
+              cards={carouselCards}
+              radius={1000}
+              cardClassName="rounded-md"
+              cardWidth={350}
+              cardHeight={275}
+              duration={100}
+              pauseOnHover={true}
+              autoPlay={true}
+              initialRotation={-90}
+              showTrackLine={true}
+              trackLineOffset={25}
+            />
+          </div>
+        </div>
+      </div>
+
+      <TryItLive />
+    </section>
+  );
+}

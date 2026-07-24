@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any
 
 from techtide_swarm.memvid_bridge import MemvidBridge, MemvidBridgeError, resolve_bridge_binary
+from techtide_swarm.persistence import store
 
 
 class MemoryManager:
@@ -53,6 +55,12 @@ class MemoryManager:
         self._shared.append(entry)
         topic_file = self._topics / f"{self._safe_key(key)}.json"
         topic_file.write_text(json.dumps(entry, indent=2), encoding="utf-8")
+        store.store_memory(
+            from_agent=from_agent,
+            to_agent=to_agent,
+            key=key,
+            content=content,
+        )
         if self._memvid and self._memvid.available:
             uri = f"swarm://{key}"
             title = f"{from_agent}->{to_agent}"
@@ -78,6 +86,8 @@ class MemoryManager:
                         "note": "matched shared memory",
                     }
                 )
+        if store.enabled:
+            out.extend(store.recall_memory(query=query, agent_id=agent_id, top_k=5))
         if self._memvid and self._memvid.available:
             try:
                 raw = self._memvid.search(query, top_k=5)
@@ -147,7 +157,40 @@ class MemoryManager:
                 seen_pairs.add(pair)
                 unique_contradictions.append(c)
 
-        return {
+        llm_notes: list[str] = []
+        if (
+            os.getenv("SWARM_DREAM_USE_LLM", "").lower() in ("1", "true", "yes")
+            and unique_contradictions
+        ):
+            key = os.getenv("ANTHROPIC_API_KEY", "").strip()
+            if key and "your-key" not in key:
+                try:
+                    from anthropic import AsyncAnthropic
+
+                    client = AsyncAnthropic(api_key=key)
+                    model = os.getenv("SWARM_DREAM_LLM_MODEL", "claude-haiku-4-5-20251001")
+                    brief = json.dumps(unique_contradictions[:5])[:8000]
+                    msg = await client.messages.create(
+                        model=model,
+                        max_tokens=400,
+                        messages=[
+                            {
+                                "role": "user",
+                                "content": (
+                                    "Given these potential memory contradictions (JSON), "
+                                    "list 1-3 concise remediation bullets. Plain text only.\n"
+                                    f"{brief}"
+                                ),
+                            }
+                        ],
+                    )
+                    for block in msg.content:
+                        if getattr(block, "type", None) == "text":
+                            llm_notes.append(getattr(block, "text", "")[:2000])
+                except Exception:
+                    llm_notes.append("(llm dream assist skipped)")
+
+        out: dict[str, Any] = {
             "status": "ok",
             "contradictions_found": len(unique_contradictions),
             "contradictions": unique_contradictions,
@@ -155,6 +198,9 @@ class MemoryManager:
             "total_entries": len(self._shared),
             "total_interactions": len(self._interactions),
         }
+        if llm_notes:
+            out["llm_remediation_notes"] = llm_notes
+        return out
 
     def migrate_flat_to_memvid(self, dest: Path) -> dict[str, Any]:
         """Copy `.swarm/topics/*.json` into a new `.mv2` via the bridge."""

@@ -51,3 +51,59 @@ ROUTE     → update routing weights based on success/failure signals
 
 ## Output format
 Return `{ "task_routed_to": str, "agents_spawned": list[str], "pattern_promoted": str | null, "swarm_health": dict }`.
+
+## Tool Usage
+
+- **WebSearch**: Search for current best practices when encountering a novel task type with no prior `.mv2` match — query format: `"[task domain] multi-agent orchestration best practice 2025"`.
+- **Read**: Read `.swarm/MEMORY.md` and `.swarm/telemetry.jsonl` at session start to load routing context and recent swarm performance signals before dispatching any agent.
+- **Write**: Write updated routing outcomes and promoted pattern snippets to `.swarm/topics/conductor-patterns.json` after each pipeline completes; write SOUL.md appendix snippets to `templates/soul/<layer>/` when confidence exceeds 0.8.
+
+## Examples
+
+**Example 1 — Cross-layer research-to-sales pipeline**
+Input: "Find the top 3 AI compliance software vendors and draft a cold outreach sequence targeting their customers."
+Output:
+
+```json
+{
+  "task_routed_to": "research",
+  "agents_spawned": [
+    "research-competitor-analyst-001",
+    "research-product-researcher-002",
+    "sales-prospect-researcher-001",
+    "sales-sdr-001"
+  ],
+  "pattern_promoted": "research-to-sales-handoff-v1",
+  "swarm_health": {
+    "research": "healthy",
+    "sales": "healthy",
+    "support": "healthy",
+    "marketing": "healthy",
+    "seo": "healthy",
+    "operations": "healthy"
+  }
+}
+```
+
+**Example 2 — Single-layer urgent support triage**
+Input: "Escalate all open Tier-2 tickets that have been waiting more than 48 hours and draft responses."
+Output:
+
+```json
+{
+  "task_routed_to": "support",
+  "agents_spawned": [
+    "support-escalation-handler-001",
+    "support-tier2-resolver-001"
+  ],
+  "pattern_promoted": null,
+  "swarm_health": {
+    "research": "healthy",
+    "sales": "healthy",
+    "support": "warn",
+    "marketing": "healthy",
+    "seo": "healthy",
+    "operations": "healthy"
+  }
+}
+```

@@ -27,3 +27,76 @@ Track agent error rates, latency spikes, and memory store degradation across all
 
 ## Output format
 Return `{ "layer_health": { "layer": { "error_rate": float, "p95_latency_ms": int, "memory_age_hours": float, "status": "healthy|warn|critical" } }, "events_raised": int }`.
+
+## Tool Usage
+
+- **Read**: Read `.swarm/telemetry.jsonl` to compute per-layer error rates and p95 latency over the last 100 calls; read `.swarm/topics/*.json` file metadata (last-modified timestamps) to compute `memory_age_hours` for each layer's `.mv2` store.
+- **Write**: Write each threshold-crossing event to `.swarm/health-events.jsonl` as a structured entry with `layer`, `signal`, `value`, `threshold`, `severity`, and `recommended_action` fields.
+
+## Examples
+
+**Example 1 — Clean health sweep**
+Input: "Run a full swarm health check."
+Output:
+
+```json
+{
+  "layer_health": {
+    "sales": {
+      "error_rate": 0.02,
+      "p95_latency_ms": 4200,
+      "memory_age_hours": 3.5,
+      "status": "healthy"
+    },
+    "support": {
+      "error_rate": 0.04,
+      "p95_latency_ms": 5800,
+      "memory_age_hours": 7.1,
+      "status": "healthy"
+    },
+    "research": {
+      "error_rate": 0.03,
+      "p95_latency_ms": 11200,
+      "memory_age_hours": 2.9,
+      "status": "healthy"
+    },
+    "marketing": {
+      "error_rate": 0.01,
+      "p95_latency_ms": 3600,
+      "memory_age_hours": 5.0,
+      "status": "healthy"
+    },
+    "seo": {
+      "error_rate": 0.02,
+      "p95_latency_ms": 4900,
+      "memory_age_hours": 4.2,
+      "status": "healthy"
+    },
+    "operations": {
+      "error_rate": 0.03,
+      "p95_latency_ms": 6100,
+      "memory_age_hours": 8.0,
+      "status": "healthy"
+    }
+  },
+  "events_raised": 0
+}
+```
+
+**Example 2 — Degraded operations layer**
+Input: "Operations layer has been slow. Run targeted health check."
+Output:
+
+```json
+{
+  "layer_health": {
+    "operations": {
+      "error_rate": 0.14,
+      "p95_latency_ms": 38500,
+      "memory_age_hours": 51.3,
+      "status": "critical"
+    }
+  },
+  "events_raised": 3
+}
+```

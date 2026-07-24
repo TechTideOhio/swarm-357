@@ -26,6 +26,19 @@ import sys
 import time
 from pathlib import Path
 
+# Ensure stdout/stderr can handle UTF-8 (box-drawing chars, emoji) on Windows.
+# reconfigure() is a no-op on platforms where encoding is already utf-8.
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 # Rich imports for beautiful terminal output
 try:
     from rich.console import Console
@@ -44,7 +57,10 @@ try:
 except ImportError:
     HAS_RICH = False
 
-console = Console() if HAS_RICH else None
+# On Windows, avoid the LegacyWindowsTerm renderer (cp1252) by forcing
+# ANSI mode; this allows box-drawing characters and Unicode to render
+# correctly in modern terminals (Windows Terminal, VS Code, etc.).
+console = Console(legacy_windows=False) if HAS_RICH else None
 
 # ──────────────────────────────────────────────
 # ASCII Banner
@@ -65,7 +81,7 @@ BANNER = r"""
 
 BANNER_PLAIN = """
   TECHTIDE SWARM 357
-  357 Claude AI Agents · 6 Business Layers · 1 Swarm
+  357 Claude AI Agents | 6 Business Layers | 1 Swarm
 """
 
 
@@ -74,9 +90,15 @@ def print_banner():
         try:
             console.print(BANNER)
         except UnicodeEncodeError:
-            console.print(BANNER_PLAIN)
+            try:
+                console.print(BANNER_PLAIN)
+            except UnicodeEncodeError:
+                sys.stdout.write(BANNER_PLAIN)
     else:
-        print(BANNER_PLAIN)
+        try:
+            print(BANNER_PLAIN)
+        except UnicodeEncodeError:
+            sys.stdout.write(BANNER_PLAIN)
 
 
 # ──────────────────────────────────────────────

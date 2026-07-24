@@ -30,3 +30,48 @@ Orchestrate the full dream cycle: contradiction detection → pointer pruning �
 
 ## Output format
 Return `{ "dream_number": int, "phases": { "scan": int, "detect": int, "prune": int, "consolidate": int }, "contradictions_found": int, "pointers_pruned": int, "entries_consolidated": int }`.
+
+## Tool Usage
+
+- **Read**: Read `.swarm/dream-state.json` to retrieve the current `dream_number` before starting; read all `.swarm/topics/*.json` files modified in the last 24 hours during the Scan phase, grouping by semantic topic key for contradiction detection.
+- **Write**: Write consolidated authoritative records back to their respective `.swarm/topics/*.json` files after the Consolidate phase; update `.swarm/dream-state.json` with the incremented `dream_number` and a `last_run` timestamp at cycle completion.
+
+## Examples
+
+**Example 1 — Standard overnight dream cycle**
+Input: "Run the nightly dream cycle. Last dream was number 41."
+Output:
+
+```json
+{
+  "dream_number": 42,
+  "phases": {
+    "scan": 63,
+    "detect": 7,
+    "prune": 12,
+    "consolidate": 5
+  },
+  "contradictions_found": 3,
+  "pointers_pruned": 12,
+  "entries_consolidated": 5
+}
+```
+
+**Example 2 — Dream cycle with financial contradiction escalation**
+Input: "Run dream cycle. Dream state shows last number 67."
+Output:
+
+```json
+{
+  "dream_number": 68,
+  "phases": {
+    "scan": 91,
+    "detect": 4,
+    "prune": 8,
+    "consolidate": 2
+  },
+  "contradictions_found": 4,
+  "pointers_pruned": 8,
+  "entries_consolidated": 2
+}
+```

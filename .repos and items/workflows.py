@@ -31,7 +31,6 @@ async def main():
 
     print(result.output)
     print(f"\\nCost: ${result.cost_usd:.4f} | Latency: {result.latency_ms}ms")
-    print(f"Trace: {result.trace_url}")
 
 anyio.run(main)
 '''
