@@ -39,7 +39,7 @@ The `.mv2` format is interesting because it has no external dependencies. The fi
 - Per-agent budget caps checked during `Agent.run()` u2014 execution halts when limit is hit
 - Per-layer daily limits (Sales: $500, Support: $300, SEO: $200, etc.)
 - `CostController.should_downgrade_model()` returns True at 80% utilization u2014 agent switches Opus u2192 Sonnet or Sonnet u2192 Haiku automatically
-- Full GTM campaign (8 agents, 43s): $0.12 in testing
+- Full GTM campaign (8 agents, 67s): $0.0773 in testing
 
 **BashSecurityGate:**
 
@@ -130,7 +130,7 @@ Cost controls are enforced in code, not documented as guidelines:
 - At 80% layer utilization, `should_downgrade_model()` returns True and the Conductor switches subsequent agent calls to a cheaper model tier
 - Cost estimation uses token counts u00d7 per-model pricing snapshots (not real-time API queries)
 
-Observed cost for 8-agent GTM campaign task: $0.12, 43 seconds.
+Observed cost for 14-agent GTM campaign task: $0.0773, 67 seconds.
 
 ---
 

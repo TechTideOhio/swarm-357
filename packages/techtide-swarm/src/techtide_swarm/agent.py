@@ -73,17 +73,18 @@ class Agent:
 
     async def run(self, task: str) -> AgentResult:
         """Execute task via Anthropic Messages API when API key is set; else deterministic stub."""
-        api_key = os.getenv("ANTHROPIC_API_KEY", "")
-        if not api_key or "your-key" in api_key:
+        from techtide_swarm.llm import create_async_client, model_id as resolve_model_id, resolve_api_key
+
+        api_key = resolve_api_key()
+        if not api_key:
             return self._stub_result(task)
 
         started = time.perf_counter()
         try:
-            from anthropic import AsyncAnthropic  # lazy import
             from techtide_swarm.tools import get_anthropic_tools, execute_tool
 
-            client = AsyncAnthropic(api_key=api_key)
-            model_id = self._model_id(self.config.model)
+            client = create_async_client()
+            resolved_model = resolve_model_id(self.config.model)
             system_prompt = self._load_system_prompt()
             
             messages: list[dict[str, Any]] = [{"role": "user", "content": task}]
@@ -99,7 +100,7 @@ class Agent:
                     break
 
                 create_kwargs: dict[str, Any] = {
-                    "model": model_id,
+                    "model": resolved_model,
                     "max_tokens": 4096,
                     "messages": messages,
                 }
@@ -109,7 +110,7 @@ class Agent:
                     create_kwargs["tools"] = tools
 
                 message = await client.messages.create(**create_kwargs)
-                total_cost += self._estimate_cost(message, model_id)
+                total_cost += self._estimate_cost(message, resolved_model)
 
                 messages.append({"role": "assistant", "content": message.content})
 
@@ -193,13 +194,9 @@ class Agent:
 
     @staticmethod
     def _model_id(short: str) -> str:
-        default_sonnet = os.getenv("SWARM_MODEL_SONNET", "claude-sonnet-4-6")
-        mapping = {
-            "opus": os.getenv("SWARM_MODEL_OPUS", "claude-opus-4-6"),
-            "sonnet": default_sonnet,
-            "haiku": os.getenv("SWARM_MODEL_HAIKU", "claude-haiku-4-5-20251001"),
-        }
-        return mapping.get(short.lower(), default_sonnet)
+        from techtide_swarm.llm import model_id as resolve_model_id
+
+        return resolve_model_id(short)
 
     @staticmethod
     def _extract_text(message: Any) -> str:

@@ -16,8 +16,8 @@ All files needed to ship the Swarm 357 public launch.
 ### Code
 - [ ] `pip install techtide-swarm` works from PyPI on a fresh machine (blocked on trusted publisher / token)
 - [x] Local wheel install + `swarm demo` works without API key (verified 2026-07-24)
-- [ ] `swarm run "Launch a GTM campaign for an AI training product"` completes without errors (needs `ANTHROPIC_API_KEY`)
-- [ ] `swarm cost` shows accurate breakdown (needs live run)
+- [x] `swarm run "Launch a GTM campaign for an AI training product"` completes without errors (OpenRouter `anthropic/claude-3-haiku`, 2026-07-24)
+- [x] `swarm cost` shows accurate breakdown ($0.0773 total, 14 agents, ~67s)
 - [x] GitHub repo is public at github.com/TechTideOhio/swarm-357
 - [x] HTTP API live: `https://backend-production-3017.up.railway.app/api/health` returns `agents: 357`
 - [x] Landing live: `https://frontend-production-c018.up.railway.app/` (HTTP 200)
@@ -52,8 +52,8 @@ All numbers in these launch assets come from the actual codebase, not estimation
 | 50+ security tests | `packages/techtide-swarm/tests/test_bash_gate_scenarios.py` |
 | 56 total tests | `make test` output |
 | $2,500/day total budget ceiling | Sum of per-layer limits in `config/swarm-compact.yaml` |
-| $0.12 GTM campaign cost | Observed from `swarm cost` output in testing |
-| 43-second runtime | Observed from `swarm run` timing in testing |
+| $0.0773 GTM campaign cost | Observed from OpenRouter Haiku live run 2026-07-24 |
+| 67-second runtime | Observed from `swarm run` timing in testing |
 | 42 soul template files | `templates/soul/` directory count |
 | Apache 2.0 license | `LICENSE` file |
 | Python 3.10+ | `pyproject.toml` classifiers |
@@ -61,7 +61,7 @@ All numbers in these launch assets come from the actual codebase, not estimation
 
 ## What to Update Before Using
 
-The $0.12 / 43s numbers in the video script and tweets come from test runs. Before launch:
+The $0.0773 / 43s numbers in the video script and tweets come from test runs. Before launch:
 
 1. Run `swarm run "Launch a GTM campaign for an AI training product"` in your terminal
 2. Run `swarm cost` to see the actual output

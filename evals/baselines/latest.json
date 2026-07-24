@@ -1,0 +1,65 @@
+{
+  "timestamp": 1784915511,
+  "results": [
+    {
+      "task_id": "eval-001",
+      "status": "success",
+      "cost_usd": 0.0019776,
+      "latency_ms": 11027,
+      "keyword_score": 1.0,
+      "length_ok": true,
+      "output_preview": "Certainly! Here are the top 3 trends in the AI agent automation market that are expected to emerge by 2026:  1. Increased Adoption of Conversational AI Assistants:    - The demand for intelligent virt",
+      "error": null,
+      "llm_judge_score": null,
+      "combined_score": 1.0
+    },
+    {
+      "task_id": "eval-002",
+      "status": "success",
+      "cost_usd": 0.001524,
+      "latency_ms": 4446,
+      "keyword_score": 1.0,
+      "length_ok": true,
+      "output_preview": "Subject: Supercharge Your Customer Support with AI Automation  Dear [CTO's Name],  I hope this email finds you well. I'm reaching out to share an exciting opportunity that could revolutionize your cus",
+      "error": null,
+      "llm_judge_score": null,
+      "combined_score": 1.0
+    },
+    {
+      "task_id": "eval-003",
+      "status": "success",
+      "cost_usd": 0.0003184,
+      "latency_ms": 1723,
+      "keyword_score": 1.0,
+      "length_ok": true,
+      "output_preview": "Here are 5 high-intent SEO keywords for an AI agent orchestration platform targeting enterprise buyers:  1. Enterprise AI orchestration platform 2. AI workflow automation for enterprises 3. Intelligen",
+      "error": null,
+      "llm_judge_score": null,
+      "combined_score": 1.0
+    },
+    {
+      "task_id": "eval-004",
+      "status": "success",
+      "cost_usd": 0.0013959999999999999,
+      "latency_ms": 5019,
+      "keyword_score": 1.0,
+      "length_ok": true,
+      "output_preview": "Here is a sample FAQ entry for \"How does Swarm 357 handle cost controls across agent layers?\":  **How does Swarm 357 handle cost controls across agent layers?**  Swarm 357 utilizes a multi-tiered appr",
+      "error": null,
+      "llm_judge_score": null,
+      "combined_score": 1.0
+    },
+    {
+      "task_id": "eval-005",
+      "status": "success",
+      "cost_usd": 0.0012231999999999998,
+      "latency_ms": 3497,
+      "keyword_score": 1.0,
+      "length_ok": true,
+      "output_preview": "Here is a 3-paragraph blog post introduction about the benefits of layered agent architectures for business automation:  Title: The Power of Layered Agent Architectures for Business Automation  In tod",
+      "error": null,
+      "llm_judge_score": null,
+      "combined_score": 1.0
+    }
+  ]
+}

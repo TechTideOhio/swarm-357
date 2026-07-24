@@ -174,13 +174,13 @@ class MemoryManager:
             os.getenv("SWARM_DREAM_USE_LLM", "").lower() in ("1", "true", "yes")
             and unique_contradictions
         ):
-            key = os.getenv("ANTHROPIC_API_KEY", "").strip()
-            if key and "your-key" not in key:
-                try:
-                    from anthropic import AsyncAnthropic
+            from techtide_swarm.llm import create_async_client, model_id, resolve_api_key
 
-                    client = AsyncAnthropic(api_key=key)
-                    model = os.getenv("SWARM_DREAM_LLM_MODEL", "claude-haiku-4-5-20251001")
+            key = resolve_api_key()
+            if key:
+                try:
+                    client = create_async_client()
+                    model = os.getenv("SWARM_DREAM_LLM_MODEL") or model_id("haiku")
                     brief = json.dumps(unique_contradictions[:5])[:8000]
                     msg = await client.messages.create(
                         model=model,
