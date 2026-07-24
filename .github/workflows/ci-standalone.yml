@@ -84,22 +84,31 @@ jobs:
         run: docker build -t swarm357-api:ci .
       - name: Health check agents == 357
         run: |
+          set -euo pipefail
           docker run -d --name swarm357-api -p 8000:8000 swarm357-api:ci
-          for i in $(seq 1 30); do
+          cleanup() { docker rm -f swarm357-api >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          ready=0
+          for i in $(seq 1 45); do
             if curl -sf http://127.0.0.1:8000/api/health > /tmp/health.json; then
+              ready=1
               break
             fi
             sleep 2
           done
+          if [ "$ready" != "1" ]; then
+            echo "API health endpoint did not become ready"
+            docker logs swarm357-api || true
+            exit 1
+          fi
           python - <<'PY'
           import json, sys
-          data = json.load(open("/tmp/health.json"))
+          data = json.load(open("/tmp/health.json", encoding="utf-8"))
           agents = data.get("agents")
           print(data)
           if agents != 357:
               sys.exit(f"expected agents==357, got {agents!r}")
           PY
-          docker rm -f swarm357-api
 
   frontend:
     runs-on: ubuntu-latest
