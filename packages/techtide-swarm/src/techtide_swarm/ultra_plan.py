@@ -29,18 +29,18 @@ class UltraPlan:
         """Return a plan dict; live API when key set."""
         plan_id = str(uuid.uuid4())
         started = time.perf_counter()
-        api_key = os.getenv("ANTHROPIC_API_KEY", "")
-        if not api_key or "your-key" in api_key:
+        from techtide_swarm.llm import create_async_client, model_id, resolve_api_key
+
+        api_key = resolve_api_key()
+        if not api_key:
             body = (
                 f"[stub ULTRAPLAN]\n\nObjective:\n{task}\n\n"
                 "Phases: (1) Discovery (2) Design (3) Rollout. "
-                "Set ANTHROPIC_API_KEY for full Opus planning."
+                "Set OPENROUTER_API_KEY or ANTHROPIC_API_KEY for full planning."
             )
         else:
-            from anthropic import AsyncAnthropic
-
-            client = AsyncAnthropic(api_key=api_key)
-            model = os.getenv("SWARM_MODEL_OPUS", "claude-opus-4-6")
+            client = create_async_client()
+            model = model_id(self.config.model or "opus")
             message = await client.messages.create(
                 model=model,
                 max_tokens=8192,

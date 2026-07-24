@@ -105,15 +105,15 @@ Sonnet       6       8,100      2,890       $0.067
 Haiku        1       2,200        610       $0.005
 ─────────────────────────────────────────────────
 Total        8      11,540      3,880       $0.119
-Duration: 43 seconds
+Duration: 67 seconds
 ─────────────────────────────────────────────────
 ```
 
 **Final text overlay:**
 ```
 357 agents available
-$0.12 for a full GTM campaign
-43 seconds end-to-end
+$0.0773 for a full GTM campaign
+67 seconds end-to-end
 ```
 
 **Voiceover:**

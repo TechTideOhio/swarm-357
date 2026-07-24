@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from techtide_swarm.http_security import max_run_budget_usd, require_swarm_write_key
+from techtide_swarm.llm import resolve_api_key
 from techtide_swarm.rate_limit import SwarmRateLimitMiddleware
 from techtide_swarm.structured_logging import CorrelationIdASGIMiddleware
 
@@ -138,7 +139,7 @@ def create_app(config_path: Path | None = None) -> FastAPI:
             "status": "ok",
             "version": "0.1.0",
             "agents": len(_get_roster()),
-            "api_key_set": bool(os.environ.get("ANTHROPIC_API_KEY")),
+            "api_key_set": bool(resolve_api_key()),
         }
 
     @app.get("/api/swarm/status")

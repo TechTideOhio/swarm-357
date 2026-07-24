@@ -10,7 +10,7 @@
 >
 > Sales. Support. Marketing. SEO. Research. Ops. All coordinated by a management layer of 10 Opus agents.
 >
-> One `pip install`. $0.12 for a full GTM campaign.
+> One `pip install`. $0.0773 for a full GTM campaign.
 >
 > Hereu2019s what I learned. ud83euddf5
 
@@ -45,7 +45,7 @@
 > u2192 Auto model downgrade at 80% utilization
 >
 > Total ceiling: $2,500/day for all 357 agents.
-> A full GTM campaign costs $0.12.
+> A full GTM campaign costs $0.0773.
 >
 > Cost controls arenu2019t bolted on. Theyu2019re enforced in code.
 
