@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Node / frontend
+.ui_landin_sample/
+node_modules/
+.next/
+
+# Rust / Memvid
+.repos and items/memvid-main/target/
+*.mv2
+
+# Swarm runtime data
+.swarm/
+*.jsonl
+
+# Dev / CI
+.github/
+.claude/
+.planning/
+docs/
+database/
+scripts/
+tests/
+e2e/
+
+# Secrets
+.env
+.env.*

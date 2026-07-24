@@ -7,7 +7,7 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 
 class MemvidBridgeError(RuntimeError):
@@ -66,7 +66,7 @@ class MemvidBridge:
         proc = self._run(["search", str(self.mv2_path), query, "--top-k", str(top_k)])
         if proc.returncode != 0:
             raise MemvidBridgeError(proc.stderr or proc.stdout or "search failed")
-        return json.loads(proc.stdout)
+        return cast(dict[str, Any], json.loads(proc.stdout))
 
     def verify(self, *, deep: bool = False) -> dict[str, Any]:
         args = ["verify", str(self.mv2_path)]
@@ -75,4 +75,4 @@ class MemvidBridge:
         proc = self._run(args)
         if proc.returncode != 0:
             raise MemvidBridgeError(proc.stderr or proc.stdout or "verify failed")
-        return json.loads(proc.stdout)
+        return cast(dict[str, Any], json.loads(proc.stdout))

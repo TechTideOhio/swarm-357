@@ -13,7 +13,7 @@ COPY templates/ ./templates/
 
 # Install the package into a prefix
 RUN pip install --no-cache-dir --prefix=/install \
-    "./packages/techtide-swarm"
+    "./packages/techtide-swarm[supabase]"
 
 # ── Runtime stage ─────────────────────────────────────────────────────────────
 FROM python:3.12-slim AS runtime

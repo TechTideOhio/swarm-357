@@ -20,6 +20,14 @@ swarm demo
 
 `swarm demo` works with or without an API key -- it shows the architecture and a sample stub when no key is set, or runs a live agent when `ANTHROPIC_API_KEY` is configured.
 
+## What "357 agents" means
+
+**357 agents** means **357 distinct agent identities** (YAML roster + soul templates), materialized at runtime—for example `sales-outreach-specialist-015`. It is **not** a claim about 357 parallel long-running LLM sessions or 357 simultaneous Opus calls. Layer execution uses bounded concurrency (`execute_layer` semaphore). Objective checks: [docs/VERIFY.md](docs/VERIFY.md) and `python scripts/generate_roster.py --compact --fix-counts`.
+
+## HTTP API (production)
+
+`uvicorn techtide_swarm.server:app` exposes **public GET** routes (`/api/health`, `/api/swarm/agents`, …) for demos. **POST** routes (`/api/swarm/run`, `/api/agent/run`, `/api/swarm/dream`) accept an optional shared secret: set `SWARM_API_KEY` on the server and send `X-SWARM-API-KEY` from clients. Use `SWARM_MAX_RUN_BUDGET_USD` (cap on request body `budget_usd`) and `SWARM_RATE_LIMIT_PER_MINUTE` (per-IP; `0` disables). See [.env.example](.env.example).
+
 ## What This Does
 
 - **`swarm run <task>`** -- Routes a task through the Conductor, which selects agents by role across layers. Passes context sequentially. Shows real cost and latency.
@@ -88,7 +96,7 @@ Set `MEMVID_SWARM_BRIDGE` to the binary path. See [`docs/MEMVID_BRIDGE.md`](docs
 
 ```bash
 make install    # pip install editable + dev deps
-make test       # pytest (56 tests, <1s)
+make test       # pytest (see packages/techtide-swarm/tests)
 make lint       # ruff check
 make typecheck  # mypy strict
 make all        # install + lint + typecheck + test
@@ -100,7 +108,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 GitHub Actions: [`.github/workflows/swarm357-ci.yml`](.github/workflows/swarm357-ci.yml)
 - Python: install, ruff, mypy, pytest
-- Roster: validate 357 agent counts
+- Roster: validate flat + compact 357-agent rosters
+- Docker: build image; `GET /api/health` must report `agents == 357`
 - Next.js: build + typecheck
 - Rust: cargo build + bridge integration tests
 
@@ -139,6 +148,7 @@ railway up --service backend
 
 # 3. Set backend env vars (replace with real values)
 railway variables set ANTHROPIC_API_KEY=sk-ant-... --service backend
+railway variables set SWARM_API_KEY=<long-random-secret> --service backend
 railway variables set SUPABASE_URL=https://xxxx.supabase.co --service backend
 railway variables set SUPABASE_SERVICE_KEY=eyJ... --service backend
 
@@ -149,6 +159,8 @@ railway up --service frontend --rootDirectory .ui_landin_sample/minimal
 #    - Get backend URL: railway domain --service backend
 #    - Set on frontend:
 railway variables set NEXT_PUBLIC_API_URL=https://<backend>.up.railway.app --service frontend
+#    - Optional: same value as SWARM_API_KEY if the landing "Try it live" form should POST from the browser
+# railway variables set NEXT_PUBLIC_SWARM_WRITE_KEY=<long-random-secret> --service frontend
 #    - Allow frontend origin on backend CORS:
 railway variables set ALLOWED_ORIGINS=https://<frontend>.up.railway.app --service backend
 

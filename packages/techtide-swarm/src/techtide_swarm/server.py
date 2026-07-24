@@ -1,15 +1,33 @@
 """FastAPI server exposing TechTide Swarm 357 as an HTTP API."""
 from __future__ import annotations
 
+import logging
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Annotated, Any, AsyncIterator, Callable
 
-from fastapi import FastAPI, HTTPException
+import yaml
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from techtide_swarm.http_security import max_run_budget_usd, require_swarm_write_key
+from techtide_swarm.rate_limit import SwarmRateLimitMiddleware
+from techtide_swarm.structured_logging import CorrelationIdASGIMiddleware
+
+if TYPE_CHECKING:
+    pass
+
+_server_logger = logging.getLogger(__name__)
+
 # ── Allowed CORS origins ─────────────────────────────────────────────────────
+# Extend at deploy time via ALLOWED_ORIGINS=https://a.example.com,https://b.example.com
+_EXTRA_ORIGINS = [
+    o.strip()
+    for o in os.getenv("ALLOWED_ORIGINS", "").split(",")
+    if o.strip()
+]
 _CORS_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
@@ -17,10 +35,19 @@ _CORS_ORIGINS = [
     "https://www.swarm357.com",
     "https://techtide.ai",
     "https://www.techtide.ai",
+    *_EXTRA_ORIGINS,
 ]
 
-# ── Default config path (resolved relative to this file) ────────────────────
-_DEFAULT_CONFIG = Path(__file__).parent.parent.parent.parent.parent / "config" / "swarm-compact.yaml"
+# ── Default config path (editable install, Docker /app, or SWARM_CONFIG_PATH) ─
+def default_config_path() -> Path:
+    """Resolve swarm-compact.yaml for local dev, Docker (/app/config), or env override."""
+    env = os.getenv("SWARM_CONFIG_PATH", "").strip()
+    if env:
+        return Path(env)
+    docker = Path("/app/config/swarm-compact.yaml")
+    if docker.is_file():
+        return docker
+    return Path(__file__).resolve().parent.parent.parent.parent.parent / "config" / "swarm-compact.yaml"
 
 
 # ── Request models ───────────────────────────────────────────────────────────
@@ -36,24 +63,47 @@ class AgentRunRequest(BaseModel):
     task: str
 
 
+# ── Lifespan ─────────────────────────────────────────────────────────────────
+
+def _make_lifespan(cfg: Path) -> Callable[[FastAPI], Any]:
+    @asynccontextmanager
+    async def _lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: ARG001
+        """Snapshot current swarm config to Supabase on startup."""
+        from techtide_swarm.persistence import store
+        if store.enabled and cfg.exists():
+            try:
+                with open(cfg, encoding="utf-8") as f:
+                    config_data = yaml.safe_load(f) or {}
+                store.snapshot_config(config_data)
+            except Exception as exc:  # noqa: BLE001
+                _server_logger.warning("Config snapshot failed: %s", exc)
+        yield
+    return _lifespan
+
+
 # ── App factory ──────────────────────────────────────────────────────────────
 
 def create_app(config_path: Path | None = None) -> FastAPI:
     """Create and return the FastAPI application."""
-    cfg = config_path or _DEFAULT_CONFIG
+    cfg = config_path if config_path is not None else default_config_path()
 
     app = FastAPI(
         title="TechTide Swarm 357 API",
         description="357 Claude AI agents organized into 6 business layers",
         version="0.1.0",
+        lifespan=_make_lifespan(cfg),
     )
 
+    # Innermost (closest to routes): correlation id + structured JSON logs.
+    app.add_middleware(CorrelationIdASGIMiddleware)
+    app.add_middleware(SwarmRateLimitMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_CORS_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["X-Correlation-ID"],
     )
 
     # ── Roster cache (loaded once per app instance) ──────────────────────────
@@ -155,9 +205,25 @@ def create_app(config_path: Path | None = None) -> FastAPI:
             "per_layer_usd": per_layer,
         }
 
+    @app.get("/api/swarm/runs")
+    async def swarm_runs(limit: int = 10) -> dict[str, Any]:
+        from techtide_swarm.telemetry import get_recent_runs
+        runs = get_recent_runs(limit=limit)
+        return {"runs": runs, "total": len(runs)}
+
     @app.post("/api/swarm/run")
-    async def swarm_run(req: SwarmRunRequest) -> dict[str, Any]:
+    async def swarm_run(
+        req: SwarmRunRequest,
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+    ) -> dict[str, Any]:
         from techtide_swarm.swarm import Swarm
+
+        cap = max_run_budget_usd()
+        if req.budget_usd > cap:
+            raise HTTPException(
+                status_code=400,
+                detail=f"budget_usd must be <= {cap} (SWARM_MAX_RUN_BUDGET_USD)",
+            )
 
         try:
             if not cfg.exists():
@@ -166,7 +232,7 @@ def create_app(config_path: Path | None = None) -> FastAPI:
             swarm = Swarm(cfg)
             if req.layer:
                 results = await swarm.execute_layer(
-                    req.layer, req.task, budget_usd=req.budget_usd
+                    req.layer, req.task, budget_usd=min(req.budget_usd, cap)
                 )
                 total_cost = sum(r.cost_usd for r in results)
                 final = results[-1].output if results else ""
@@ -178,7 +244,7 @@ def create_app(config_path: Path | None = None) -> FastAPI:
                     "agent_results": [_agent_result_dict(r) for r in results],
                 }
             else:
-                result = await swarm.execute(req.task, budget_usd=req.budget_usd)
+                result = await swarm.execute(req.task, budget_usd=min(req.budget_usd, cap))
                 return {
                     "pipeline_id": result.pipeline_id,
                     "status": result.status,
@@ -197,7 +263,10 @@ def create_app(config_path: Path | None = None) -> FastAPI:
             }
 
     @app.post("/api/agent/run")
-    async def agent_run(req: AgentRunRequest) -> dict[str, Any]:
+    async def agent_run(
+        req: AgentRunRequest,
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+    ) -> dict[str, Any]:
         from techtide_swarm.agent import Agent, AgentConfig
         from techtide_swarm.core.types import LayerType
 
@@ -237,11 +306,15 @@ def create_app(config_path: Path | None = None) -> FastAPI:
             }
 
     @app.post("/api/swarm/dream")
-    async def swarm_dream() -> dict[str, Any]:
+    async def swarm_dream(
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+    ) -> dict[str, Any]:
         from techtide_swarm.memory import MemoryManager
+        from techtide_swarm.persistence import store as _store
         mem = MemoryManager()
         try:
             report = await mem.run_dream_cycle()
+            _store.log_dream(report)
             return report
         except Exception as exc:
             return {"status": "error", "error": str(exc)}

@@ -40,6 +40,10 @@ class EvalResult:
     length_ok: bool
     output_preview: str
     error: str | None = None
+    llm_judge_score: float | None = None
+    """Set when SWARM_EVAL_LLM_JUDGE=1 and ANTHROPIC_API_KEY is set (Haiku 0..1)."""
+    combined_score: float | None = None
+    """0.6 * keyword_score + 0.4 * llm_judge when LLM judge runs; else keyword only."""
 
 
 EVAL_TASKS: list[EvalTask] = [
@@ -74,6 +78,46 @@ EVAL_TASKS: list[EvalTask] = [
         expected_keywords=["layer", "agent", "business", "automation"],
     ),
 ]
+
+
+async def maybe_llm_judge(task_description: str, output: str) -> float | None:
+    """Optional quality score from Claude Haiku. Disabled unless SWARM_EVAL_LLM_JUDGE is set."""
+    if os.getenv("SWARM_EVAL_LLM_JUDGE", "").lower() not in ("1", "true", "yes"):
+        return None
+    key = os.getenv("ANTHROPIC_API_KEY", "").strip()
+    if not key or "your-key" in key:
+        return None
+    try:
+        from anthropic import AsyncAnthropic
+
+        client = AsyncAnthropic(api_key=key)
+        model = os.getenv("SWARM_EVAL_JUDGE_MODEL", "claude-haiku-4-5-20251001")
+        msg = await client.messages.create(
+            model=model,
+            max_tokens=120,
+            messages=[
+                {
+                    "role": "user",
+                    "content": (
+                        "Rate how well the OUTPUT addresses the TASK on a scale of 0.0 to 1.0. "
+                        "Reply with JSON only: {\"score\": <float>}.\n\n"
+                        f"TASK:\n{task_description[:2000]}\n\nOUTPUT:\n{output[:6000]}"
+                    ),
+                }
+            ],
+        )
+        text = ""
+        for block in msg.content:
+            if getattr(block, "type", None) == "text":
+                text += getattr(block, "text", "")
+        start, end = text.find("{"), text.rfind("}")
+        if start < 0 or end <= start:
+            return None
+        data = json.loads(text[start : end + 1])
+        score = float(data.get("score", 0.0))
+        return max(0.0, min(1.0, score))
+    except Exception:
+        return None
 
 
 def score_keywords(output: str, expected: list[str]) -> float:
@@ -137,6 +181,8 @@ async def run_eval_task(task: EvalTask, use_swarm: bool = False) -> EvalResult:
         latency = int((time.perf_counter() - started) * 1000)
         kw_score = score_keywords(output, task.expected_keywords)
         length_ok = len(output) >= task.min_output_length
+        llm_j = await maybe_llm_judge(task.description, output)
+        combined = (0.6 * kw_score + 0.4 * llm_j) if llm_j is not None else kw_score
 
         return EvalResult(
             task_id=task.task_id,
@@ -146,6 +192,8 @@ async def run_eval_task(task: EvalTask, use_swarm: bool = False) -> EvalResult:
             keyword_score=kw_score,
             length_ok=length_ok,
             output_preview=output[:200].replace("\n", " "),
+            llm_judge_score=llm_j,
+            combined_score=combined,
         )
     except Exception as e:
         latency = int((time.perf_counter() - started) * 1000)
@@ -226,16 +274,29 @@ def main() -> None:
     results = asyncio.run(run_all_evals(save=args.save_baseline, use_swarm=args.swarm))
 
     total_cost = sum(r.cost_usd for r in results)
-    avg_kw = sum(r.keyword_score for r in results) / len(results) if results else 0
     successes = sum(1 for r in results if r.status == "success")
 
+    use_llm = any(r.llm_judge_score is not None for r in results)
+    avg_metric = (
+        sum((r.combined_score or r.keyword_score) for r in results) / len(results)
+        if results
+        else 0.0
+    )
     print(f"\n--- Eval Summary ---")
-    print(f"Tasks: {len(results)} | Passed: {successes} | Avg keyword score: {avg_kw:.2f}")
+    print(
+        f"Tasks: {len(results)} | Passed: {successes} | "
+        f"Avg {'combined' if use_llm else 'keyword'} score: {avg_metric:.2f}"
+    )
     print(f"Total cost: ${total_cost:.4f}")
 
     for r in results:
-        status = "OK" if r.status == "success" and r.keyword_score >= 0.5 else "WARN"
-        print(f"  [{status}] {r.task_id}: kw={r.keyword_score:.2f} len_ok={r.length_ok} ${r.cost_usd:.4f} {r.latency_ms}ms")
+        metric = r.combined_score if r.combined_score is not None else r.keyword_score
+        status = "OK" if r.status == "success" and metric >= 0.5 else "WARN"
+        llm_part = f" llm={r.llm_judge_score:.2f}" if r.llm_judge_score is not None else ""
+        print(
+            f"  [{status}] {r.task_id}: kw={r.keyword_score:.2f}{llm_part} "
+            f"score={metric:.2f} len_ok={r.length_ok} ${r.cost_usd:.4f} {r.latency_ms}ms"
+        )
 
     if args.compare:
         baseline = load_baseline(Path("evals/baselines"))

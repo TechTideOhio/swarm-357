@@ -11,9 +11,12 @@ Registers:
 
 from __future__ import annotations
 
+import importlib
+import importlib.util
 import logging
 import os
 import re
+from typing import Any, cast
 
 from techtide_swarm.tools.registry import registry
 
@@ -47,7 +50,8 @@ def _strip_html(html: str) -> str:
 
 
 def _scrape_firecrawl(url: str) -> str:
-    from firecrawl import FirecrawlApp
+    fc_mod = importlib.import_module("firecrawl")
+    FirecrawlApp = cast(Any, getattr(fc_mod, "FirecrawlApp"))
     app = FirecrawlApp(api_key=os.environ["FIRECRAWL_API_KEY"])
     result = app.scrape_url(url, formats=["markdown"])
     if isinstance(result, dict):
@@ -56,7 +60,8 @@ def _scrape_firecrawl(url: str) -> str:
 
 
 def _scrape_exa(url: str) -> str:
-    from exa_py import Exa
+    exa_mod = importlib.import_module("exa_py")
+    Exa = cast(Any, getattr(exa_mod, "Exa"))
     client = Exa(api_key=os.environ["EXA_API_KEY"])
     result = client.get_contents([url], text={"max_characters": _MAX_CHARS})
     if result.results:
@@ -86,21 +91,15 @@ def web_scrape(url: str) -> str:
 
     Tries Firecrawl (rich markdown), then Exa, then plain httpx + HTML strip.
     """
-    if _has_env("FIRECRAWL_API_KEY"):
+    if _has_env("FIRECRAWL_API_KEY") and importlib.util.find_spec("firecrawl") is not None:
         try:
-            import firecrawl  # noqa: F401
             return _scrape_firecrawl(url)
-        except ImportError:
-            logger.debug("firecrawl not installed; trying Exa")
         except Exception as exc:
             logger.warning("Firecrawl scrape failed: %s", exc)
 
-    if _has_env("EXA_API_KEY"):
+    if _has_env("EXA_API_KEY") and importlib.util.find_spec("exa_py") is not None:
         try:
-            import exa_py  # noqa: F401
             return _scrape_exa(url)
-        except ImportError:
-            logger.debug("exa_py not installed; falling back to httpx")
         except Exception as exc:
             logger.warning("Exa scrape failed: %s", exc)
 

@@ -86,7 +86,7 @@ class Agent:
             model_id = self._model_id(self.config.model)
             system_prompt = self._load_system_prompt()
             
-            messages = [{"role": "user", "content": task}]
+            messages: list[dict[str, Any]] = [{"role": "user", "content": task}]
             tools = get_anthropic_tools(self.config.tools)
             
             total_cost = 0.0
@@ -110,11 +110,17 @@ class Agent:
 
                 message = await client.messages.create(**create_kwargs)
                 total_cost += self._estimate_cost(message, model_id)
-                
+
                 messages.append({"role": "assistant", "content": message.content})
-                
+
+                if total_cost >= budget:
+                    final_text = self._extract_text(message) or (
+                        f"Budget limit reached (${budget:.2f}). Stopping."
+                    )
+                    break
+
                 tool_uses = [block for block in message.content if getattr(block, "type", None) == "tool_use"]
-                
+
                 if not tool_uses:
                     final_text = self._extract_text(message)
                     break

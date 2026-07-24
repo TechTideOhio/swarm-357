@@ -11,9 +11,12 @@ Registers:
 
 from __future__ import annotations
 
+import importlib
+import importlib.util
 import json
 import logging
 import os
+from typing import Any, cast
 
 from techtide_swarm.tools.registry import registry
 
@@ -27,23 +30,16 @@ def _has_env(name: str) -> bool:
 
 def check_web_search() -> bool:
     """Return True when at least one real search backend is available."""
-    if _has_env("EXA_API_KEY"):
-        try:
-            import exa_py  # noqa: F401
-            return True
-        except ImportError:
-            pass
-    if _has_env("FIRECRAWL_API_KEY"):
-        try:
-            import firecrawl  # noqa: F401
-            return True
-        except ImportError:
-            pass
+    if _has_env("EXA_API_KEY") and importlib.util.find_spec("exa_py") is not None:
+        return True
+    if _has_env("FIRECRAWL_API_KEY") and importlib.util.find_spec("firecrawl") is not None:
+        return True
     return False
 
 
 def _search_exa(query: str, num_results: int) -> str:
-    from exa_py import Exa
+    exa_mod = importlib.import_module("exa_py")
+    Exa = cast(Any, getattr(exa_mod, "Exa"))
     client = Exa(api_key=os.environ["EXA_API_KEY"])
     response = client.search_and_contents(
         query,
@@ -61,7 +57,8 @@ def _search_exa(query: str, num_results: int) -> str:
 
 
 def _search_firecrawl(query: str, num_results: int) -> str:
-    from firecrawl import FirecrawlApp
+    fc_mod = importlib.import_module("firecrawl")
+    FirecrawlApp = cast(Any, getattr(fc_mod, "FirecrawlApp"))
     app = FirecrawlApp(api_key=os.environ["FIRECRAWL_API_KEY"])
     response = app.search(query, limit=num_results)
     data = response if isinstance(response, list) else (response.get("data") or [])
@@ -80,21 +77,15 @@ def web_search(query: str, num_results: int = 5) -> str:
     Tries Exa first, then Firecrawl; falls back to an informative stub when
     no API keys are available.
     """
-    if _has_env("EXA_API_KEY"):
+    if _has_env("EXA_API_KEY") and importlib.util.find_spec("exa_py") is not None:
         try:
-            import exa_py  # noqa: F401 — verify importable before calling
             return _search_exa(query, num_results)
-        except ImportError:
-            logger.debug("exa_py not installed; trying next backend")
         except Exception as exc:
             logger.warning("Exa search failed: %s", exc)
 
-    if _has_env("FIRECRAWL_API_KEY"):
+    if _has_env("FIRECRAWL_API_KEY") and importlib.util.find_spec("firecrawl") is not None:
         try:
-            import firecrawl  # noqa: F401
             return _search_firecrawl(query, num_results)
-        except ImportError:
-            logger.debug("firecrawl not installed; falling back to stub")
         except Exception as exc:
             logger.warning("Firecrawl search failed: %s", exc)
 
