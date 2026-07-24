@@ -23,7 +23,7 @@ Burn passes (`{task_id}-burnN`) consume remaining budget with tool-enabled singl
 
 ## Current baseline
 
-![Eval results by layer](assets/eval-results.svg)
+![Eval results by layer](assets/eval-results.png)
 
 <!-- include generated snippet -->
 

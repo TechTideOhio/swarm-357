@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-label="Swarm 357 request lifecycle">
   <title>POST /api/swarm/run lifecycle</title>
   <rect width="960" height="420" fill="#fafafa"/>
@@ -20,7 +21,7 @@
 
     <rect x="680" y="100" width="240" height="64" rx="8" fill="#fffbeb" stroke="#ffd900" stroke-width="2"/>
     <text x="800" y="128" text-anchor="middle" font-size="12" font-weight="700" fill="#0a0a0a">Conductor</text>
-    <text x="800" y="146" text-anchor="middle" font-size="10" fill="#737373">text-only · max_turns=2</text>
+    <text x="800" y="146" text-anchor="middle" font-size="10" fill="#737373">text-only Â· max_turns=2</text>
   </g>
 
   <!-- arrows row 1 -->
@@ -40,26 +41,26 @@
 
   <rect x="560" y="214" width="320" height="64" rx="8" fill="#0a0a0a"/>
   <text x="720" y="242" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700" fill="#ffd900">Role agents</text>
-  <text x="720" y="260" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="10" fill="#a3a3a3">layer specialists · capped turns · tool loop</text>
+  <text x="720" y="260" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="10" fill="#a3a3a3">layer specialists Â· capped turns Â· tool loop</text>
 
   <line x1="720" y1="278" x2="720" y2="310" stroke="#0a0a0a" stroke-width="2" marker-end="url(#arrow)"/>
 
   <rect x="480" y="314" width="200" height="64" rx="8" fill="#fff" stroke="#e5e5e5" stroke-width="2"/>
   <text x="580" y="342" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700" fill="#0a0a0a">input_normalize</text>
-  <text x="580" y="360" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="10" fill="#737373">alias coerce · kwargs filter</text>
+  <text x="580" y="360" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="10" fill="#737373">alias coerce Â· kwargs filter</text>
 
   <rect x="720" y="314" width="200" height="64" rx="8" fill="#fff" stroke="#e5e5e5" stroke-width="2"/>
   <text x="820" y="342" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700" fill="#0a0a0a">ToolRegistry</text>
-  <text x="820" y="360" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="10" fill="#737373">Read · Write · Bash · Web</text>
+  <text x="820" y="360" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="10" fill="#737373">Read Â· Write Â· Bash Â· Web</text>
 
   <line x1="680" y1="346" x2="716" y2="346" stroke="#0a0a0a" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- telemetry -->
   <rect x="40" y="214" width="400" height="164" rx="10" fill="#f5f5f5" stroke="#e5e5e5" stroke-width="2"/>
   <text x="60" y="244" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700" fill="#0a0a0a">Observability</text>
-  <text x="60" y="270" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">· .swarm/telemetry.jsonl</text>
-  <text x="60" y="292" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">· X-Correlation-ID + structured logs</text>
-  <text x="60" y="314" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">· CostController.record_spend()</text>
-  <text x="60" y="336" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">· optional Supabase dual-write</text>
-  <text x="60" y="358" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">· BashSecurityGate on shell tools</text>
+  <text x="60" y="270" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">Â· .swarm/telemetry.jsonl</text>
+  <text x="60" y="292" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">Â· X-Correlation-ID + structured logs</text>
+  <text x="60" y="314" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">Â· CostController.record_spend()</text>
+  <text x="60" y="336" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">Â· optional Supabase dual-write</text>
+  <text x="60" y="358" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#525252">Â· BashSecurityGate on shell tools</text>
 </svg>

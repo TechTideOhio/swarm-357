@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/banner.svg" alt="TechTide Swarm 357" width="100%" />
+  <img src="docs/assets/banner.png" alt="TechTide Swarm 357" width="100%" />
 </p>
 
 # TechTide Swarm 357
@@ -12,7 +12,7 @@
 Layered agent orchestration for business automation — **357** Claude AI agent roles across **6** business layers, backed by portable Memvid memory and honest cost controls.
 
 <p align="center">
-  <img src="docs/assets/architecture.svg" alt="Swarm 357 architecture" width="90%" />
+  <img src="docs/assets/architecture.png" alt="Swarm 357 architecture" width="90%" />
 </p>
 
 ```mermaid
@@ -60,7 +60,7 @@ Built by [TechTide AI](https://techtide.ai) for Claude Code–native workflows. 
 
 Numbers below come from [`evals/baselines/latest.json`](evals/baselines/latest.json) via [`scripts/render_eval_assets.py`](scripts/render_eval_assets.py). Full write-up: [docs/EVALS.md](docs/EVALS.md).
 
-![Eval results by layer](docs/assets/eval-results.svg)
+![Eval results by layer](docs/assets/eval-results.png)
 
 | Metric | Value |
 |--------|------:|
@@ -95,7 +95,7 @@ swarm eval --save-baseline --compare
 
 ## Request lifecycle
 
-![Request lifecycle](docs/assets/request-lifecycle.svg)
+![Request lifecycle](docs/assets/request-lifecycle.png)
 
 ```mermaid
 flowchart LR
