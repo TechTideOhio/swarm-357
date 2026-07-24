@@ -33,8 +33,11 @@ CI workflow [`.github/workflows/publish.yml`](.github/workflows/publish.yml):
 
 1. Push tag `v*` to `TechTideOhio/swarm-357`.
 2. Job builds wheel/sdist.
-3. Publishes to PyPI via OIDC trusted publishing (`environment: pypi`).
-4. Creates a GitHub Release with artifacts attached.
+3. Publishes to PyPI via `PYPI_API_TOKEN` (if set) or OIDC trusted publishing
+   (`environment: pypi`). Trusted publisher must be registered for
+   `TechTideOhio/swarm-357` / workflow `publish.yml` / environment `pypi`.
+4. Creates a GitHub Release with artifacts attached (even if PyPI fails, so the
+   tag is not silent).
 
 ```bash
 # From the public repo clone (swarm357-sync), after content is mirrored:
