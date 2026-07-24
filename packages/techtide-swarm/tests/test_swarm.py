@@ -40,6 +40,154 @@ def test_cost_controller_downgrade():
     assert cc.should_downgrade_model("nonexistent") is False
 
 
+def test_cost_controller_record_spend_triggers_downgrade():
+    cc = CostController()
+    cc.set_budget("research", daily_limit_usd=100.0)
+    cc.record_spend("research", 79.0)
+    assert cc.should_downgrade_model("research") is False
+    cc.record_spend("research", 1.0)
+    assert cc.should_downgrade_model("research") is True
+    report = cc.get_swarm_cost_report()
+    assert report["layers"]["research"]["spent_usd"] == 80.0
+    assert report["layers"]["research"]["utilization_pct"] == 80.0
+
+
+def test_cost_controller_record_spend_ignores_zero():
+    cc = CostController()
+    cc.set_budget("sales", daily_limit_usd=50.0)
+    cc.record_spend("sales", 0.0)
+    cc.record_spend("sales", -1.0)
+    assert cc.get_swarm_cost_report()["layers"]["sales"]["spent_usd"] == 0.0
+
+
+@pytest.mark.asyncio
+async def test_execute_records_spend(tmp_path, monkeypatch):
+    """Swarm.execute records agent costs into CostController."""
+    from techtide_swarm.agent import AgentResult
+
+    compact = textwrap.dedent("""\
+        swarm:
+          version: "2.0"
+          layer_budgets:
+            research: {daily_limit_usd: 10.0, model_preference: sonnet}
+            management: {daily_limit_usd: 10.0, model_preference: opus}
+        layers:
+          management:
+            roles:
+              conductor: {count: 1, model: opus, budget_usd: 5.0, tools: [Read]}
+            soul: templates/soul/management/conductor.md
+          research:
+            roles:
+              market_analyst: {count: 1, model: sonnet, budget_usd: 2.0, tools: [Read]}
+            soul: templates/soul/research/market-analyst.md
+    """)
+    cfg = tmp_path / "compact.yaml"
+    cfg.write_text(compact)
+    swarm = Swarm(cfg)
+    await swarm.boot()
+
+    async def fake_run(self, task: str) -> AgentResult:
+        return AgentResult(
+            agent_name=self.config.name,
+            output="market_analyst" if self.config.role == "conductor" else "ok",
+            cost_usd=1.0,
+            latency_ms=1,
+            status="success",
+        )
+
+    monkeypatch.setattr("techtide_swarm.agent.Agent.run", fake_run)
+    result = await swarm.execute("Test task", budget_usd=10.0)
+    assert result.status == "ok"
+    report = swarm.cost_controller.get_swarm_cost_report()
+    assert report["layers"]["management"]["spent_usd"] == 1.0
+    assert report["layers"]["research"]["spent_usd"] == 1.0
+
+
+@pytest.mark.asyncio
+async def test_execute_layer_downgrades_after_spend(tmp_path, monkeypatch):
+    """execute_layer uses haiku once CostController hits the 80% threshold."""
+    from techtide_swarm.agent import AgentResult
+
+    compact = textwrap.dedent("""\
+        swarm:
+          version: "2.0"
+          layer_budgets:
+            research: {daily_limit_usd: 10.0, model_preference: sonnet}
+        layers:
+          research:
+            roles:
+              market_analyst: {count: 1, model: sonnet, budget_usd: 2.0, tools: [Read]}
+            soul: templates/soul/research/market-analyst.md
+    """)
+    cfg = tmp_path / "compact.yaml"
+    cfg.write_text(compact)
+    swarm = Swarm(cfg)
+    await swarm.boot()
+    swarm.cost_controller.record_spend("research", 8.0)
+    assert swarm.cost_controller.should_downgrade_model("research") is True
+
+    seen_models: list[str] = []
+
+    async def fake_run(self, task: str) -> AgentResult:
+        seen_models.append(self.config.model)
+        return AgentResult(
+            agent_name=self.config.name,
+            output="ok",
+            cost_usd=0.5,
+            latency_ms=1,
+            status="success",
+        )
+
+    monkeypatch.setattr("techtide_swarm.agent.Agent.run", fake_run)
+    results = await swarm.execute_layer("research", "task", budget_usd=5.0)
+    assert len(results) == 1
+    assert seen_models == ["haiku"]
+    assert swarm.cost_controller.get_swarm_cost_report()["layers"]["research"]["spent_usd"] == 8.5
+
+
+@pytest.mark.asyncio
+async def test_conductor_fallback_uses_roster_roles(tmp_path, monkeypatch):
+    """Stub/unparseable conductor output falls back to roles that exist in the roster."""
+    from techtide_swarm.agent import AgentResult
+
+    compact = textwrap.dedent("""\
+        swarm:
+          version: "2.0"
+          layer_budgets:
+            research: {daily_limit_usd: 100.0, model_preference: sonnet}
+            management: {daily_limit_usd: 100.0, model_preference: opus}
+        layers:
+          management:
+            roles:
+              conductor: {count: 1, model: opus, budget_usd: 5.0, tools: [Read]}
+            soul: templates/soul/management/conductor.md
+          research:
+            roles:
+              market_analyst: {count: 1, model: sonnet, budget_usd: 2.0, tools: [Read]}
+            soul: templates/soul/research/market-analyst.md
+    """)
+    cfg = tmp_path / "compact.yaml"
+    cfg.write_text(compact)
+    swarm = Swarm(cfg)
+    await swarm.boot()
+
+    async def fake_run(self, task: str) -> AgentResult:
+        # Unparseable role list (matches stub-style output)
+        output = "[stub] would process" if self.config.role == "conductor" else "done"
+        return AgentResult(
+            agent_name=self.config.name,
+            output=output,
+            cost_usd=0.1,
+            latency_ms=1,
+            status="success",
+        )
+
+    monkeypatch.setattr("techtide_swarm.agent.Agent.run", fake_run)
+    result = await swarm.execute("Test task", budget_usd=10.0)
+    names = [r.agent_name for r in result.agent_results]
+    assert any("market-analyst" in n or "market_analyst" in n for n in names)
+
+
 def test_compact_format_expansion(tmp_path):
     """Compact YAML with layers/roles generates the correct agent count."""
     compact = textwrap.dedent("""\

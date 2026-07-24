@@ -55,6 +55,19 @@ class CostController:
         lb.utilization_pct = (lb.spent_usd / daily_limit_usd * 100) if daily_limit_usd else 0.0
         self._layers[layer] = lb
 
+    def record_spend(self, layer: str, cost_usd: float) -> None:
+        """Accumulate spend for a layer and refresh utilization."""
+        if cost_usd <= 0:
+            return
+        lb = self._layers.get(layer)
+        if lb is None:
+            lb = LayerBudget()
+            self._layers[layer] = lb
+        lb.spent_usd += cost_usd
+        lb.utilization_pct = (
+            (lb.spent_usd / lb.daily_limit_usd * 100) if lb.daily_limit_usd else 0.0
+        )
+
     def get_swarm_cost_report(self) -> dict[str, Any]:
         layers_out: dict[str, dict[str, Any]] = {}
         for name, lb in self._layers.items():
@@ -223,6 +236,7 @@ class Swarm:
                 agent = Agent(run_cfg)
                 result = await agent.run(task)
                 spent += result.cost_usd
+                self.cost_controller.record_spend(layer, result.cost_usd)
                 return result
 
         return list(await asyncio.gather(*[run_one(cfg) for cfg in configs]))
@@ -266,6 +280,7 @@ class Swarm:
             conductor_res = await conductor.run(routing_prompt)
             results.append(conductor_res)
             total += conductor_res.cost_usd
+            self.cost_controller.record_spend(conductor_cfg.layer.value, conductor_res.cost_usd)
 
             if conductor_res.status != "success":
                 return SwarmExecutionResult(
@@ -276,11 +291,26 @@ class Swarm:
                     final_output=f"Conductor failed: {conductor_res.error}",
                 )
 
-            # Parse conductor output
-            roles_to_run = [r.strip() for r in conductor_res.output.split(",") if r.strip()]
+            # Parse conductor output; keep only roles that exist in the roster
+            available_set = set(available_roles)
+            roles_to_run = [
+                r.strip()
+                for r in conductor_res.output.split(",")
+                if r.strip() and r.strip() in available_set
+            ]
             if not roles_to_run:
-                # Fallback if conductor fails to parse
-                roles_to_run = ["market_researcher", "content_strategist", "outreach_specialist"]
+                # Prefer known specialists that exist; else one agent per layer
+                preferred = [
+                    "market_analyst",
+                    "market_researcher",
+                    "content_strategist",
+                    "outreach_specialist",
+                ]
+                roles_to_run = [r for r in preferred if r in available_set]
+            if not roles_to_run:
+                roles_to_run = [
+                    c.role for c in self._default_pipeline_configs() if c.role in available_set
+                ]
 
             # 3. Execute the selected roles
             for role in roles_to_run:
@@ -323,6 +353,7 @@ class Swarm:
                 results.append(res)
                 total += res.cost_usd
                 remaining_budget -= res.cost_usd
+                self.cost_controller.record_spend(agent_cfg.layer.value, res.cost_usd)
                 if res.output:
                     final_chunks.append(res.output)
         except Exception:

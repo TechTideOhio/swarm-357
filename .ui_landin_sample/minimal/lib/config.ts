@@ -13,16 +13,16 @@ export const siteConfig = {
   url: "https://swarm357.techtide.ai",
   social: {
     twitter: "@techtide",
-    github: "https://github.com/TechTide-AI/swarm357",
+    github: "https://github.com/TechTideOhio/swarm-357",
   },
   nav: {
     cta: {
       text: "Get the repo",
-      href: "https://github.com/TechTide-AI/swarm357",
+      href: "https://github.com/TechTideOhio/swarm-357",
     },
     signIn: {
       text: "Docs",
-      href: "https://github.com/TechTide-AI/swarm357/blob/main/CLAUDE.md",
+      href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md",
     },
   },
 } as const;
@@ -38,7 +38,7 @@ export const heroConfig = {
   cta: {
     primary: {
       text: "Install the Python package",
-      href: "https://github.com/TechTide-AI/swarm357/tree/main/packages/techtide-swarm",
+      href: "https://github.com/TechTideOhio/swarm-357/tree/main/packages/techtide-swarm",
     },
     secondary: {
       text: "See architecture",
@@ -67,7 +67,7 @@ export const howItWorksConfig = {
     "Marketing site and docs bring people in; the swarm CLI and YAML layers coordinate work; Memvid stores portable memory; Opik (optional) and cost reports keep production honest.",
   cta: {
     text: "Read CLAUDE.md",
-    href: "https://github.com/TechTide-AI/swarm357/blob/main/CLAUDE.md",
+    href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md",
   },
 } as const;
 
@@ -92,11 +92,11 @@ export const pricingConfig = {
   cta: {
     primary: {
       text: "View on GitHub",
-      href: "https://github.com/TechTide-AI/swarm357",
+      href: "https://github.com/TechTideOhio/swarm-357",
     },
     secondary: {
       text: "Enterprise controls",
-      href: "https://github.com/TechTide-AI/swarm357",
+      href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/ENTERPRISE_CONTROLS.md",
     },
   },
 } as const;
@@ -104,10 +104,10 @@ export const pricingConfig = {
 export const faqConfig = {
   title: "Common Questions",
   contact: {
-    text: "Still have questions? Read the research pack under .planning/research.",
+    text: "Still have questions? Open an issue on GitHub.",
     cta: {
       text: "Get in Touch",
-      href: "https://github.com/TechTide-AI/swarm357/issues",
+      href: "https://github.com/TechTideOhio/swarm-357/issues",
     },
   },
 } as const;
@@ -118,7 +118,7 @@ export const finalCtaConfig = {
     "Clone the repo, pip install the techtide-swarm package, optional-build the Memvid bridge, and point your Claude Code session at CLAUDE.md.",
   cta: {
     text: "Start with swarm init",
-    href: "https://github.com/TechTide-AI/swarm357",
+    href: "https://github.com/TechTideOhio/swarm-357",
   },
 } as const;
 
@@ -127,27 +127,27 @@ export const footerConfig = {
     "Swarm 357 pairs layered business agents with Memvid single-file memory and honest cost surfaces—so your GitHub story matches what security and FinOps reviewers can verify.",
   cta: {
     text: "Documentation",
-    href: "https://github.com/TechTide-AI/swarm357/blob/main/CLAUDE.md",
+    href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md",
   },
   links: {
     product: [
-      { label: "Python package", href: "https://github.com/TechTide-AI/swarm357/tree/main/packages/techtide-swarm" },
-      { label: "Memvid bridge", href: "https://github.com/TechTide-AI/swarm357/tree/main/packages/memvid-swarm-bridge" },
-      { label: "CLI reference", href: "https://github.com/TechTide-AI/swarm357/blob/main/CLAUDE.md" },
-      { label: "Enterprise controls", href: "https://github.com/TechTide-AI/swarm357" },
+      { label: "Python package", href: "https://github.com/TechTideOhio/swarm-357/tree/main/packages/techtide-swarm" },
+      { label: "Memvid bridge", href: "https://github.com/TechTideOhio/swarm-357/tree/main/packages/memvid-swarm-bridge" },
+      { label: "CLI reference", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md" },
+      { label: "Enterprise controls", href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/ENTERPRISE_CONTROLS.md" },
     ],
     company: [
-      { label: "Architecture", href: "https://github.com/TechTide-AI/swarm357/blob/main/CLAUDE.md" },
-      { label: "Research notes", href: "https://github.com/TechTide-AI/swarm357" },
-      { label: "Contributing", href: "https://github.com/TechTide-AI/swarm357" },
-      { label: "Contact", href: "https://github.com/TechTide-AI/swarm357/issues" },
+      { label: "Architecture", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md" },
+      { label: "Research notes", href: "https://github.com/TechTideOhio/swarm-357/tree/main/docs" },
+      { label: "Contributing", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CONTRIBUTING.md" },
+      { label: "Contact", href: "https://github.com/TechTideOhio/swarm-357/issues" },
     ],
   },
   contact: {
     location: "Remote",
     address: "",
     hours: "",
-    email: "hello@example.com",
+    email: "https://github.com/TechTideOhio/swarm-357/issues",
   },
   copyright: `© ${new Date().getFullYear()} TechTide Swarm 357`,
 } as const;
@@ -162,6 +162,7 @@ export const features = {
   darkMode: true,
   ditherCursor: true,
   statsSection: true,
+  testimonialsSection: false,
 } as const;
 
 export const apiConfig = {

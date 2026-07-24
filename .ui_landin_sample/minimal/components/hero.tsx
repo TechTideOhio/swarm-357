@@ -5,29 +5,20 @@ import { TryItLive } from "./try-it-live";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import DitherCursor from "./dither-cursor";
 import RotatingCards, { type Card } from "./rotating-cards";
+import { heroConfig } from "@/lib/config";
 
-const headlineText = "Run Your Business on Agents";
+const headlineText = [
+  heroConfig.headline.prefix,
+  heroConfig.headline.accent,
+  heroConfig.headline.suffix,
+].join(" ");
 
-const cardData = [
-  { label: "Sales Outreach" },
-  { label: "Support Tier-1" },
-  { label: "Content Strategy" },
-  { label: "SEO Clusters" },
-  { label: "Market Research" },
-  { label: "Project Ops" },
-  { label: "Memvid Memory" },
-  { label: "Cost Controls" },
-  { label: "Bash Security" },
-  { label: "Dream Cycles" },
-  { label: "Eval Harness" },
-];
-
-const carouselCards: Card[] = cardData.map((card, index) => ({
+const carouselCards: Card[] = heroConfig.carousel.map((label, index) => ({
   id: index + 1,
   content: (
     <div className="flex h-full flex-col items-center justify-center p-4">
       <div className="px-1 pt-3 text-center">
-        <span className="text-sm font-medium">{card.label}</span>
+        <span className="text-sm font-medium">{label}</span>
       </div>
     </div>
   ),

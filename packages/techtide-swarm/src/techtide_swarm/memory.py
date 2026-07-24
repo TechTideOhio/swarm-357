@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 from pathlib import Path
@@ -10,6 +11,9 @@ from typing import Any
 
 from techtide_swarm.memvid_bridge import MemvidBridge, MemvidBridgeError, resolve_bridge_binary
 from techtide_swarm.persistence import store
+
+logger = logging.getLogger(__name__)
+_bridge_unavailable_warned = False
 
 
 class MemoryManager:
@@ -37,6 +41,14 @@ class MemoryManager:
             self._memvid = MemvidBridge(memvid_path)
             if self._memvid.available and not memvid_path.exists():
                 self._memvid.create()
+            elif not self._memvid.available:
+                global _bridge_unavailable_warned
+                if not _bridge_unavailable_warned:
+                    logger.warning(
+                        "Memvid bridge unavailable (set MEMVID_SWARM_BRIDGE or PATH); "
+                        "falling back to flat .swarm/topics memory"
+                    )
+                    _bridge_unavailable_warned = True
 
     def share(
         self,
@@ -67,8 +79,8 @@ class MemoryManager:
             body = f"{content}\n\nmeta: {json.dumps(entry)}".encode("utf-8")
             try:
                 self._memvid.put(uri=uri, title=title, body=body)
-            except MemvidBridgeError:
-                pass
+            except MemvidBridgeError as exc:
+                logger.warning("Memvid put failed for key=%s: %s", key, exc)
 
     def recall(self, agent_id: str, query: str) -> list[dict[str, Any]]:
         q = query.lower()
@@ -101,8 +113,8 @@ class MemoryManager:
                             "note": "memvid search",
                         }
                     )
-            except MemvidBridgeError:
-                pass
+            except MemvidBridgeError as exc:
+                logger.warning("Memvid search failed for query=%r: %s", query, exc)
         return out
 
     def log_interaction(self, agent_id: str, prompt: str, response: str) -> None:
