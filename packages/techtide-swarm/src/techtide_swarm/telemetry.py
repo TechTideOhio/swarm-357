@@ -67,6 +67,7 @@ def _local_total_cost() -> float:
 
 
 def _local_layer_stats() -> dict[str, dict[str, Any]]:
+    """Aggregate stats by layer from the local telemetry file."""
     stats: dict[str, dict[str, Any]] = {}
     if not TELEMETRY_FILE.exists():
         return stats
