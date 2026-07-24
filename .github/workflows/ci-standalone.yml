@@ -18,12 +18,14 @@ jobs:
       - name: Install techtide-swarm
         run: pip install -e "packages/techtide-swarm[dev]"
       - name: Ruff lint
-        run: ruff check packages/techtide-swarm/src
+        working-directory: packages/techtide-swarm
+        run: ruff check src
       - name: MyPy type check
         working-directory: packages/techtide-swarm
         run: mypy src
       - name: Pytest
-        run: python -m pytest packages/techtide-swarm/tests -v
+        working-directory: packages/techtide-swarm
+        run: python -m pytest tests -v -p no:schemathesis
 
   roster:
     runs-on: ubuntu-latest
