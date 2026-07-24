@@ -1,5 +1,6 @@
 import { FAQ } from "@/components/faq";
 import { AgentRoster } from "@/components/agent-roster";
+import { Features } from "@/components/features";
 import { FinalCTA } from "@/components/final-cta";
 import { Hero } from "@/components/hero";
 import { HowItWorks } from "@/components/how-it-works";
@@ -23,6 +24,7 @@ export default function HomePage(): ReactNode {
     <main id="main-content" className="flex-1">
       <Hero />
       <HowItWorks />
+      <Features />
       <AgentRoster />
       <LiveStats />
       <RecentRuns />

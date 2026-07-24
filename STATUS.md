@@ -44,10 +44,10 @@ Feature maturity levels:
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| CI (GitHub Actions) | **Stable** | Python tests, Next.js build, Rust bridge, roster validators, Docker `/api/health` smoke |
-| PyPI publishing | **Beta** | [`.github/workflows/publish.yml`](../.github/workflows/publish.yml) on `v*` tags (trusted publishing); verify project on PyPI |
-| Evaluation harness | **Beta** | Keyword overlap + optional Haiku judge when `SWARM_EVAL_LLM_JUDGE=1` |
-| Landing page | **Beta** | Next.js 16; public GET-only data by default; optional `NEXT_PUBLIC_SWARM_WRITE_KEY` for demo POSTs |
+| CI (GitHub Actions) | **Stable** | [ci-standalone.yml](.github/workflows/ci-standalone.yml): python, roster, build-package, rust-bridge, docker health smoke, Next.js typecheck/build |
+| PyPI publishing | **Beta** | [`.github/workflows/publish.yml`](.github/workflows/publish.yml) on `v*` tags (OIDC) + GitHub Release with wheel/sdist |
+| Evaluation harness | **Beta** | 25-task catalog; keyword + optional Haiku judge; `$5` budget; baselines in `evals/baselines/` |
+| Landing page | **Beta** | Next.js 16 + `/about`; public GET-only data by default; optional `NEXT_PUBLIC_SWARM_WRITE_KEY` for demo POSTs |
 | Memvid bridge (Rust binary) | **Stable** | `create`, `put`, `search`, `verify` commands |
 | Claim verification | **Stable** | [docs/VERIFY.md](docs/VERIFY.md) + `scripts/generate_roster.py --compact --fix-counts` |
 

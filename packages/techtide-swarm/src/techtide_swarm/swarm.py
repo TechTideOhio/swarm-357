@@ -264,17 +264,19 @@ class Swarm:
                 budget_limit_usd=10.0,
             )
             
-        conductor = Agent(conductor_cfg)
-        
+        # Routing is text-only — tools during role selection cause flaky multi-turn loops.
+        conductor = Agent(conductor_cfg.model_copy(update={"tools": [], "max_turns": 2}))
+
         status = "ok"
         try:
             # 2. Ask Conductor to route the task
             available_roles = list(set(a.get("role", "agent") for a in self._get_roster()))
             routing_prompt = (
                 f"You are the Conductor. Analyze the following task and decide which agent roles are needed to complete it.\n"
-                f"Available roles: {', '.join(available_roles)}\n\n"
+                f"Available roles: {', '.join(sorted(available_roles))}\n\n"
                 f"Task: {task}\n\n"
-                f"Return a comma-separated list of roles to execute in order. Nothing else."
+                f"Return ONLY a comma-separated list of roles to execute in order. "
+                f"Pick 2-5 roles. No tools, no explanation, no markdown."
             )
 
             conductor_res = await conductor.run(routing_prompt)
@@ -342,7 +344,9 @@ class Swarm:
                 if self.cost_controller.should_downgrade_model(agent_cfg.layer.value):
                     agent_cfg = agent_cfg.model_copy(update={"model": "haiku"})
 
-                agent = Agent(agent_cfg)
+                # Cap turns so tool loops cannot hang a pipeline indefinitely
+                max_turns = min(int(getattr(agent_cfg, "max_turns", 10) or 10), 5)
+                agent = Agent(agent_cfg.model_copy(update={"max_turns": max_turns}))
 
                 # Pass previous context to the next agent
                 context_prompt = task

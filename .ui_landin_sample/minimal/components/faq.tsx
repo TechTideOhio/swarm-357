@@ -137,13 +137,13 @@ export function FAQ(): ReactNode {
           transition={{ duration: 0.6, delay: 0.2, ease: easeOut }}
         >
           <p className="text-background/60 mb-6 text-base">
-            Still have questions? Read the research pack under .planning/research.
+            Still have questions? Open an issue on GitHub.
           </p>
           <a
-            href="mailto:hello@example.com"
+            href="https://github.com/TechTideOhio/swarm-357/issues"
             className="group inline-flex items-center gap-3 rounded-md bg-background py-3 pl-5 pr-3 font-medium text-foreground shadow-lg transition-all duration-500 ease-out hover:rounded-[50px]"
           >
-            <span>Get in Touch</span>
+            <span>Open an issue</span>
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background transition-all duration-300 group-hover:scale-110">
               <ChevronRightIcon className="h-4 w-4 relative left-px" />
             </span>

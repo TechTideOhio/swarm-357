@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Swarm 357 mark">
+  <title>Swarm 357</title>
+  <rect width="64" height="64" rx="14" fill="#0a0a0a"/>
+  <!-- six layer bands -->
+  <g fill="none" stroke="#ffd900" stroke-width="2.2" stroke-linecap="round">
+    <path d="M12 18h40" opacity="0.35"/>
+    <path d="M14 25h36" opacity="0.5"/>
+    <path d="M16 32h32" opacity="0.7"/>
+    <path d="M18 39h28" opacity="0.85"/>
+    <path d="M20 46h24"/>
+    <path d="M24 53h16" opacity="0.55"/>
+  </g>
+  <!-- converging nodes -->
+  <g fill="#ffd900">
+    <circle cx="18" cy="18" r="2.2"/>
+    <circle cx="46" cy="18" r="2.2"/>
+    <circle cx="22" cy="25" r="2.2"/>
+    <circle cx="42" cy="25" r="2.2"/>
+    <circle cx="28" cy="32" r="2.4"/>
+    <circle cx="36" cy="32" r="2.4"/>
+    <circle cx="32" cy="39" r="3"/>
+  </g>
+  <g stroke="#ffd900" stroke-width="1.4" opacity="0.7">
+    <line x1="18" y1="18" x2="28" y2="32"/>
+    <line x1="46" y1="18" x2="36" y2="32"/>
+    <line x1="22" y1="25" x2="32" y2="39"/>
+    <line x1="42" y1="25" x2="32" y2="39"/>
+    <line x1="28" y1="32" x2="32" y2="39"/>
+    <line x1="36" y1="32" x2="32" y2="39"/>
+  </g>
+</svg>

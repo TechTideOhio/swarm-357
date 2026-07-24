@@ -41,13 +41,18 @@ _CORS_ORIGINS = [
 
 # ── Default config path (editable install, Docker /app, or SWARM_CONFIG_PATH) ─
 def default_config_path() -> Path:
-    """Resolve swarm-compact.yaml for local dev, Docker (/app/config), or env override."""
+    """Resolve swarm-compact.yaml for local dev, Docker (/app/config), wheel data, or env."""
     env = os.getenv("SWARM_CONFIG_PATH", "").strip()
     if env:
         return Path(env)
     docker = Path("/app/config/swarm-compact.yaml")
     if docker.is_file():
         return docker
+    from techtide_swarm.paths import bundled_compact_config
+
+    bundled = bundled_compact_config()
+    if bundled is not None:
+        return bundled
     return Path(__file__).resolve().parent.parent.parent.parent.parent / "config" / "swarm-compact.yaml"
 
 
@@ -88,10 +93,12 @@ def create_app(config_path: Path | None = None) -> FastAPI:
     """Create and return the FastAPI application."""
     cfg = config_path if config_path is not None else default_config_path()
 
+    from techtide_swarm import __version__ as _pkg_version
+
     app = FastAPI(
         title="TechTide Swarm 357 API",
         description="357 Claude AI agents organized into 6 business layers",
-        version="0.1.0",
+        version=_pkg_version,
         lifespan=_make_lifespan(cfg),
     )
 
@@ -135,9 +142,11 @@ def create_app(config_path: Path | None = None) -> FastAPI:
 
     @app.get("/api/health")
     async def health() -> dict[str, Any]:
+        from techtide_swarm import __version__ as _pkg_version
+
         return {
             "status": "ok",
-            "version": "0.1.0",
+            "version": _pkg_version,
             "agents": len(_get_roster()),
             "api_key_set": bool(resolve_api_key()),
         }

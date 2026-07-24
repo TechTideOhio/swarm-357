@@ -1,5 +1,6 @@
 "use client";
 
+import { siteConfig } from "@/lib/config";
 import { ArrowUpRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
@@ -11,9 +12,8 @@ const spring = { type: "spring", stiffness: 100, damping: 20, mass: 1 } as const
 const DESKTOP_BREAKPOINT = 700;
 
 const socialLinks = [
-  { label: "Twitter", icon: TwitterIcon, href: "#" },
-  { label: "LinkedIn", icon: LinkedInIcon, href: "#" },
-  { label: "GitHub", icon: GitHubIcon, href: "#" },
+  { label: "Twitter", icon: TwitterIcon, href: `https://twitter.com/${siteConfig.social.twitter.replace("@", "")}` },
+  { label: "GitHub", icon: GitHubIcon, href: siteConfig.social.github },
 ];
 
 function useIsDesktop(): boolean {
@@ -31,21 +31,21 @@ function useIsDesktop(): boolean {
 const menuCards = [
   {
     id: "products",
-    title: "PRODUCTS",
+    title: "PRODUCT",
     links: [
-      { label: "Chrome Extension", href: "#", badge: null },
-      { label: "Safari Extension", href: "#", badge: "NEW" },
-      { label: "API Access", href: "#", badge: null },
+      { label: "Python package", href: "https://pypi.org/project/techtide-swarm/", badge: null },
+      { label: "Try it live", href: "#try-it-live", badge: "LIVE" },
+      { label: "HTTP API docs", href: "https://github.com/TechTideOhio/swarm-357#http-api-production", badge: null },
     ],
   },
   {
     id: "resources",
     title: "RESOURCES",
     links: [
-      { label: "Documentation", href: "#", badge: null },
-      { label: "Changelog", href: "#", badge: null },
-      { label: "Pricing", href: "#", badge: null },
-      { label: "Blog", href: "#", badge: null },
+      { label: "About", href: "/about", badge: null },
+      { label: "Documentation", href: siteConfig.nav.signIn.href, badge: null },
+      { label: "Evals", href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/EVALS.md", badge: null },
+      { label: "Changelog", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CHANGELOG.md", badge: null },
     ],
   },
   {
@@ -80,14 +80,6 @@ function TwitterIcon({ className }: { className?: string }): ReactNode {
   );
 }
 
-function LinkedInIcon({ className }: { className?: string }): ReactNode {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-    </svg>
-  );
-}
-
 function GitHubIcon({ className }: { className?: string }): ReactNode {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -116,10 +108,10 @@ function MenuCard({ card }: { card: (typeof menuCards)[number] }): ReactNode {
       {card.id === "contact" && (
         <div className="mt-6 flex h-[calc(100%-2rem)] flex-col justify-between pb-4">
           <Link
-            href="mailto:hello@tldr.app"
+            href="https://github.com/TechTideOhio/swarm-357/issues"
             className="text-background hover:text-background/70 text-xl font-semibold transition-colors md:text-2xl"
           >
-            hello@tldr.app
+            GitHub Issues
           </Link>
           <div className="mt-auto flex items-center gap-4 pt-8">
             {socialLinks.map(({ label, icon: Icon, href }) => (
@@ -179,13 +171,13 @@ function MobileSignUpButton(): ReactNode {
       }}
     >
       <Link
-        href="#"
+        href="/about"
         className="text-background rounded-[3.5px] bg-background/10 px-6 py-3 text-xl font-medium tracking-tight transition-colors"
       >
-        Sign Up
+        About
       </Link>
       <Link
-        href="#"
+        href={siteConfig.nav.cta.href}
         className="group bg-accent relative rounded-[3.5px] px-6 py-3 text-xl font-medium tracking-tight text-black transition-all duration-500 hover:rounded-[50px]"
       >
         <span
@@ -198,9 +190,9 @@ function MobileSignUpButton(): ReactNode {
           }}
         >
           <span className="flex flex-col duration-0 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2/3 group-hover:transition-transform group-hover:duration-300">
-            <span className="block leading-[1.25em]">Try It</span>
-            <span className="block leading-[1.25em]">Try It</span>
-            <span className="block leading-[1.25em]">Try It</span>
+            <span className="block leading-[1.25em]">{siteConfig.nav.cta.text}</span>
+            <span className="block leading-[1.25em]">{siteConfig.nav.cta.text}</span>
+            <span className="block leading-[1.25em]">{siteConfig.nav.cta.text}</span>
           </span>
         </span>
       </Link>
@@ -275,9 +267,9 @@ export function Header(): ReactNode {
           transition={{ ...spring, delay: isMenuOpen ? 0 : 0.15 }}
         >
           <div className="flex w-full items-center justify-between py-2 pr-2 pl-4">
-            <Link href="/">
-              <span className="text-background text-4xl font-extrabold -tracking-widest">
-                TLDR
+            <Link href="/" className="flex items-center gap-2">
+              <span className="text-background text-2xl font-extrabold tracking-tight md:text-3xl">
+                {siteConfig.name}
               </span>
             </Link>
 

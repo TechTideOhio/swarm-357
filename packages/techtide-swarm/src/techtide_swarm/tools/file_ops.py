@@ -70,16 +70,23 @@ def read_file(path: str, offset: int = 1, limit: int = 500) -> str:
         return f"Error reading file: {exc}"
 
 
-def write_file(path: str, content: str) -> str:
-    """Write *content* to *path*, creating parent directories as needed."""
+def write_file(path: str, content: str = "") -> str:
+    """Write *content* to *path*, creating parent directories as needed.
+
+    ``content`` defaults to empty string so model calls that omit the field
+    still succeed (create/truncate) instead of raising TypeError.
+    """
     try:
-        p = Path(path)
+        if not path:
+            return "Error: Write requires a non-empty 'path'"
+        p = Path(str(path))
         allowed, reason = _is_write_allowed(p)
         if not allowed:
             return reason
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(content, encoding="utf-8")
-        return f"Successfully wrote {len(content)} bytes to {path}"
+        text = "" if content is None else str(content)
+        p.write_text(text, encoding="utf-8")
+        return f"Successfully wrote {len(text)} bytes to {path}"
     except Exception as exc:
         return f"Error writing file: {exc}"
 
@@ -120,20 +127,24 @@ registry.register(
 registry.register(
     name="Write",
     schema={
-        "description": "Write content to a file, creating parent directories as needed.",
+        "description": (
+            "Write content to a file, creating parent directories as needed. "
+            "ALWAYS pass both 'path' (string) and 'content' (string) together."
+        ),
         "input_schema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Absolute or relative path to the file.",
+                    "description": "Absolute or relative path to the file to write.",
                 },
                 "content": {
                     "type": "string",
-                    "description": "Content to write.",
+                    "description": "Full text content to write into the file.",
                 },
             },
             "required": ["path", "content"],
+            "additionalProperties": False,
         },
     },
     handler=write_file,

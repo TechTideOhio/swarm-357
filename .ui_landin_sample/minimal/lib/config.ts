@@ -137,10 +137,10 @@ export const footerConfig = {
       { label: "Enterprise controls", href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/ENTERPRISE_CONTROLS.md" },
     ],
     company: [
+      { label: "About", href: "/about" },
       { label: "Architecture", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md" },
-      { label: "Research notes", href: "https://github.com/TechTideOhio/swarm-357/tree/main/docs" },
+      { label: "Evals", href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/EVALS.md" },
       { label: "Contributing", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CONTRIBUTING.md" },
-      { label: "Contact", href: "https://github.com/TechTideOhio/swarm-357/issues" },
     ],
   },
   contact: {

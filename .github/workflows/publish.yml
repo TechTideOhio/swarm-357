@@ -6,7 +6,7 @@ on:
       - "v*"
 
 permissions:
-  contents: read
+  contents: write
   id-token: write  # required for OIDC trusted publishing
 
 jobs:
@@ -33,3 +33,36 @@ jobs:
           packages-dir: packages/techtide-swarm/dist/
           # No password needed - uses OIDC trusted publishing
           # Set up at: https://pypi.org/manage/project/techtide-swarm/settings/publishing/
+
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          text = Path("CHANGELOG.md").read_text(encoding="utf-8")
+          lines = text.splitlines()
+          out = []
+          capturing = False
+          for line in lines:
+              if line.startswith("## [") and capturing:
+                  break
+              if line.startswith("## [0.") or (line.startswith("## [") and "Unreleased" not in line):
+                  if not capturing:
+                      capturing = True
+                      out.append(line)
+                      continue
+              if capturing:
+                  out.append(line)
+          body = "\n".join(out).strip() or "See CHANGELOG.md"
+          Path("release-notes.md").write_text(body + "\n", encoding="utf-8")
+          print(body[:500])
+          PY
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-notes.md
+          files: |
+            packages/techtide-swarm/dist/*
+          generate_release_notes: true

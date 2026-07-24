@@ -1,26 +1,27 @@
 import type { Metadata } from "next";
+import { siteConfig as appSiteConfig } from "@/lib/config";
 
 export const siteConfig = {
-  name: "React Bits Pro - Minimal Template",
-  tagline: "Read smarter, not longer",
-  description:
-    "AI-powered summaries for articles, videos, and documents. Save hours every week.",
-  url: "https://example.com",
+  name: appSiteConfig.name,
+  tagline: appSiteConfig.tagline,
+  description: appSiteConfig.description,
+  url: appSiteConfig.url,
   ogImage: "/og-image.png",
-  creator: "@tldr",
+  creator: appSiteConfig.social.twitter,
   authors: [
     {
-      name: "TLDR Technologies",
-      url: "https://example.com",
+      name: "TechTide AI",
+      url: appSiteConfig.url,
     },
   ],
   keywords: [
-    "AI summarizer",
-    "article summary",
-    "TLDR",
-    "content summarization",
-    "productivity",
-    "reading assistant",
+    "AI agents",
+    "multi-agent",
+    "Claude",
+    "Swarm 357",
+    "Memvid",
+    "agent orchestration",
+    "TechTide",
   ],
 } as const;
 
@@ -73,9 +74,8 @@ export const baseMetadata: Metadata = {
     creator: siteConfig.creator,
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-icon.png",
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
   },
   manifest: "/site.webmanifest",
 };

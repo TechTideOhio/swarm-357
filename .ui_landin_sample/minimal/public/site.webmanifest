@@ -1,11 +1,11 @@
 {
-  "name": "Your Site Name",
-  "short_name": "Site",
-  "description": "A modern, accessible landing page template built with Next.js, Tailwind CSS, and TypeScript.",
+  "name": "Swarm 357",
+  "short_name": "Swarm 357",
+  "description": "Layered agents. Durable memory. Observable runs. 357 Claude agents across six business layers.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0066FF",
+  "background_color": "#0a0a0a",
+  "theme_color": "#ffd900",
   "icons": [
     {
       "src": "/icon-192.png",

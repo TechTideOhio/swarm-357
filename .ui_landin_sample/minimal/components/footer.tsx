@@ -1,5 +1,6 @@
 "use client";
 
+import { footerConfig, siteConfig } from "@/lib/config";
 import { ChevronRightIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -14,38 +15,15 @@ const fadeInUp = {
   transition: { duration: 0.8, ease: easeOut },
 };
 
-const productLinks = [
-  { label: "Chrome Extension", href: "#" },
-  { label: "Safari Extension", href: "#" },
-  { label: "API Access", href: "#" },
-  { label: "Enterprise", href: "#" },
-];
-
-const companyLinks = [
-  { label: "About", href: "#" },
-  { label: "Blog", href: "#" },
-  { label: "Careers", href: "#" },
-  { label: "Contact", href: "#" },
-];
-
 const socialLinks = [
-  { label: "Twitter", icon: TwitterIcon, href: "#" },
-  { label: "LinkedIn", icon: LinkedInIcon, href: "#" },
-  { label: "GitHub", icon: GitHubIcon, href: "#" },
+  { label: "Twitter", icon: TwitterIcon, href: `https://twitter.com/${siteConfig.social.twitter.replace("@", "")}` },
+  { label: "GitHub", icon: GitHubIcon, href: siteConfig.social.github },
 ];
 
 function TwitterIcon({ className }: { className?: string }): ReactNode {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  );
-}
-
-function LinkedInIcon({ className }: { className?: string }): ReactNode {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
     </svg>
   );
 }
@@ -65,14 +43,13 @@ export function Footer(): ReactNode {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
           <motion.div className="max-w-md" {...fadeInUp}>
             <p className="text-lg leading-relaxed text-black/80">
-              Ready to read smarter? TLDR transforms any article into a concise summary,
-              helping you stay informed without the time commitment.
+              {footerConfig.description}
             </p>
             <Link
-              href="#"
+              href={footerConfig.cta.href}
               className="group mt-8 inline-flex items-center gap-3 rounded-md bg-white py-3 pl-4 pr-3 font-medium shadow-lg shadow-black/10 transition-all duration-500 ease-out hover:rounded-[50px] hover:bg-white/90 hover:shadow-xl hover:shadow-black/20"
             >
-              <span>Get Started Free</span>
+              <span>{footerConfig.cta.text}</span>
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-black transition-all duration-300 group-hover:scale-110">
                 <ChevronRightIcon className="h-4 w-4 relative left-px" />
               </span>
@@ -85,7 +62,7 @@ export function Footer(): ReactNode {
                 Product
               </h4>
               <ul className="space-y-3">
-                {productLinks.map((link) => (
+                {footerConfig.links.product.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
@@ -102,7 +79,7 @@ export function Footer(): ReactNode {
                 Company
               </h4>
               <ul className="space-y-3">
-                {companyLinks.map((link) => (
+                {footerConfig.links.company.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
@@ -121,33 +98,25 @@ export function Footer(): ReactNode {
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
           <motion.div {...fadeInUp}>
-            <h2 className="text-6xl font-medium leading-none tracking-tight md:text-7xl lg:text-8xl">
-              Reach
+            <h2 className="text-5xl font-medium leading-none tracking-tight md:text-6xl lg:text-7xl">
+              Build with
               <br />
-              Out To Us
+              Swarm 357
             </h2>
-            <p className="mt-8 text-sm text-black/50">
-              © {new Date().getFullYear()} TLDR Technologies Inc.
-            </p>
+            <p className="mt-8 text-sm text-black/50">{footerConfig.copyright}</p>
           </motion.div>
 
           <div className="flex flex-col justify-between gap-8 lg:items-end lg:text-right">
             <motion.div className="space-y-6" {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }}>
               <div>
-                <h4 className="mb-1 font-semibold">San Francisco</h4>
-                <p className="text-black/70">
-                  548 Market St, Suite 95000
-                  <br />
-                  San Francisco, CA 94104
-                  <br />
-                  Mon-Fri 9:00 am - 6:00 pm (PST)
-                </p>
+                <h4 className="mb-1 font-semibold">{footerConfig.contact.location}</h4>
+                <p className="text-black/70">TechTide AI · open source Apache-2.0</p>
               </div>
               <a
-                href="mailto:hello@tldr.app"
+                href={footerConfig.contact.email}
                 className="inline-block text-lg font-medium underline underline-offset-4 transition-opacity hover:opacity-70"
               >
-                hello@tldr.app
+                Open an issue
               </a>
             </motion.div>
 
