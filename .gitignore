@@ -48,3 +48,6 @@ _quarantine/
 
 # Git worktrees
 .worktrees/
+
+# Package-local runtime (never commit)
+**/.swarm/
