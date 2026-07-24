@@ -14,11 +14,13 @@ All files needed to ship the Swarm 357 public launch.
 ## Pre-Launch Checklist
 
 ### Code
-- [ ] `pip install techtide-swarm` works on a fresh machine (test in Docker or a venv)
-- [ ] `swarm demo` shows architecture without API key
-- [ ] `swarm run "Launch a GTM campaign for an AI training product"` completes without errors
-- [ ] `swarm cost` shows accurate breakdown
-- [ ] GitHub repo is public at github.com/TechTideOhio/swarm357
+- [ ] `pip install techtide-swarm` works from PyPI on a fresh machine (blocked on trusted publisher / token)
+- [x] Local wheel install + `swarm demo` works without API key (verified 2026-07-24)
+- [ ] `swarm run "Launch a GTM campaign for an AI training product"` completes without errors (needs `ANTHROPIC_API_KEY`)
+- [ ] `swarm cost` shows accurate breakdown (needs live run)
+- [x] GitHub repo is public at github.com/TechTideOhio/swarm-357
+- [x] HTTP API live: `https://backend-production-3017.up.railway.app/api/health` returns `agents: 357`
+- [x] Landing live: `https://frontend-production-c018.up.railway.app/` (HTTP 200)
 - [ ] README links all resolve
 
 ### Video
