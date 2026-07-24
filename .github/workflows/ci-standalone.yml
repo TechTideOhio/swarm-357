@@ -89,7 +89,7 @@ jobs:
           cleanup() { docker rm -f swarm357-api >/dev/null 2>&1 || true; }
           trap cleanup EXIT
           ready=0
-          for i in $(seq 1 45); do
+          for _ in $(seq 1 45); do
             if curl -sf http://127.0.0.1:8000/api/health > /tmp/health.json; then
               ready=1
               break
