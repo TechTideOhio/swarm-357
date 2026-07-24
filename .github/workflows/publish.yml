@@ -13,6 +13,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     environment: pypi
+    env:
+      # Prefer API token when configured; empty means use OIDC trusted publishing.
+      # Trusted publisher must match: TechTideOhio/swarm-357, workflow publish.yml, env pypi.
+      PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -27,17 +31,15 @@ jobs:
         working-directory: packages/techtide-swarm
         run: python -m build
 
-      # Prefer PYPI_API_TOKEN when configured; otherwise OIDC trusted publishing.
-      # Trusted publisher must match: TechTideOhio/swarm-357, workflow publish.yml, env pypi.
       - name: Publish to PyPI (API token)
-        if: ${{ secrets.PYPI_API_TOKEN != '' }}
+        if: env.PYPI_TOKEN != ''
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: packages/techtide-swarm/dist/
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          password: ${{ env.PYPI_TOKEN }}
 
       - name: Publish to PyPI (trusted publishing)
-        if: ${{ secrets.PYPI_API_TOKEN == '' }}
+        if: env.PYPI_TOKEN == ''
         id: pypi_oidc
         continue-on-error: true
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -45,16 +47,15 @@ jobs:
           packages-dir: packages/techtide-swarm/dist/
 
       - name: Fail if PyPI publish did not succeed
-        if: ${{ secrets.PYPI_API_TOKEN == '' && steps.pypi_oidc.outcome != 'success' }}
+        if: env.PYPI_TOKEN == '' && steps.pypi_oidc.outcome != 'success'
         run: |
           echo "::error::PyPI trusted publishing failed. Configure the publisher at"
           echo "https://pypi.org/manage/project/techtide-swarm/settings/publishing/"
-          echo "for repo TechTideOhio/swarm-357, workflow publish.yml, environment pypi —"
+          echo "for repo TechTideOhio/swarm-357, workflow publish.yml, environment pypi,"
           echo "or add repository secret PYPI_API_TOKEN."
           exit 1
 
       - name: Extract changelog section
-        id: changelog
         if: always()
         run: |
           python - <<'PY'
@@ -80,7 +81,7 @@ jobs:
 
       # Cut the GitHub Release even when PyPI fails so tags are not silent.
       - name: GitHub Release
-        if: always() && hashFiles('packages/techtide-swarm/dist/*') != ''
+        if: always()
         uses: softprops/action-gh-release@v2
         with:
           body_path: release-notes.md
