@@ -21,13 +21,8 @@ venv/
 *.swp
 *.swo
 
-# Next.js build artifacts
-.ui_landin_sample/minimal/.next/
-.ui_landin_sample/minimal/node_modules/
-
 # Rust build
 packages/memvid-swarm-bridge/target/
-.repos and items/memvid-main/memvid-main/target/
 
 # Swarm runtime state (generated at runtime, not source)
 .swarm/topics/
@@ -55,14 +50,15 @@ _quarantine/
 # Local test / vendor junk never ship
 .hypothesis/
 **/.hypothesis/
-.repos and items/**/assets/
-.repos and items/**/.cursor/
-.repos and items/**/*.png
-.repos and items/**/*.jpg
-.repos and items/**/*.jpeg
-.repos and items/**/*.webp
-.repos and items/**/*.gif
 
 # Eval run artifacts
 evals/results/
 
+# ---------------------------------------------------------------------------
+# Permanently excluded from this public mirror (do not re-add)
+# Scrubbed from history 2026-07-24 — keep local copies only outside this repo
+# ---------------------------------------------------------------------------
+.github/
+.planning/
+.repos and items/
+.ui_landin_sample/
