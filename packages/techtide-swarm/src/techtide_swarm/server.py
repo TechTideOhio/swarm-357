@@ -7,7 +7,6 @@ from __future__ import annotations
 import logging
 import os
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, AsyncIterator, Callable, NoReturn, cast
 

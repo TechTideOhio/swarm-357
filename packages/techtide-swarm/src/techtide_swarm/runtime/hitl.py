@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import os
 import threading
-import time
 from datetime import datetime, timezone
 from techtide_swarm.runtime.checkpoint import CheckpointStore, get_default_store
 from techtide_swarm.runtime.state import ApprovalRecord, RunStatus
