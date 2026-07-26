@@ -1,4 +1,4 @@
-"""23-point style bash command validation (subset implemented; extend as needed)."""
+"""13-pattern bash command validation (regex gate; not an OS sandbox)."""
 
 from __future__ import annotations
 

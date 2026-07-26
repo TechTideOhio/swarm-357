@@ -160,9 +160,26 @@ class MemoryCheckpointStore(CheckpointStore):
         self._runs.pop(run_id, None)
 
 
+_PROCESS_STORE: CheckpointStore | None = None
+
+
 def default_checkpoint_store() -> CheckpointStore:
     """Factory: SQLite by default; memory when SWARM_CHECKPOINT_BACKEND=memory."""
     backend = os.getenv("SWARM_CHECKPOINT_BACKEND", "sqlite").strip().lower()
     if backend == "memory":
         return MemoryCheckpointStore()
     return SqliteCheckpointStore()
+
+
+def get_default_store() -> CheckpointStore:
+    """Process-wide store shared by Swarm, HITL, and tools."""
+    global _PROCESS_STORE
+    if _PROCESS_STORE is None:
+        _PROCESS_STORE = default_checkpoint_store()
+    return _PROCESS_STORE
+
+
+def set_default_store(store: CheckpointStore) -> None:
+    """Bind the process-wide store (called from Swarm.checkpoint)."""
+    global _PROCESS_STORE
+    _PROCESS_STORE = store

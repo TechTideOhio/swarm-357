@@ -28,3 +28,6 @@ def _allow_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("SWARM_WORKSPACE_ROOT", raising=False)
     monkeypatch.delenv("SWARM_WRITE_SAFE_ROOT", raising=False)
     monkeypatch.delenv("SWARM_CONFINEMENT", raising=False)
+    # Default product confine is CWD; unit tests use tmp_path outside CWD.
+    # Confinement tests must monkeypatch.delenv("SWARM_UNSAFE_FS").
+    monkeypatch.setenv("SWARM_UNSAFE_FS", "1")

@@ -26,8 +26,8 @@ Swarm 357 is a **357-role catalog plus orchestration runtime**, not a production
 | `BashSecurityGate` + argv policy | **Stable** | Server/prod denies Bash unless `SWARM_ALLOW_BASH=1` |
 | Read/Write workspace confinement | **Stable** | Server mode confines to workspace root |
 | HTTP API | **Beta** | Fail-closed auth in production; non-200 errors; SSE events |
-| HITL approvals | **Beta** | Approval records + approve/reject API/CLI stubs |
-| SSE event stream | **Beta** | Run/step/cost events |
+| HITL approvals | **Beta** | Real Bash gate (`SWARM_HITL_BASH`); `swarm approve`/`reject` + HTTP; timeout rejects |
+| SSE event stream | **Beta** | Auth when `SWARM_API_KEY` set; bus closes on terminal run; `stream.end` |
 | Structured traces | **Beta** | `.swarm/traces.jsonl`; optional OTel via `SWARM_OTEL_EXPORT=1` |
 | UltraPlan | **Beta** | Opus-class planning when keyed |
 
@@ -38,7 +38,7 @@ Swarm 357 is a **357-role catalog plus orchestration runtime**, not a production
 | `swarm init` | **Stable** | Installs bundled compact config + Support souls |
 | `swarm demo` | **Stable** | Explicit simulation without key |
 | `swarm boot` / `run` | **Beta** | Resolves bundled config from wheel installs |
-| `swarm inspect/resume/cancel/replay/fork` | **Beta** | Checkpoint control plane |
+| `swarm inspect/resume/cancel/approve/reject/replay/fork` | **Beta** | Durable cancel flag + HITL control plane |
 | `swarm eval` | **Beta** | Separate single vs swarm reporting |
 | `swarm serve` | **Beta** | FastAPI |
 

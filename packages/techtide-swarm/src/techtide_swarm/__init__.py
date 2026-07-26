@@ -14,7 +14,7 @@ from techtide_swarm.ultra_plan import UltraPlan, UltraPlanConfig
 try:
     __version__ = version("techtide-swarm")
 except PackageNotFoundError:  # pragma: no cover — editable / source tree
-    __version__ = "0.2.1"
+    __version__ = "0.2.2"
 
 __all__ = [
     "Agent",

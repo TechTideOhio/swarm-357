@@ -16,8 +16,8 @@
 4. Tag and push:
 
 ```bash
-git tag -a v0.2.1 -m "techtide-swarm 0.2.1"
-git push origin v0.2.1
+git tag -a v0.2.2 -m "techtide-swarm 0.2.2"
+git push origin v0.2.2
 ```
 
 5. `publish.yml` runs CI gate → build → attestations → PyPI → GitHub Release.
@@ -26,20 +26,30 @@ git push origin v0.2.1
 
 Apply on `TechTideOhio/swarm-357`:
 
-- Branch protection on `main`: require PR, require CI status checks, squash merges, delete branch on merge
+- Branch protection on `main`: require PR, squash-only, delete head branches
+- Required status checks (minimum):
+  - `python (3.10)`, `python (3.12)`
+  - `roster`, `build-package`, `docs-links`
+  - `rust-bridge`, `docker`, `dependency-audit`
 - Dependabot enabled (`.github/dependabot.yml`)
 - Secret scanning + push protection
-- Code scanning (CodeQL or equivalent) when available for the org plan
+- CodeQL workflow (`.github/workflows/codeql.yml`) + CODEOWNERS
 - PyPI trusted publisher: repo `TechTideOhio/swarm-357`, workflow `publish.yml`, environment `pypi`
+- Repo `homepage`: `https://swarm357fe.up.railway.app`
 
 ## Post-release verification
 
 ```bash
-python -m venv /tmp/swarm-verify && /tmp/swarm-verify/bin/pip install techtide-swarm==0.2.1
+python -m venv /tmp/swarm-verify && /tmp/swarm-verify/bin/pip install techtide-swarm==0.2.2
 /tmp/swarm-verify/bin/swarm boot
 curl -sf "$SWARM_API_URL/api/health"
 ```
 
 ## Landing deploy
 
-Deploy from `TechTideOhio/swarm-357-site` (Railway root = repo root). Point `NEXT_PUBLIC_API_URL` at the backend.
+Deploy from `TechTideOhio/swarm-357-site` (Railway root = repo root).
+
+- Frontend: https://swarm357fe.up.railway.app
+- Backend: https://swarm357be.up.railway.app (`NEXT_PUBLIC_API_URL=https://swarm357be.up.railway.app`)
+- Site BFF: set server-only `SWARM_API_KEY` (never `NEXT_PUBLIC_SWARM_WRITE_KEY`)
+- Backend CORS: `ALLOWED_ORIGINS=https://swarm357fe.up.railway.app`

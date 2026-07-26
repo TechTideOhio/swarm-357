@@ -2,6 +2,32 @@
 
 All notable changes to TechTide Swarm 357 are documented here.
 
+## [0.2.2] — 2026-07-26
+
+### Correction (v0.2.1 gaps)
+
+v0.2.1 labeled HITL as Beta while approve/reject APIs never produced waiting Bash approvals; SSE was unauthenticated and never closed; cancel was process-local only; docs/metrics and `CLAUDE.md` still drifted from baselines and banned paths.
+
+### Added
+
+- Real Bash HITL gate (`SWARM_HITL_BASH`, default on in server/production) with durable `ApprovalRecord`, timeout reject, `swarm approve` / `swarm reject`, and HTTP resolve wired to waiters.
+- SSE write-key auth + `stream.end` when the event bus closes on terminal run status.
+- Durable `cancel_requested` on `RunState` / checkpoint (survives new `Swarm` instance).
+- Explicit `model_downgrade` telemetry when CostController forces Haiku.
+- Default Read/Write confinement to CWD (`SWARM_UNSAFE_FS=1` escape).
+- `.github/CODEOWNERS` + CodeQL workflow (python + actions).
+- Gold `CLAUDE.md` aligned to STATUS/SECURITY/VERIFY (no scrubbed path refs).
+
+### Fixed
+
+- Docs/metrics honesty: single-agent 142/142 via render script; Bash scenario count; Dream **Experimental** everywhere.
+- CI: `pip-audit` fails the job; `dtolnay/rust-toolchain` SHA-pinned; coverage floor **40**.
+
+### Changed
+
+- Package version **0.2.1 → 0.2.2**.
+- Site demo writes move to same-origin BFF (server-only `SWARM_API_KEY`); no client write key.
+
 ## [0.2.1] — 2026-07-25
 
 ### Correction (v0.2.0)

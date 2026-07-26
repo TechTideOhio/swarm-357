@@ -42,8 +42,11 @@ _EXTRA_ORIGINS = [
 _CORS_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "https://swarm357fe.up.railway.app",
     "https://swarm357.com",
     "https://www.swarm357.com",
+    "https://swarm357.techtide.ai",
+    "https://www.swarm357.techtide.ai",
     "https://techtide.ai",
     "https://www.techtide.ai",
     *_EXTRA_ORIGINS,
@@ -368,7 +371,10 @@ def create_app(config_path: Path | None = None) -> FastAPI:
             _raise_run_error(exc)
 
     @app.get("/api/swarm/runs/{run_id}/events")
-    async def swarm_run_events(run_id: str) -> StreamingResponse:
+    async def swarm_run_events(
+        run_id: str,
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+    ) -> StreamingResponse:
         from techtide_swarm.runtime.events import get_event_bus
 
         bus = get_event_bus()
@@ -376,6 +382,7 @@ def create_app(config_path: Path | None = None) -> FastAPI:
         async def _event_stream() -> AsyncIterator[str]:
             async for event in bus.subscribe(run_id):
                 yield event.to_sse()
+            yield "event: stream.end\ndata: {}\n\n"
 
         return StreamingResponse(
             _event_stream(),
@@ -393,21 +400,24 @@ def create_app(config_path: Path | None = None) -> FastAPI:
         _authorized: Annotated[bool, Depends(require_swarm_write_key)],
         req: ApprovalDecisionRequest | None = None,
     ) -> dict[str, Any]:
+        from techtide_swarm.runtime.hitl import get_approval_gate
+
         swarm = _swarm_or_503(cfg)
-        found = _find_approval(swarm, approval_id)
-        if found is None:
-            raise HTTPException(status_code=404, detail=f"Approval not found: {approval_id}")
-        state, appr = found
         body = req or ApprovalDecisionRequest()
-        appr.status = "approved"
-        appr.decided_by = body.decided_by
-        appr.reason = body.reason
-        appr.decided_at = datetime.now(timezone.utc)
-        state.touch()
-        swarm.checkpoint.save(state)
+        ok = get_approval_gate().resolve(
+            approval_id,
+            status="approved",
+            decided_by=body.decided_by,
+            reason=body.reason,
+            store=swarm.checkpoint,
+        )
+        if not ok and _find_approval(swarm, approval_id) is None:
+            raise HTTPException(status_code=404, detail=f"Approval not found: {approval_id}")
+        found = _find_approval(swarm, approval_id)
+        run_id = found[0].run_id if found else ""
         return {
             "approval_id": approval_id,
-            "run_id": state.run_id,
+            "run_id": run_id,
             "status": "approved",
         }
 
@@ -417,21 +427,24 @@ def create_app(config_path: Path | None = None) -> FastAPI:
         _authorized: Annotated[bool, Depends(require_swarm_write_key)],
         req: ApprovalDecisionRequest | None = None,
     ) -> dict[str, Any]:
+        from techtide_swarm.runtime.hitl import get_approval_gate
+
         swarm = _swarm_or_503(cfg)
-        found = _find_approval(swarm, approval_id)
-        if found is None:
-            raise HTTPException(status_code=404, detail=f"Approval not found: {approval_id}")
-        state, appr = found
         body = req or ApprovalDecisionRequest()
-        appr.status = "rejected"
-        appr.decided_by = body.decided_by
-        appr.reason = body.reason
-        appr.decided_at = datetime.now(timezone.utc)
-        state.touch()
-        swarm.checkpoint.save(state)
+        ok = get_approval_gate().resolve(
+            approval_id,
+            status="rejected",
+            decided_by=body.decided_by,
+            reason=body.reason,
+            store=swarm.checkpoint,
+        )
+        if not ok and _find_approval(swarm, approval_id) is None:
+            raise HTTPException(status_code=404, detail=f"Approval not found: {approval_id}")
+        found = _find_approval(swarm, approval_id)
+        run_id = found[0].run_id if found else ""
         return {
             "approval_id": approval_id,
-            "run_id": state.run_id,
+            "run_id": run_id,
             "status": "rejected",
         }
 

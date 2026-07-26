@@ -26,8 +26,11 @@ We aim to acknowledge reports within 72 hours and provide a remediation timeline
 | Rate limiting | Per-IP sliding window via `SWARM_RATE_LIMIT_PER_MINUTE` (`0` disables) |
 | Run budget cap | Request `budget_usd` capped by `SWARM_MAX_RUN_BUDGET_USD` |
 | BashSecurityGate | 13-pattern regex validator on the `Bash` tool — blocks destructive and exfiltration-shaped commands |
-| Write sandbox | `SWARM_WRITE_SAFE_ROOT` restricts Write tool destinations when set |
+| Bash HITL | When Bash is enabled, `SWARM_HITL_BASH` (default on in server/production) requires approve/reject before execution |
+| Write sandbox | Workspace root confinement for Read/Write (CWD by default; `SWARM_UNSAFE_FS=1` opt-out) |
 | File deny-list | Path deny patterns in file ops |
+| Model mapping | OpenRouter does **not** silently map opus/sonnet → Haiku unless `SWARM_OPENROUTER_CHEAP=1` |
+| Cost downgrade | `CostController` may force Haiku at 80% layer spend; this is **logged** (`model_downgrade`), not a silent provider remap |
 
 ## Non-scope / limitations
 
