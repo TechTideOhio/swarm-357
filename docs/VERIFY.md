@@ -1,6 +1,8 @@
-# Swarm 357 — Executable acceptance criteria
+# Swarm 357 - Executable acceptance criteria
 
-This document is the **mechanical** gate list for releases. Every check must be backed by CI, a script, or a live probe — not marketing language.
+> **Hosted docs:** https://swarm357fe.up.railway.app/docs/resources/verification
+
+This document is the **mechanical** gate list for releases. Every check must be backed by CI, a script, or a live probe - not marketing language.
 
 ## Matrix
 

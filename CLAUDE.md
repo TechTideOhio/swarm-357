@@ -18,7 +18,7 @@ TechTide Swarm 357 is a **357-role catalog plus orchestration runtime** across 6
 | `docs/` | VERIFY, EVALS, DEPLOY_RAILWAY, MEMVID_BRIDGE, DATA_PLANE, etc. |
 | `scripts/` | Roster generation, eval asset render, quickstart |
 
-**Landing site is a separate repo:** [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) — live FE `https://swarm357fe.up.railway.app`, API `https://swarm357be.up.railway.app`.
+**Landing site is a separate repo:** [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) - live docs at `https://swarm357fe.up.railway.app/docs`, API `https://swarm357be.up.railway.app`.
 
 Do **not** reference scrubbed/private trees in public docs or commits: `.planning/`, `.repos and items/`, `.ui_landin_sample/`. CI `docs-links` bans those strings in markdown.
 
