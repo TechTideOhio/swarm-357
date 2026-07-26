@@ -99,8 +99,35 @@ async def test_swarm_cost(app):
 
 
 @pytest.mark.asyncio
-async def test_swarm_run_stub(app):
-    """Should return a SwarmExecutionResult-shaped JSON even without API key."""
+async def test_swarm_run_stub(app, monkeypatch):
+    """Without LLM keys, simulate=true returns a SwarmExecutionResult-shaped payload."""
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test", timeout=60.0
+    ) as client:
+        resp = await client.post(
+            "/api/swarm/run",
+            json={
+                "task": "summarise top SEO trends",
+                "budget_usd": 0.10,
+                "simulate": True,
+            },
+        )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "pipeline_id" in data
+    assert "status" in data
+    assert data["status"] == "simulated"
+    assert "total_cost_usd" in data
+    assert "agent_results" in data
+
+
+@pytest.mark.asyncio
+async def test_swarm_run_without_key_fails_closed(app, monkeypatch):
+    """Missing LLM credentials surface as HTTP 500 (not silent 200 success)."""
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test", timeout=60.0
     ) as client:
@@ -108,29 +135,34 @@ async def test_swarm_run_stub(app):
             "/api/swarm/run",
             json={"task": "summarise top SEO trends", "budget_usd": 0.10},
         )
-    assert resp.status_code == 200
-    data = resp.json()
-    assert "pipeline_id" in data
-    assert "status" in data
-    assert "total_cost_usd" in data
-    assert "agent_results" in data
+    assert resp.status_code == 500
+    assert "API_KEY" in resp.json()["detail"]
 
 
 @pytest.mark.asyncio
-async def test_swarm_run_with_layer(app):
+async def test_swarm_run_with_layer(app, monkeypatch):
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test", timeout=60.0
     ) as client:
         resp = await client.post(
             "/api/swarm/run",
-            json={"task": "find leads", "budget_usd": 0.05, "layer": "sales"},
+            json={
+                "task": "find leads",
+                "budget_usd": 0.05,
+                "layer": "sales",
+                "simulate": True,
+            },
         )
     assert resp.status_code == 200
+    assert resp.json()["status"] == "ok"
 
 
 @pytest.mark.asyncio
-async def test_agent_run_stub(app):
-    """Single-agent run returns AgentResult shape."""
+async def test_agent_run_stub(app, monkeypatch):
+    """Single-agent run returns AgentResult shape (stub allowed via conftest)."""
+    monkeypatch.setenv("SWARM_ALLOW_STUB", "1")
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test", timeout=30.0
     ) as client:
@@ -147,6 +179,7 @@ async def test_agent_run_stub(app):
     data = resp.json()
     assert "output" in data
     assert "status" in data
+    assert data["status"] in {"stub", "simulated", "success"}
 
 
 @pytest.mark.asyncio
@@ -330,14 +363,18 @@ async def test_post_run_requires_api_key_when_configured(app, monkeypatch):
 
 @pytest.mark.asyncio
 async def test_post_run_succeeds_with_api_key(app, monkeypatch):
+    """Auth passes with matching key; simulate avoids needing live LLM credentials."""
     monkeypatch.setenv("SWARM_API_KEY", "secret-test-key")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post(
             "/api/swarm/run",
-            json={"task": "hello", "budget_usd": 0.1},
+            json={"task": "hello", "budget_usd": 0.1, "simulate": True},
             headers={"X-SWARM-API-KEY": "secret-test-key"},
         )
     assert resp.status_code == 200
+    assert resp.json()["status"] == "simulated"
 
 
 @pytest.mark.asyncio

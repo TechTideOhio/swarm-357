@@ -5,7 +5,7 @@
 # TechTide Swarm 357
 
 [![PyPI](https://img.shields.io/pypi/v/techtide-swarm.svg)](https://pypi.org/project/techtide-swarm/)
-[![CI](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci-standalone.yml/badge.svg)](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci-standalone.yml)
+[![CI](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci.yml/badge.svg)](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://pypi.org/project/techtide-swarm/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
@@ -118,8 +118,8 @@ flowchart LR
 | Agent roster | [`config/swarm-compact.yaml`](config/swarm-compact.yaml) | Compact 357-agent expansion (also bundled in the wheel) |
 | Soul templates | [`templates/soul/`](templates/soul/) | Personality files with YAML front-matter + system prompts |
 | Eval harness | [`evals/`](evals/) | 25-task benchmark, LLM judge, baselines |
-| Landing page | [`.ui_landin_sample/minimal/`](.ui_landin_sample/minimal/) | Next.js 16 product surface + `/about` |
-| Memvid core (vendored) | [`.repos and items/memvid-main/`](.repos%20and%20items/memvid-main/) | Upstream Rust library referenced by the bridge |
+| Landing page | [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) | Next.js 16 product surface (separate public repo) |
+| Memvid core | [memvid/memvid](https://github.com/memvid/memvid) / [crates.io/memvid-core](https://crates.io/crates/memvid-core) | Upstream Rust library used by the bridge |
 
 ## Key Differentiators
 
@@ -185,16 +185,21 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Roadmap: [ROADMAP.md](ROADMAP.md). Relea
 
 ## CI
 
-GitHub Actions: [`.github/workflows/ci-standalone.yml`](.github/workflows/ci-standalone.yml)
+GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 
-- **python** — install, ruff, mypy, pytest
-- **roster** — validate 357-agent compact + flat counts
+- **python** — 3.10–3.13, ruff, mypy, pytest + coverage, clean-wheel boot smoke
+- **roster** — validate 357-agent counts + Support souls packaged
 - **build-package** — wheel + sdist artifact
-- **rust-bridge** — cargo build + bridge integration tests
-- **docker** — image build; `GET /api/health` must report `agents == 357`
-- **frontend** — Next.js typecheck + production build
+- **rust-bridge** — fmt, clippy, build, bridge integration tests
+- **docker** — health `agents == 357` + auth non-200 without key
+- **docs-links** — ban scrubbed path references
 
-Publish: [`.github/workflows/publish.yml`](.github/workflows/publish.yml) on `v*` tags → PyPI (OIDC) + GitHub Release.
+Landing CI lives in [swarm-357-site](https://github.com/TechTideOhio/swarm-357-site).  
+Publish: [`.github/workflows/publish.yml`](.github/workflows/publish.yml) on `v*` tags → attestations + PyPI + GitHub Release.
+
+## v0.2.1 correction
+
+v0.2.0 over-claimed CI/frontend paths after the public history scrub. **0.2.1** restores workflows, crates.io Memvid, truthful docs, install-to-boot from a wheel, bounded fan-out, durable checkpoints, SSE, fail-closed auth, and explicit simulation.
 
 ## Required Environment
 
@@ -211,7 +216,7 @@ Optional: `SWARM_MODEL_*`, `MEMVID_SWARM_BRIDGE`, `SWARM_API_KEY`, `ANTHROPIC_BA
 | Service | Build | Root | Health |
 |---------|-------|------|--------|
 | `backend` | Dockerfile | `/` | `/api/health` |
-| `frontend` | Nixpacks (Next.js 16) | `.ui_landin_sample/minimal/` | `/` |
+| `frontend` | Nixpacks (Next.js 16) | `https://github.com/TechTideOhio/swarm-357-site` | `/` |
 
 See [docs/DEPLOY_RAILWAY.md](docs/DEPLOY_RAILWAY.md).
 

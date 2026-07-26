@@ -116,11 +116,14 @@ def cmd_init(args: argparse.Namespace) -> None:
     print_banner()
     console.print("\n[bold green]⚡ Initializing TechTide Swarm 357...[/bold green]\n")
 
+    from techtide_swarm.paths import install_project_config, install_project_souls
+
     dirs = [
         ".swarm",
         ".swarm/topics",
         ".swarm/transcripts",
         ".swarm/audit",
+        "config",
         "agents/sales",
         "agents/support",
         "agents/marketing",
@@ -136,7 +139,7 @@ def cmd_init(args: argparse.Namespace) -> None:
         TimeElapsedColumn(),
         console=console,
     ) as progress:
-        task = progress.add_task("Creating directories...", total=len(dirs))
+        task = progress.add_task("Creating directories...", total=len(dirs) + 3)
         for d in dirs:
             Path(d).mkdir(parents=True, exist_ok=True)
             progress.advance(task)
@@ -151,18 +154,28 @@ def cmd_init(args: argparse.Namespace) -> None:
                 "OPIK_API_KEY=your-opik-key\n"
                 "OPIK_WORKSPACE=techtide\n"
             )
+        progress.advance(task)
 
         # Create MEMORY.md
         progress.update(task, description="Initializing memory...")
         mem_path = Path(".swarm/MEMORY.md")
         if not mem_path.exists():
             mem_path.write_text("# TechTide Swarm 357 — Memory Index\n# 0 pointers\n")
+        progress.advance(task)
+
+        progress.update(task, description="Installing config + soul templates...")
+        cfg_path = install_project_config()
+        souls_path = install_project_souls()
+        progress.advance(task)
 
     console.print("\n[bold green]✅ Swarm initialized![/bold green]")
+    console.print(f"[dim]Config:[/dim] {cfg_path}")
+    console.print(f"[dim]Souls:[/dim]  {souls_path}")
     console.print("\n[dim]Next steps:[/dim]")
-    console.print("  1. Add your ANTHROPIC_API_KEY to .env")
-    console.print("  2. Run [bold]swarm demo[/bold] to see architecture + sample output")
-    console.print("  3. Run [bold]swarm run 'your task'[/bold] to execute across the swarm\n")
+    console.print("  1. Add your ANTHROPIC_API_KEY (or OPENROUTER_API_KEY) to .env")
+    console.print("  2. Review [bold]config/swarm-compact.yaml[/bold] (357-agent roster)")
+    console.print("  3. Run [bold]swarm demo[/bold] to see architecture + sample output")
+    console.print("  4. Run [bold]swarm run 'your task'[/bold] to execute across the swarm\n")
 
 
 def cmd_demo(args: argparse.Namespace) -> None:
@@ -313,10 +326,14 @@ async def _demo_live() -> None:
     console.print(f"\n[bold]Pipeline complete. Total cost: [yellow]${total_cost:.4f}[/yellow][/bold]\n")
 
 
-def _build_status_dict(config_path: str = "config/swarm.yaml") -> dict[str, Any]:
+def _build_status_dict(config_path: str | None = None) -> dict[str, Any]:
     """Build machine-readable status payload for `swarm status --json`."""
     import json as _j
     from collections import Counter
+
+    from techtide_swarm.paths import resolve_config_path
+
+    resolved = resolve_config_path(config_path)
 
     layers_order = [
         "management",
@@ -332,7 +349,7 @@ def _build_status_dict(config_path: str = "config/swarm.yaml") -> dict[str, Any]
     try:
         import yaml
 
-        raw = yaml.safe_load(Path(config_path).read_text(encoding="utf-8")) or {}
+        raw = yaml.safe_load(resolved.read_text(encoding="utf-8")) or {}
         agents = raw.get("agents", [])
         if agents:
             layer_counts = Counter(a["layer"] for a in agents)
@@ -382,21 +399,48 @@ def _build_status_dict(config_path: str = "config/swarm.yaml") -> dict[str, Any]
 
 def cmd_status(args: argparse.Namespace) -> None:
     """Show swarm health dashboard."""
+    from techtide_swarm.paths import resolve_config_path
+
+    config_path = resolve_config_path(getattr(args, "config", None))
     if getattr(args, "json", False):
         import json as _j
 
-        print(_j.dumps(_build_status_dict(), indent=2))
+        print(_j.dumps(_build_status_dict(str(config_path)), indent=2))
         return
     print_banner()
     console.print("\n[bold]📊 Swarm Status Dashboard[/bold]\n")
-    
+    console.print(f"[dim]Config: {config_path}[/dim]\n")
+
     try:
         from techtide_swarm.telemetry import get_layer_stats
         stats = get_layer_stats()
         if not stats:
-            console.print("[dim]No live telemetry data available yet. Run agents to generate metrics.[/dim]")
+            # Fall back to roster counts from resolved config
+            payload = _build_status_dict(str(config_path))
+            table = Table(
+                title="Layer Health (roster)",
+                box=box.HEAVY_EDGE,
+                show_header=True,
+                header_style="bold white on blue",
+            )
+            table.add_column("Layer", style="bold", min_width=12)
+            table.add_column("Agents", justify="center")
+            table.add_column("Model", justify="center")
+            table.add_column("Status", justify="center")
+            for layer in payload["layers"]:
+                table.add_row(
+                    layer["name"].upper(),
+                    str(layer["agent_count"]),
+                    layer["model"],
+                    layer["status"],
+                )
+            console.print(table)
+            console.print(
+                f"\n[dim]Total agents: {payload['total_agents']} · "
+                f"No live telemetry yet.[/dim]\n"
+            )
             return
-            
+
         table = Table(
             title="Layer Health",
             box=box.HEAVY_EDGE,
@@ -407,7 +451,7 @@ def cmd_status(args: argparse.Namespace) -> None:
         table.add_column("Calls", justify="center")
         table.add_column("Cost", justify="right", style="yellow")
         table.add_column("Avg Latency", justify="right")
-        
+
         total_calls = 0
         total_cost = 0.0
         for layer, data in stats.items():
@@ -420,7 +464,7 @@ def cmd_status(args: argparse.Namespace) -> None:
             )
             total_calls += data["calls"]
             total_cost += data["cost"]
-            
+
         table.add_row(
             "[bold]TOTAL[/bold]",
             f"[bold]{total_calls}[/bold]",
@@ -428,7 +472,7 @@ def cmd_status(args: argparse.Namespace) -> None:
             "",
             style="bold",
         )
-        
+
         console.print(table)
     except Exception as e:
         console.print(f"[red]Error loading telemetry: {e}[/red]")
@@ -477,21 +521,23 @@ def cmd_boot(args: argparse.Namespace) -> None:
     print_banner()
     console.print("\n[bold]⚡ Booting Swarm 357...[/bold]\n")
 
-    config_path = getattr(args, "config", "config/swarm.yaml")
+    from techtide_swarm.paths import resolve_config_path
+
+    config_path = resolve_config_path(getattr(args, "config", None))
 
     try:
         import yaml
         from techtide_swarm import Swarm
 
-        if not Path(config_path).is_file():
+        if not config_path.is_file():
             console.print(f"[red]Config not found: {config_path}[/red]")
-            console.print("[dim]Run 'swarm init' first, then ensure config/swarm.yaml exists.[/dim]")
+            console.print("[dim]Run 'swarm init' first (installs config/swarm-compact.yaml).[/dim]")
             sys.exit(1)
 
         swarm = Swarm.from_config(config_path)
         asyncio.run(swarm.boot())
 
-        raw = yaml.safe_load(Path(config_path).read_text(encoding="utf-8")) or {}
+        raw = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
         agents = swarm._get_roster()
         layer_budgets = raw.get("swarm", {}).get("layer_budgets", {})
 
@@ -538,23 +584,49 @@ def cmd_run(args: argparse.Namespace) -> None:
     """Run a task across the swarm or a single layer."""
     print_banner()
 
+    from techtide_swarm.paths import resolve_config_path
+
     task = " ".join(args.task) if isinstance(args.task, list) else args.task
-    config_path = getattr(args, "config", "config/swarm.yaml")
+    config_path = resolve_config_path(getattr(args, "config", None))
     layer = getattr(args, "layer", None)
     budget = float(getattr(args, "budget", 25.0))
     max_parallel = int(getattr(args, "max_parallel", 10))
+    simulate = bool(getattr(args, "simulate", False))
+    full_fanout = bool(getattr(args, "full_fanout", False))
+
+    if simulate:
+        os.environ["SWARM_SIMULATE"] = "1"
+        console.print("\n[bold yellow]SIMULATION mode (--simulate)[/bold yellow]")
 
     console.print(f"\n[bold]🚀 Swarm Run[/bold]\n[dim]Task:[/dim] {task[:120]}\n")
+    console.print(f"[dim]Config: {config_path}[/dim]\n")
 
     try:
         from techtide_swarm import Swarm
+
+        if not config_path.is_file():
+            console.print(f"[red]Config not found: {config_path}[/red]")
+            sys.exit(1)
 
         swarm = Swarm.from_config(config_path)
         asyncio.run(swarm.boot())
 
         if layer:
-            console.print(f"[dim]Layer: {layer} · Budget: ${budget:.2f} · Max parallel: {max_parallel}[/dim]\n")
-            results = asyncio.run(swarm.execute_layer(layer, task, budget_usd=budget, max_parallel=max_parallel))
+            console.print(
+                f"[dim]Layer: {layer} · Budget: ${budget:.2f} · "
+                f"Max parallel: {max_parallel}"
+                f"{' · full-fanout' if full_fanout else ''}[/dim]\n"
+            )
+            results = asyncio.run(
+                swarm.execute_layer(
+                    layer,
+                    task,
+                    budget_usd=budget,
+                    max_parallel=max_parallel,
+                    full_fanout=full_fanout,
+                    simulate=simulate,
+                )
+            )
 
             table = Table(
                 title=f"Layer: {layer.upper()}",
@@ -599,7 +671,9 @@ def cmd_run(args: argparse.Namespace) -> None:
                 console=console,
             ) as progress:
                 prog_task = progress.add_task("Swarm executing...", total=None)
-                result = asyncio.run(swarm.execute(task, budget_usd=budget))
+                result = asyncio.run(
+                    swarm.execute(task, budget_usd=budget, simulate=simulate)
+                )
                 progress.update(prog_task, description="Done", completed=True)
 
             console.print(Panel(
@@ -740,11 +814,142 @@ def cmd_plan(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+def _resolve_swarm(args: argparse.Namespace) -> Any:
+    """Load Swarm from resolved config path (shared by run-control commands)."""
+    from techtide_swarm.paths import resolve_config_path
+    from techtide_swarm import Swarm
+
+    config_path = resolve_config_path(getattr(args, "config", None))
+    if not config_path.is_file():
+        console.print(f"[red]Config not found: {config_path}[/red]")
+        sys.exit(1)
+    return Swarm.from_config(config_path)
+
+
+def cmd_inspect(args: argparse.Namespace) -> None:
+    """Inspect a checkpointed run by run_id."""
+    print_banner()
+    run_id = args.run_id
+    try:
+        import json as _j
+
+        swarm = _resolve_swarm(args)
+        state = swarm.inspect_run(run_id)
+        if state is None:
+            console.print(f"[red]Run not found: {run_id}[/red]")
+            sys.exit(1)
+        console.print(Panel(
+            _j.dumps(state.model_dump(mode="json"), indent=2, default=str)[:8000],
+            title=f"Run {run_id}",
+            border_style="cyan",
+        ))
+    except Exception as exc:
+        console.print(f"[red]Inspect failed: {exc}[/red]")
+        sys.exit(1)
+
+
+def cmd_resume(args: argparse.Namespace) -> None:
+    """Resume a checkpointed run."""
+    print_banner()
+    run_id = args.run_id
+    try:
+        swarm = _resolve_swarm(args)
+
+        async def _resume() -> Any:
+            await swarm.ensure_booted()
+            return await swarm.resume(run_id)
+
+        result = asyncio.run(_resume())
+        console.print(Panel(
+            result.final_output[:3000] if result.final_output else "[dim]No output[/dim]",
+            title=f"Resumed {result.pipeline_id} ({result.status})",
+            border_style="green",
+        ))
+        console.print(f"\n[dim]Cost: ${result.total_cost_usd:.4f}[/dim]\n")
+    except Exception as exc:
+        console.print(f"[red]Resume failed: {exc}[/red]")
+        sys.exit(1)
+
+
+def cmd_cancel(args: argparse.Namespace) -> None:
+    """Cancel a running (or resumable) checkpointed run."""
+    print_banner()
+    from techtide_swarm.runtime.state import RunStatus
+
+    run_id = args.run_id
+    try:
+        swarm = _resolve_swarm(args)
+        state = swarm.inspect_run(run_id)
+        if state is None:
+            console.print(f"[red]Run not found: {run_id}[/red]")
+            sys.exit(1)
+        swarm.cancel_run(run_id)
+        state.status = RunStatus.CANCELLED
+        state.error = "cancelled via CLI"
+        state.touch()
+        swarm._checkpoint.save(state)
+        console.print(f"[bold green]Cancelled run {run_id}[/bold green]\n")
+    except Exception as exc:
+        console.print(f"[red]Cancel failed: {exc}[/red]")
+        sys.exit(1)
+
+
+def cmd_replay(args: argparse.Namespace) -> None:
+    """Replay a prior run as a new execution."""
+    print_banner()
+    run_id = args.run_id
+    try:
+        swarm = _resolve_swarm(args)
+
+        async def _replay() -> Any:
+            await swarm.ensure_booted()
+            return await swarm.replay(run_id)
+
+        result = asyncio.run(_replay())
+        console.print(Panel(
+            result.final_output[:3000] if result.final_output else "[dim]No output[/dim]",
+            title=f"Replay → {result.pipeline_id} ({result.status})",
+            border_style="green",
+        ))
+        console.print(f"\n[dim]Cost: ${result.total_cost_usd:.4f}[/dim]\n")
+    except Exception as exc:
+        console.print(f"[red]Replay failed: {exc}[/red]")
+        sys.exit(1)
+
+
+def cmd_fork(args: argparse.Namespace) -> None:
+    """Fork a prior run, optionally editing the task."""
+    print_banner()
+    run_id = args.run_id
+    edit_task = getattr(args, "edit_task", None)
+    if isinstance(edit_task, list):
+        edit_task = " ".join(edit_task) if edit_task else None
+    try:
+        swarm = _resolve_swarm(args)
+
+        async def _fork() -> Any:
+            await swarm.ensure_booted()
+            return await swarm.fork(run_id, edit_task=edit_task)
+
+        result = asyncio.run(_fork())
+        console.print(Panel(
+            result.final_output[:3000] if result.final_output else "[dim]No output[/dim]",
+            title=f"Fork {run_id} → {result.pipeline_id} ({result.status})",
+            border_style="green",
+        ))
+        console.print(f"\n[dim]Cost: ${result.total_cost_usd:.4f}[/dim]\n")
+    except Exception as exc:
+        console.print(f"[red]Fork failed: {exc}[/red]")
+        sys.exit(1)
+
+
 def cmd_agent(args: argparse.Namespace) -> None:
     """List agents or inspect/run a specific agent."""
     print_banner()
 
-    config_path = getattr(args, "config", "config/swarm.yaml")
+    from techtide_swarm.paths import resolve_config_path
+
+    config_path = resolve_config_path(getattr(args, "config", None))
     list_flag = getattr(args, "list", False)
     layer_filter = getattr(args, "layer", None)
     agent_id = getattr(args, "agent_id", None)
@@ -752,7 +957,7 @@ def cmd_agent(args: argparse.Namespace) -> None:
     info_flag = getattr(args, "info", False)
 
     try:
-        if not Path(config_path).is_file():
+        if not config_path.is_file():
             console.print(f"[red]Config not found: {config_path}[/red]")
             sys.exit(1)
 
@@ -1098,17 +1303,35 @@ def main() -> None:
         "--json", action="store_true", default=False,
         help="Output machine-readable JSON instead of Rich table (CI-friendly)",
     )
+    status_parser.add_argument(
+        "--config", default=None,
+        help="Path to swarm YAML (default: resolve config/swarm-compact.yaml)",
+    )
     subparsers.add_parser("cost", help="Show cost report")
 
     run_parser = subparsers.add_parser("run", help="Run a task across the swarm")
     run_parser.add_argument("task", nargs="+", help="The task to execute")
     run_parser.add_argument("--layer", default=None, help="Route to a single layer")
     run_parser.add_argument("--budget", type=float, default=25.0, help="Budget in USD (default: 25.0)")
-    run_parser.add_argument("--config", default="config/swarm.yaml")
+    run_parser.add_argument(
+        "--config", default=None,
+        help="Path to swarm YAML (default: resolve config/swarm-compact.yaml)",
+    )
     run_parser.add_argument("--max-parallel", type=int, default=10, dest="max_parallel")
+    run_parser.add_argument(
+        "--simulate", action="store_true", default=False,
+        help="Explicit simulation (sets SWARM_SIMULATE=1; no live API calls)",
+    )
+    run_parser.add_argument(
+        "--full-fanout", action="store_true", default=False, dest="full_fanout",
+        help="Unsafe: run all role clones in a layer (default is one-per-role)",
+    )
 
     boot_parser = subparsers.add_parser("boot", help="Boot all 357 agents")
-    boot_parser.add_argument("--config", default="config/swarm.yaml")
+    boot_parser.add_argument(
+        "--config", default=None,
+        help="Path to swarm YAML (default: resolve config/swarm-compact.yaml)",
+    )
 
     agent_parser = subparsers.add_parser("agent", help="List or inspect/run agents")
     agent_parser.add_argument("agent_id", nargs="?", default=None, help="Agent name to inspect or run")
@@ -1116,7 +1339,34 @@ def main() -> None:
     agent_parser.add_argument("--layer", default=None, help="Filter by layer when listing")
     agent_parser.add_argument("--run", default=None, metavar="TASK", help="Run this agent on a task")
     agent_parser.add_argument("--info", action="store_true", help="Show agent config")
-    agent_parser.add_argument("--config", default="config/swarm.yaml")
+    agent_parser.add_argument(
+        "--config", default=None,
+        help="Path to swarm YAML (default: resolve config/swarm-compact.yaml)",
+    )
+
+    inspect_parser = subparsers.add_parser("inspect", help="Inspect a checkpointed run")
+    inspect_parser.add_argument("run_id", help="Run UUID to inspect")
+    inspect_parser.add_argument("--config", default=None)
+
+    resume_parser = subparsers.add_parser("resume", help="Resume a checkpointed run")
+    resume_parser.add_argument("run_id", help="Run UUID to resume")
+    resume_parser.add_argument("--config", default=None)
+
+    cancel_parser = subparsers.add_parser("cancel", help="Cancel a checkpointed run")
+    cancel_parser.add_argument("run_id", help="Run UUID to cancel")
+    cancel_parser.add_argument("--config", default=None)
+
+    replay_parser = subparsers.add_parser("replay", help="Replay a prior run as a new execution")
+    replay_parser.add_argument("run_id", help="Run UUID to replay")
+    replay_parser.add_argument("--config", default=None)
+
+    fork_parser = subparsers.add_parser("fork", help="Fork a prior run (optional task edit)")
+    fork_parser.add_argument("run_id", help="Run UUID to fork")
+    fork_parser.add_argument(
+        "--edit-task", nargs="+", default=None, dest="edit_task",
+        help="Optional replacement task text for the forked run",
+    )
+    fork_parser.add_argument("--config", default=None)
 
     dream_parser = subparsers.add_parser("dream", help="Trigger memory consolidation")
     dream_parser.add_argument("--migrate", action="store_true", help="Also migrate flat files to Memvid .mv2")
@@ -1176,6 +1426,16 @@ def main() -> None:
         cmd_boot(args)
     elif args.command == "agent":
         cmd_agent(args)
+    elif args.command == "inspect":
+        cmd_inspect(args)
+    elif args.command == "resume":
+        cmd_resume(args)
+    elif args.command == "cancel":
+        cmd_cancel(args)
+    elif args.command == "replay":
+        cmd_replay(args)
+    elif args.command == "fork":
+        cmd_fork(args)
     elif args.command == "dream":
         cmd_dream(args)
     elif args.command == "plan":

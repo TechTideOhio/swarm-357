@@ -2,6 +2,35 @@
 
 All notable changes to TechTide Swarm 357 are documented here.
 
+## [0.2.1] — 2026-07-25
+
+### Correction (v0.2.0)
+
+v0.2.0 public docs/CI badges still referenced scrubbed paths (`.github` workflows, landing tree, vendored Memvid). Fresh installs could not `swarm boot` from the wheel; Support souls were missing; OpenRouter silently mapped opus/sonnet → Haiku; HTTP errors returned 200; layer fan-out could dispatch entire layers.
+
+### Added
+
+- Restored `.github/workflows/ci.yml` + `publish.yml` (SHA-pinned actions, attestations, no core-repo frontend job).
+- Durable runtime: typed `RunState`/`StepState`, SQLite checkpoints, inspect/resume/cancel/replay/fork, SSE events, HITL approval stubs.
+- Atomic `BudgetLedger`, structured routing JSON, resilience helpers, workspace-confined Read/Write, argv Bash policy.
+- `resolve_config_path()` + `swarm init` installs bundled compact config and all Support souls.
+- Structured traces (`.swarm/traces.jsonl`) with optional OTel export (`SWARM_OTEL_EXPORT=1`).
+- Split landing to [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site).
+- Memvid bridge depends on crates.io `memvid-core` 2.x; `Cargo.lock` committed.
+
+### Fixed
+
+- HTTP `ensure_booted()`; meaningful 4xx/5xx; production auth fail-closed without `SWARM_API_KEY`.
+- OpenRouter model defaults no longer silently substitute Haiku (opt-in `SWARM_OPENROUTER_CHEAP=1`).
+- Layer runs default to one agent per role with a hard cap.
+- Telemetry redacts secrets before JSONL write.
+- Explicit `--simulate` / `SWARM_SIMULATE` instead of successful stubs without credentials.
+
+### Changed
+
+- Package version **0.2.0 → 0.2.1**.
+- Docs/STATUS/VERIFY rewritten as executable acceptance criteria (no “10/10” marketing).
+
 ## [0.2.0] — 2026-07-24
 
 ### Added

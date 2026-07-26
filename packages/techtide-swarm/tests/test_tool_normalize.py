@@ -61,22 +61,25 @@ def test_filter_handler_kwargs_drops_unknown() -> None:
     assert filtered == {"path": "a", "content": "b"}
 
 
-def test_execute_write_with_file_path_alias(tmp_path: Path) -> None:
+def test_execute_write_with_file_path_alias(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("SWARM_WORKSPACE_ROOT", str(tmp_path))
     target = str(tmp_path / "alias.txt")
     result = execute_tool("Write", {"file_path": target, "text": "via alias"})
     assert "Successfully" in result
     assert Path(target).read_text(encoding="utf-8") == "via alias"
 
 
-def test_execute_write_missing_content_does_not_crash(tmp_path: Path) -> None:
+def test_execute_write_missing_content_does_not_crash(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("SWARM_WORKSPACE_ROOT", str(tmp_path))
     target = str(tmp_path / "empty.txt")
     result = execute_tool("Write", {"path": target})
     assert "error" not in result.lower() or "Successfully" in result
     assert Path(target).exists()
 
 
-def test_execute_write_file_handler_name(tmp_path: Path) -> None:
+def test_execute_write_file_handler_name(tmp_path: Path, monkeypatch) -> None:
     """Backward-compat: models sometimes emit write_file instead of Write."""
+    monkeypatch.setenv("SWARM_WORKSPACE_ROOT", str(tmp_path))
     target = str(tmp_path / "snake.txt")
     result = execute_tool("write_file", {"path": target, "content": "snake"})
     assert "Successfully" in result

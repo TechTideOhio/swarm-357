@@ -12,16 +12,16 @@ async def test_swarm_execute_stub(tmp_path):
     config_path = tmp_path / "swarm.yaml"
     config_path.write_text("# empty config for stub mode\n")
     swarm = Swarm.from_config(config_path)
-    result = await swarm.execute("Analyze the AI market", budget_usd=5.0)
-    assert result.status == "ok"
-    assert len(result.agent_results) >= 1
+    result = await swarm.execute("Analyze the AI market", budget_usd=5.0, simulate=True)
+    assert result.status == "simulated"
+    assert "[simulated]" in result.final_output
 
 
 @pytest.mark.asyncio
 async def test_swarm_no_config_file(tmp_path):
     swarm = Swarm(tmp_path / "nonexistent.yaml")
-    result = await swarm.execute("Test task")
-    assert result.status == "ok"
+    result = await swarm.execute("Test task", simulate=True)
+    assert result.status == "simulated"
 
 
 def test_cost_controller_budget():
@@ -65,6 +65,9 @@ async def test_execute_records_spend(tmp_path, monkeypatch):
     """Swarm.execute records agent costs into CostController."""
     from techtide_swarm.agent import AgentResult
 
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test-key-for-spend")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+
     compact = textwrap.dedent("""\
         swarm:
           version: "2.0"
@@ -87,9 +90,13 @@ async def test_execute_records_spend(tmp_path, monkeypatch):
     await swarm.boot()
 
     async def fake_run(self, task: str) -> AgentResult:
+        if self.config.role == "conductor":
+            output = '{"roles": ["market_analyst"], "rationale": "spend test"}'
+        else:
+            output = "ok"
         return AgentResult(
             agent_name=self.config.name,
-            output="market_analyst" if self.config.role == "conductor" else "ok",
+            output=output,
             cost_usd=1.0,
             latency_ms=1,
             status="success",
@@ -107,6 +114,9 @@ async def test_execute_records_spend(tmp_path, monkeypatch):
 async def test_execute_layer_downgrades_after_spend(tmp_path, monkeypatch):
     """execute_layer uses haiku once CostController hits the 80% threshold."""
     from techtide_swarm.agent import AgentResult
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test-key-for-layer")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
 
     compact = textwrap.dedent("""\
         swarm:
@@ -146,9 +156,12 @@ async def test_execute_layer_downgrades_after_spend(tmp_path, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_conductor_fallback_uses_roster_roles(tmp_path, monkeypatch):
-    """Stub/unparseable conductor output falls back to roles that exist in the roster."""
+async def test_conductor_json_routes_to_roster_roles(tmp_path, monkeypatch):
+    """Valid conductor JSON routes to known roster roles; invalid JSON fails closed."""
     from techtide_swarm.agent import AgentResult
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test-key-for-routing")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
 
     compact = textwrap.dedent("""\
         swarm:
@@ -172,8 +185,10 @@ async def test_conductor_fallback_uses_roster_roles(tmp_path, monkeypatch):
     await swarm.boot()
 
     async def fake_run(self, task: str) -> AgentResult:
-        # Unparseable role list (matches stub-style output)
-        output = "[stub] would process" if self.config.role == "conductor" else "done"
+        if self.config.role == "conductor":
+            output = '{"roles": ["market_analyst"], "rationale": "research"}'
+        else:
+            output = "done"
         return AgentResult(
             agent_name=self.config.name,
             output=output,
@@ -184,8 +199,25 @@ async def test_conductor_fallback_uses_roster_roles(tmp_path, monkeypatch):
 
     monkeypatch.setattr("techtide_swarm.agent.Agent.run", fake_run)
     result = await swarm.execute("Test task", budget_usd=10.0)
+    assert result.status == "ok"
     names = [r.agent_name for r in result.agent_results]
     assert any("market-analyst" in n or "market_analyst" in n for n in names)
+
+    async def bad_conductor(self, task: str) -> AgentResult:
+        return AgentResult(
+            agent_name=self.config.name,
+            output="[stub] would process",
+            cost_usd=0.1,
+            latency_ms=1,
+            status="success",
+        )
+
+    monkeypatch.setattr("techtide_swarm.agent.Agent.run", bad_conductor)
+    swarm2 = Swarm(cfg)
+    await swarm2.boot()
+    bad = await swarm2.execute("Test task", budget_usd=10.0)
+    assert bad.status == "error"
+    assert "Routing" in (bad.final_output or "")
 
 
 def test_compact_format_expansion(tmp_path):
@@ -248,7 +280,7 @@ def test_legacy_format_still_works(tmp_path):
 
 @pytest.mark.asyncio
 async def test_compact_execute_stub(tmp_path):
-    """Compact config produces a working swarm execution in stub mode."""
+    """Compact config produces a working swarm execution in simulate mode."""
     compact = textwrap.dedent("""\
         swarm:
           version: "2.0"
@@ -269,8 +301,8 @@ async def test_compact_execute_stub(tmp_path):
     cfg.write_text(compact)
     swarm = Swarm(cfg)
     await swarm.boot()
-    result = await swarm.execute("Test task", budget_usd=10.0)
-    assert result.status == "ok"
+    result = await swarm.execute("Test task", budget_usd=10.0, simulate=True)
+    assert result.status == "simulated"
 
 
 def test_roster_soul_uniqueness():

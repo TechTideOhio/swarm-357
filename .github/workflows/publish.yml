@@ -1,0 +1,100 @@
+# file: .github/workflows/publish.yml
+# description: Trusted PyPI publish with attestations for tagged releases
+# reference: packages/techtide-swarm, .github/workflows/ci.yml
+name: publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  ci-gate:
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    needs: ci-gate
+    runs-on: ubuntu-latest
+    environment: pypi
+    env:
+      PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Install build
+        run: pip install build
+
+      - name: Build wheel + sdist
+        working-directory: packages/techtide-swarm
+        run: python -m build
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: packages/techtide-swarm/dist/*
+
+      - name: Publish to PyPI (API token)
+        if: env.PYPI_TOKEN != ''
+        uses: pypa/gh-action-pypi-publish@76f17cbe78078678c8738b1f0f01a9f53c8ac608 # v1.12.4
+        with:
+          packages-dir: packages/techtide-swarm/dist/
+          password: ${{ env.PYPI_TOKEN }}
+
+      - name: Publish to PyPI (trusted publishing)
+        if: env.PYPI_TOKEN == ''
+        id: pypi_oidc
+        continue-on-error: true
+        uses: pypa/gh-action-pypi-publish@76f17cbe78078678c8738b1f0f01a9f53c8ac608 # v1.12.4
+        with:
+          packages-dir: packages/techtide-swarm/dist/
+
+      - name: Fail if PyPI publish did not succeed
+        if: env.PYPI_TOKEN == '' && steps.pypi_oidc.outcome != 'success'
+        run: |
+          echo "::error::PyPI trusted publishing failed. Configure the publisher at"
+          echo "https://pypi.org/manage/project/techtide-swarm/settings/publishing/"
+          echo "for repo TechTideOhio/swarm-357, workflow publish.yml, environment pypi,"
+          echo "or add repository secret PYPI_API_TOKEN."
+          exit 1
+
+      - name: Extract changelog section
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path("CHANGELOG.md").read_text(encoding="utf-8")
+          lines = text.splitlines()
+          out = []
+          capturing = False
+          for line in lines:
+              if line.startswith("## [") and capturing:
+                  break
+              if line.startswith("## [0.") or (line.startswith("## [") and "Unreleased" not in line):
+                  if not capturing:
+                      capturing = True
+                      out.append(line)
+                      continue
+              if capturing:
+                  out.append(line)
+          body = "\n".join(out).strip() or "See CHANGELOG.md"
+          Path("release-notes.md").write_text(body + "\n", encoding="utf-8")
+          print(body[:500])
+          PY
+
+      - name: GitHub Release
+        if: always()
+        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d920e712bc38e # v2.3.2
+        with:
+          body_path: release-notes.md
+          files: |
+            packages/techtide-swarm/dist/*
+          generate_release_notes: true

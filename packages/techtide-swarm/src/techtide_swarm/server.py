@@ -1,26 +1,36 @@
+# file: packages/techtide-swarm/src/techtide_swarm/server.py
+# description: FastAPI HTTP API for Swarm 357 — hardened run control, SSE, and fail-closed errors
+# reference: techtide_swarm.paths, techtide_swarm.runtime.events, techtide_swarm.runtime.routing
 """FastAPI server exposing TechTide Swarm 357 as an HTTP API."""
 from __future__ import annotations
 
 import logging
 import os
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Any, AsyncIterator, Callable
+from typing import TYPE_CHECKING, Annotated, Any, AsyncIterator, Callable, NoReturn, cast
 
 import yaml
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from techtide_swarm.http_security import max_run_budget_usd, require_swarm_write_key
-from techtide_swarm.llm import resolve_api_key
+from techtide_swarm.llm import resolve_api_key, resolved_model_info
+from techtide_swarm.paths import resolve_config_path
 from techtide_swarm.rate_limit import SwarmRateLimitMiddleware
+from techtide_swarm.runtime.routing import RoutingError
 from techtide_swarm.structured_logging import CorrelationIdASGIMiddleware
 
 if TYPE_CHECKING:
     pass
 
 _server_logger = logging.getLogger(__name__)
+
+# Server mode disables destructive local tools (terminal / file writes).
+os.environ.setdefault("SWARM_SERVER_MODE", "1")
 
 # ── Allowed CORS origins ─────────────────────────────────────────────────────
 # Extend at deploy time via ALLOWED_ORIGINS=https://a.example.com,https://b.example.com
@@ -39,21 +49,19 @@ _CORS_ORIGINS = [
     *_EXTRA_ORIGINS,
 ]
 
-# ── Default config path (editable install, Docker /app, or SWARM_CONFIG_PATH) ─
-def default_config_path() -> Path:
-    """Resolve swarm-compact.yaml for local dev, Docker (/app/config), wheel data, or env."""
-    env = os.getenv("SWARM_CONFIG_PATH", "").strip()
-    if env:
-        return Path(env)
-    docker = Path("/app/config/swarm-compact.yaml")
-    if docker.is_file():
-        return docker
-    from techtide_swarm.paths import bundled_compact_config
 
-    bundled = bundled_compact_config()
-    if bundled is not None:
-        return bundled
-    return Path(__file__).resolve().parent.parent.parent.parent.parent / "config" / "swarm-compact.yaml"
+# ── Default config path (thin wrapper over resolve_config_path) ───────────────
+def default_config_path() -> Path:
+    """Resolve swarm config via unified path search (env, project, Docker, bundled)."""
+    return resolve_config_path()
+
+
+def _auth_required() -> bool:
+    """True when write routes require X-SWARM-API-KEY (key set or force-auth env)."""
+    if os.getenv("SWARM_API_KEY", "").strip():
+        return True
+    flag = os.getenv("SWARM_REQUIRE_AUTH", "").strip().lower()
+    return flag in {"1", "true", "yes", "on"}
 
 
 # ── Request models ───────────────────────────────────────────────────────────
@@ -62,11 +70,22 @@ class SwarmRunRequest(BaseModel):
     task: str
     budget_usd: float = 25.0
     layer: str | None = None
+    simulate: bool = False
+    full_fanout: bool = False
 
 
 class AgentRunRequest(BaseModel):
     agent_name: str
     task: str
+
+
+class ForkRunRequest(BaseModel):
+    edit_task: str | None = None
+
+
+class ApprovalDecisionRequest(BaseModel):
+    reason: str = ""
+    decided_by: str = "api"
 
 
 # ── Lifespan ─────────────────────────────────────────────────────────────────
@@ -75,6 +94,7 @@ def _make_lifespan(cfg: Path) -> Callable[[FastAPI], Any]:
     @asynccontextmanager
     async def _lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: ARG001
         """Snapshot current swarm config to Supabase on startup."""
+        os.environ["SWARM_SERVER_MODE"] = "1"
         from techtide_swarm.persistence import store
         if store.enabled and cfg.exists():
             try:
@@ -87,11 +107,46 @@ def _make_lifespan(cfg: Path) -> Callable[[FastAPI], Any]:
     return _lifespan
 
 
+def _raise_run_error(exc: BaseException) -> NoReturn:
+    """Map execution errors to HTTP status codes (never silent 200)."""
+    if isinstance(exc, HTTPException):
+        raise exc
+    if isinstance(exc, (ValueError, RoutingError, KeyError)):
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+def _swarm_or_503(cfg: Path) -> Any:
+    from techtide_swarm.swarm import Swarm
+
+    if not cfg.exists():
+        raise HTTPException(
+            status_code=503,
+            detail=f"Swarm config not found: {cfg}",
+        )
+    return Swarm(cfg)
+
+
+def _find_approval(
+    swarm: Any, approval_id: str
+) -> tuple[Any, Any] | None:
+    """Locate (RunState, ApprovalRecord) by approval_id across recent checkpoints."""
+    for summary in swarm.list_runs(limit=200):
+        state = swarm.inspect_run(summary["run_id"])
+        if state is None:
+            continue
+        for appr in state.approvals:
+            if appr.approval_id == approval_id:
+                return state, appr
+    return None
+
+
 # ── App factory ──────────────────────────────────────────────────────────────
 
 def create_app(config_path: Path | None = None) -> FastAPI:
     """Create and return the FastAPI application."""
-    cfg = config_path if config_path is not None else default_config_path()
+    os.environ["SWARM_SERVER_MODE"] = "1"
+    cfg = config_path if config_path is not None else resolve_config_path()
 
     from techtide_swarm import __version__ as _pkg_version
 
@@ -149,6 +204,9 @@ def create_app(config_path: Path | None = None) -> FastAPI:
             "version": _pkg_version,
             "agents": len(_get_roster()),
             "api_key_set": bool(resolve_api_key()),
+            "auth_required": _auth_required(),
+            "model": resolved_model_info("sonnet"),
+            "config_path": str(cfg),
         }
 
     @app.get("/api/swarm/status")
@@ -221,13 +279,165 @@ def create_app(config_path: Path | None = None) -> FastAPI:
         runs = get_recent_runs(limit=limit)
         return {"runs": runs, "total": len(runs)}
 
+    @app.get("/api/swarm/runs/{run_id}")
+    async def swarm_run_inspect(run_id: str) -> dict[str, Any]:
+        swarm = _swarm_or_503(cfg)
+        state = swarm.inspect_run(run_id)
+        if state is None:
+            raise HTTPException(status_code=404, detail=f"Run not found: {run_id}")
+        return cast("dict[str, Any]", state.model_dump(mode="json"))
+
+    @app.post("/api/swarm/runs/{run_id}/resume")
+    async def swarm_run_resume(
+        run_id: str,
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+    ) -> dict[str, Any]:
+        swarm = _swarm_or_503(cfg)
+        try:
+            await swarm.ensure_booted()
+            result = await swarm.resume(run_id)
+            return {
+                "pipeline_id": result.pipeline_id,
+                "status": result.status,
+                "total_cost_usd": round(result.total_cost_usd, 6),
+                "final_output": result.final_output,
+                "agent_results": [_agent_result_dict(r) for r in result.agent_results],
+            }
+        except Exception as exc:
+            _raise_run_error(exc)
+
+    @app.post("/api/swarm/runs/{run_id}/cancel")
+    async def swarm_run_cancel(
+        run_id: str,
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+    ) -> dict[str, Any]:
+        from techtide_swarm.runtime.state import RunStatus
+
+        swarm = _swarm_or_503(cfg)
+        state = swarm.inspect_run(run_id)
+        if state is None:
+            raise HTTPException(status_code=404, detail=f"Run not found: {run_id}")
+        swarm.cancel_run(run_id)
+        state.status = RunStatus.CANCELLED
+        state.error = "cancelled via API"
+        state.touch()
+        swarm._checkpoint.save(state)
+        return {"run_id": run_id, "status": "cancelled"}
+
+    @app.post("/api/swarm/runs/{run_id}/replay")
+    async def swarm_run_replay(
+        run_id: str,
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+    ) -> dict[str, Any]:
+        swarm = _swarm_or_503(cfg)
+        try:
+            await swarm.ensure_booted()
+            result = await swarm.replay(run_id)
+            return {
+                "pipeline_id": result.pipeline_id,
+                "status": result.status,
+                "total_cost_usd": round(result.total_cost_usd, 6),
+                "final_output": result.final_output,
+                "agent_results": [_agent_result_dict(r) for r in result.agent_results],
+            }
+        except Exception as exc:
+            _raise_run_error(exc)
+
+    @app.post("/api/swarm/runs/{run_id}/fork")
+    async def swarm_run_fork(
+        run_id: str,
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+        req: ForkRunRequest | None = None,
+    ) -> dict[str, Any]:
+        swarm = _swarm_or_503(cfg)
+        body = req or ForkRunRequest()
+        try:
+            await swarm.ensure_booted()
+            result = await swarm.fork(run_id, edit_task=body.edit_task)
+            return {
+                "pipeline_id": result.pipeline_id,
+                "status": result.status,
+                "total_cost_usd": round(result.total_cost_usd, 6),
+                "final_output": result.final_output,
+                "agent_results": [_agent_result_dict(r) for r in result.agent_results],
+                "parent_run_id": run_id,
+            }
+        except Exception as exc:
+            _raise_run_error(exc)
+
+    @app.get("/api/swarm/runs/{run_id}/events")
+    async def swarm_run_events(run_id: str) -> StreamingResponse:
+        from techtide_swarm.runtime.events import get_event_bus
+
+        bus = get_event_bus()
+
+        async def _event_stream() -> AsyncIterator[str]:
+            async for event in bus.subscribe(run_id):
+                yield event.to_sse()
+
+        return StreamingResponse(
+            _event_stream(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
+
+    @app.post("/api/swarm/approvals/{approval_id}/approve")
+    async def approval_approve(
+        approval_id: str,
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+        req: ApprovalDecisionRequest | None = None,
+    ) -> dict[str, Any]:
+        swarm = _swarm_or_503(cfg)
+        found = _find_approval(swarm, approval_id)
+        if found is None:
+            raise HTTPException(status_code=404, detail=f"Approval not found: {approval_id}")
+        state, appr = found
+        body = req or ApprovalDecisionRequest()
+        appr.status = "approved"
+        appr.decided_by = body.decided_by
+        appr.reason = body.reason
+        appr.decided_at = datetime.now(timezone.utc)
+        state.touch()
+        swarm._checkpoint.save(state)
+        return {
+            "approval_id": approval_id,
+            "run_id": state.run_id,
+            "status": "approved",
+        }
+
+    @app.post("/api/swarm/approvals/{approval_id}/reject")
+    async def approval_reject(
+        approval_id: str,
+        _authorized: Annotated[bool, Depends(require_swarm_write_key)],
+        req: ApprovalDecisionRequest | None = None,
+    ) -> dict[str, Any]:
+        swarm = _swarm_or_503(cfg)
+        found = _find_approval(swarm, approval_id)
+        if found is None:
+            raise HTTPException(status_code=404, detail=f"Approval not found: {approval_id}")
+        state, appr = found
+        body = req or ApprovalDecisionRequest()
+        appr.status = "rejected"
+        appr.decided_by = body.decided_by
+        appr.reason = body.reason
+        appr.decided_at = datetime.now(timezone.utc)
+        state.touch()
+        swarm._checkpoint.save(state)
+        return {
+            "approval_id": approval_id,
+            "run_id": state.run_id,
+            "status": "rejected",
+        }
+
     @app.post("/api/swarm/run")
     async def swarm_run(
         req: SwarmRunRequest,
         _authorized: Annotated[bool, Depends(require_swarm_write_key)],
     ) -> dict[str, Any]:
-        from techtide_swarm.swarm import Swarm
-
         cap = max_run_budget_usd()
         if req.budget_usd > cap:
             raise HTTPException(
@@ -235,14 +445,26 @@ def create_app(config_path: Path | None = None) -> FastAPI:
                 detail=f"budget_usd must be <= {cap} (SWARM_MAX_RUN_BUDGET_USD)",
             )
 
+        if not cfg.exists():
+            if req.simulate:
+                return _stub_swarm_result(req.task, simulated=True)
+            raise HTTPException(
+                status_code=503,
+                detail=f"Swarm config not found: {cfg}. Pass simulate=true for a stub response.",
+            )
+
         try:
-            if not cfg.exists():
-                return _stub_swarm_result(req.task)
+            from techtide_swarm.swarm import Swarm
 
             swarm = Swarm(cfg)
+            await swarm.ensure_booted()
             if req.layer:
                 results = await swarm.execute_layer(
-                    req.layer, req.task, budget_usd=min(req.budget_usd, cap)
+                    req.layer,
+                    req.task,
+                    budget_usd=min(req.budget_usd, cap),
+                    full_fanout=req.full_fanout,
+                    simulate=req.simulate,
                 )
                 total_cost = sum(r.cost_usd for r in results)
                 final = results[-1].output if results else ""
@@ -253,24 +475,21 @@ def create_app(config_path: Path | None = None) -> FastAPI:
                     "final_output": final,
                     "agent_results": [_agent_result_dict(r) for r in results],
                 }
-            else:
-                result = await swarm.execute(req.task, budget_usd=min(req.budget_usd, cap))
-                return {
-                    "pipeline_id": result.pipeline_id,
-                    "status": result.status,
-                    "total_cost_usd": round(result.total_cost_usd, 6),
-                    "final_output": result.final_output,
-                    "agent_results": [_agent_result_dict(r) for r in result.agent_results],
-                }
-        except Exception as exc:
+            result = await swarm.execute(
+                req.task,
+                budget_usd=min(req.budget_usd, cap),
+                simulate=req.simulate,
+            )
             return {
-                "pipeline_id": "error",
-                "status": "error",
-                "total_cost_usd": 0.0,
-                "final_output": "",
-                "agent_results": [],
-                "error": str(exc),
+                "pipeline_id": result.pipeline_id,
+                "status": result.status,
+                "total_cost_usd": round(result.total_cost_usd, 6),
+                "final_output": result.final_output,
+                "agent_results": [_agent_result_dict(r) for r in result.agent_results],
             }
+        except Exception as exc:
+            _raise_run_error(exc)
+            raise  # pragma: no cover — _raise_run_error always raises
 
     @app.post("/api/agent/run")
     async def agent_run(
@@ -304,16 +523,17 @@ def create_app(config_path: Path | None = None) -> FastAPI:
             )
             agent = Agent(config)
             result = await agent.run(req.task)
+            if result.status == "error":
+                raise HTTPException(
+                    status_code=500,
+                    detail=result.error or f"Agent '{req.agent_name}' failed",
+                )
             return _agent_result_dict(result)
+        except HTTPException:
+            raise
         except Exception as exc:
-            return {
-                "output": "",
-                "cost_usd": 0.0,
-                "latency_ms": 0,
-                "status": "error",
-                "agent_name": req.agent_name,
-                "error": str(exc),
-            }
+            _raise_run_error(exc)
+            raise  # pragma: no cover
 
     @app.post("/api/swarm/dream")
     async def swarm_dream(
@@ -327,7 +547,7 @@ def create_app(config_path: Path | None = None) -> FastAPI:
             _store.log_dream(report)
             return report
         except Exception as exc:
-            return {"status": "error", "error": str(exc)}
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     return app
 
@@ -345,12 +565,13 @@ def _agent_result_dict(result: Any) -> dict[str, Any]:
     }
 
 
-def _stub_swarm_result(task: str) -> dict[str, Any]:
+def _stub_swarm_result(task: str, *, simulated: bool = False) -> dict[str, Any]:
+    label = "simulated" if simulated else "stub"
     return {
-        "pipeline_id": "stub-no-config",
-        "status": "stub",
+        "pipeline_id": f"{label}-no-config",
+        "status": label,
         "total_cost_usd": 0.0,
-        "final_output": f"[STUB] Task received: {task}",
+        "final_output": f"[{label.upper()}] Task received: {task}",
         "agent_results": [],
     }
 

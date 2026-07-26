@@ -1,43 +1,50 @@
-# Swarm 357 — Verification scorecard (10/10)
+# Swarm 357 — Executable acceptance criteria
 
-This document is the **single source of truth** for objective checks. Each category should pass before claiming that maturity level in release notes.
+This document is the **mechanical** gate list for releases. Every check must be backed by CI, a script, or a live probe — not marketing language.
 
-## Category matrix
+## Matrix
 
 | Category | Verifier | Pass criteria |
 |----------|----------|----------------|
-| **Claim integrity** | Roster scripts + `/api/health` | `python scripts/generate_roster.py --fix-counts` and `python scripts/generate_roster.py --compact --fix-counts` exit 0; `GET /api/health` → `agents` == **357** (with shipped compact config). |
-| **Runtime correctness** | Pytest | `pytest packages/techtide-swarm/tests -v` green; stub mode when `ANTHROPIC_API_KEY` unset; live mode when key set. |
-| **Tools & tasks** | Code + STATUS | No tool claims “live” behavior without env-backed providers; see [STATUS.md](../STATUS.md). |
-| **Production ops** | Docker + Railway | `docker build -f Dockerfile .` succeeds; container `GET /api/health` returns 200; [docs/DEPLOY_RAILWAY.md](DEPLOY_RAILWAY.md). |
-| **Data plane** | SQL migration | [database/migrations/001_initial.sql](../database/migrations/001_initial.sql) matches `SwarmStore` inserts; apply in Supabase SQL editor or CLI. See [DATA_PLANE.md](DATA_PLANE.md). |
-| **Security** | Pytest + curl | When `SWARM_API_KEY` is set, `POST /api/swarm/run` without `X-SWARM-API-KEY` returns **401**; rate limit returns **429** when exceeded. |
-| **Observability** | Local + optional cloud | `.swarm/telemetry.jsonl` appended on runs; Supabase dual-write when `SUPABASE_*` set. |
-| **UX / OSS** | Landing build | `cd .ui_landin_sample/minimal && npm run build` succeeds; README quickstart matches repo layout. |
+| **Claim integrity** | Roster + health | `python scripts/generate_roster.py --compact --fix-counts` exits 0; Docker/`GET /api/health` → `agents == 357` |
+| **Install path** | Clean wheel | Build wheel → fresh venv → `swarm boot` loads 357 agents; Support souls present in package data |
+| **Runtime correctness** | Pytest | `pytest packages/techtide-swarm/tests -v -p no:schemathesis` green |
+| **Fan-out safety** | Pytest | Layer runs default to one agent per role with a hard cap; full fan-out requires explicit flag |
+| **Budgets** | Pytest | Concurrent reservations cannot exceed the ceiling |
+| **Auth** | Docker/CI | Production/`SWARM_REQUIRE_AUTH=1` without `SWARM_API_KEY` → fail closed; bad key → **401**; unauthenticated POST ≠ **200** |
+| **Failures** | API tests | Execution errors return **4xx/5xx**, never HTTP 200 with `"status":"error"` alone |
+| **Models** | Pytest | OpenRouter does not silently map opus/sonnet → Haiku unless `SWARM_OPENROUTER_CHEAP=1` |
+| **Durable runtime** | Pytest | Checkpoint save/load/resume; cancel/replay/fork CLI/API |
+| **Streaming** | API smoke | `GET /api/swarm/runs/{id}/events` streams SSE |
+| **Security tools** | Pytest | Bash denied in server mode; Read/Write confined to workspace root |
+| **Bridge** | CI rust job | `cargo fmt/clippy/build` + bridge integration tests with `MEMVID_SWARM_BRIDGE` |
+| **Evals** | Baseline artifacts | Single-agent and swarm metrics reported **separately** in `evals/baselines/latest.json`; README numbers regenerated via `scripts/render_eval_assets.py` |
+| **Landing** | Split repo | [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) CI build green; not shipped inside this core repo |
+| **Supply chain** | Publish workflow | Tagged release builds wheel/sdist, attestations, PyPI publish after CI |
 
-## Commands (copy-paste)
-
-From repository root `Apps/swarm357` (or `swarm357` if standalone):
+## Commands
 
 ```bash
-# Python package
-pip install -e "packages/techtide-swarm[dev,supabase]"
+pip install -e "packages/techtide-swarm[dev]"
 ruff check packages/techtide-swarm/src
-cd packages/techtide-swarm && mypy src && cd ../..
-
-# Roster: legacy flat + compact (Docker/API default)
-python scripts/generate_roster.py --fix-counts
+cd packages/techtide-swarm && mypy src && python -m pytest tests -v -p no:schemathesis && cd ../..
 python scripts/generate_roster.py --compact --fix-counts
 
-# Tests
-python -m pytest packages/techtide-swarm/tests -v
+# Clean wheel smoke
+python -m build packages/techtide-swarm
+python -m venv /tmp/swarm-wheel && /tmp/swarm-wheel/bin/pip install packages/techtide-swarm/dist/*.whl
+/tmp/swarm-wheel/bin/swarm boot
 
-# Docker smoke (optional)
-docker build -t swarm357-api -f Dockerfile .
-docker run --rm -p 8000:8000 swarm357-api &
-curl -s http://127.0.0.1:8000/api/health | jq .
+# Docker
+docker build -t swarm357-api .
+docker run --rm -e SWARM_API_KEY=ci -e SWARM_REQUIRE_AUTH=1 -p 8000:8000 swarm357-api
+curl -sf http://127.0.0.1:8000/api/health
 ```
 
 ## Definition: “357 agents”
 
-**357 agents** means **357 distinct agent identities** (YAML roster expansion + soul templates) orchestrated by the Swarm runtime — not 357 parallel long-running LLM processes or 357 simultaneous Opus calls. Layer concurrency caps apply (`execute_layer` semaphore).
+**357 agents** means **357 distinct agent identities** (YAML roster + soul templates) orchestrated by the runtime — not 357 parallel long-running LLM sessions. Default layer execution selects **one agent per role** with a configurable cap.
+
+## Maturity honesty
+
+See [STATUS.md](../STATUS.md). Stable ≠ complete agent platform. Durable checkpoints, SSE, and HITL approvals are **Beta**; dream write-back and Opik remain experimental/planned.

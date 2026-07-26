@@ -4311,5 +4311,22 @@
       "agent_cost_usd": 0.023523000000000002,
       "judge_cost_usd": 0.0002155
     }
-  ]
+  ],
+  "summary": {
+    "single_agent_pass": "142/142",
+    "swarm_pass": "4/12",
+    "single_agent": {
+      "total": 142,
+      "passed": 142,
+      "failed": 0,
+      "pass_rate": 1.0
+    },
+    "swarm": {
+      "total": 12,
+      "passed": 4,
+      "failed": 8,
+      "pass_rate": 0.3333333333333333
+    },
+    "note": "Do not aggregate swarm into a headline dominated by single-agent burns."
+  }
 }

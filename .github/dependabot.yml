@@ -1,0 +1,17 @@
+# file: .github/dependabot.yml
+# description: Weekly dependency updates for Actions and Python package
+# reference: .github/workflows/ci.yml
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: pip
+    directory: /packages/techtide-swarm
+    schedule:
+      interval: weekly
+  - package-ecosystem: cargo
+    directory: /packages/memvid-swarm-bridge
+    schedule:
+      interval: weekly

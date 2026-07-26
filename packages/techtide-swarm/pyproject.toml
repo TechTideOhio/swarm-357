@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "techtide-swarm"
-version = "0.2.0"
+version = "0.2.1"
 description = "TechTide Swarm 357 — layered orchestration, durable memory bridge, and observability hooks."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -100,5 +100,5 @@ ignore_errors = true
 # imported when the corresponding extras ([web], [supabase]) are installed,
 # so allow missing imports for them without weakening type checking elsewhere.
 [[tool.mypy.overrides]]
-module = ["supabase", "exa_py", "firecrawl"]
+module = ["supabase", "exa_py", "firecrawl", "opentelemetry", "opentelemetry.*"]
 ignore_missing_imports = true

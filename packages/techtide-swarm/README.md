@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/techtide-swarm.svg)](https://pypi.org/project/techtide-swarm/)
 [![Python](https://img.shields.io/pypi/pyversions/techtide-swarm.svg)](https://pypi.org/project/techtide-swarm/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/TechTideOhio/swarm-357/blob/main/LICENSE)
-[![CI](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci-standalone.yml/badge.svg)](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci-standalone.yml)
+[![CI](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci.yml/badge.svg)](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci.yml)
 
 Python package for **Swarm 357**: layered orchestration of 357 Claude agent roles across six business layers, portable Memvid memory, cost controls, and a FastAPI HTTP surface.
 

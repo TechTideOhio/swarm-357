@@ -1,4 +1,7 @@
-"""Bash execution tool, gated by BashSecurityGate.
+# file: packages/techtide-swarm/src/techtide_swarm/tools/terminal.py
+# description: Bash tool with explicit argv execution policy (no shell=True by default)
+# reference: techtide_swarm.bash_gate, techtide_swarm.tools.registry
+"""Bash execution tool, gated by BashSecurityGate and execution policy.
 
 Registers:
   - Bash  (toolset: core_tools)
@@ -6,29 +9,75 @@ Registers:
 
 from __future__ import annotations
 
+import os
+import shlex
 import subprocess
 
 from techtide_swarm.bash_gate import BashSecurityGate
 from techtide_swarm.tools.registry import registry
 
 
-def run_bash(command: str, timeout: int = 30) -> str:
-    """Execute a shell command after BashSecurityGate validation.
+def bash_denied() -> bool:
+    """Default-deny Bash in server/production unless explicitly allowed."""
+    if os.getenv("SWARM_ALLOW_BASH", "").strip().lower() in {"1", "true", "yes", "on"}:
+        return False
+    if os.getenv("SWARM_DENY_BASH", "").strip().lower() in {"1", "true", "yes", "on"}:
+        return True
+    env = os.getenv("SWARM_ENV", "").strip().lower()
+    if env in {"prod", "production", "server"}:
+        return True
+    if os.getenv("SWARM_SERVER_MODE", "").strip().lower() in {"1", "true", "yes", "on"}:
+        return True
+    return False
 
-    Returns stdout (and stderr on non-zero exit).  Output is capped at
-    8 000 characters so it stays comfortably inside a Claude context window.
+
+def allow_shell_true() -> bool:
+    """Unsafe local opt-in for shell=True (never default)."""
+    return os.getenv("SWARM_ALLOW_UNSAFE_BASH", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def run_bash(command: str, timeout: int = 30) -> str:
+    """Execute a command after BashSecurityGate validation.
+
+    Default: argv list via shlex.split (no shell). Production/server denies Bash
+    unless SWARM_ALLOW_BASH=1. SWARM_ALLOW_UNSAFE_BASH=1 restores shell=True.
     """
+    if bash_denied():
+        return (
+            "BLOCKED by execution policy: Bash is disabled in server/production. "
+            "Set SWARM_ALLOW_BASH=1 to enable (still gated)."
+        )
     safe, reason = BashSecurityGate.validate(command)
     if not safe:
         return f"BLOCKED by BashSecurityGate: {reason}"
     try:
-        result = subprocess.run(
-            command,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
+        if allow_shell_true():
+            result = subprocess.run(
+                command,
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+        else:
+            try:
+                argv = shlex.split(command, posix=os.name != "nt")
+            except ValueError as exc:
+                return f"Error: invalid command quoting: {exc}"
+            if not argv:
+                return "Error: empty command"
+            result = subprocess.run(
+                argv,
+                shell=False,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
         output = result.stdout or ""
         if result.returncode != 0:
             if result.stderr:
@@ -47,7 +96,7 @@ registry.register(
     schema={
         "description": (
             "Execute a shell command. Commands are validated by BashSecurityGate "
-            "before execution to block destructive or dangerous operations."
+            "and an explicit execution policy before execution."
         ),
         "input_schema": {
             "type": "object",

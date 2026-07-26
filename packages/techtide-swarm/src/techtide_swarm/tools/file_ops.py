@@ -1,3 +1,6 @@
+# file: packages/techtide-swarm/src/techtide_swarm/tools/file_ops.py
+# description: File read/write tools with workspace-root confinement for server mode
+# reference: techtide_swarm.tools.registry
 """File read/write tools with path-safety checks.
 
 Registers:
@@ -11,11 +14,6 @@ import os
 from pathlib import Path
 
 from techtide_swarm.tools.registry import registry
-
-# ---------------------------------------------------------------------------
-# Write-path deny list — patterns that must not appear in resolved write paths.
-# Checked against the absolute, resolved path string.
-# ---------------------------------------------------------------------------
 
 _WRITE_DENY_PATTERNS: list[str] = [
     "/.ssh/",
@@ -34,53 +32,74 @@ _WRITE_DENY_PATTERNS: list[str] = [
     "/.bash_profile",
 ]
 
-# If SWARM_WRITE_SAFE_ROOT is set, all writes must live under that directory.
-_SAFE_ROOT = os.getenv("SWARM_WRITE_SAFE_ROOT", "")
+
+def _workspace_root() -> Path | None:
+    """Immutable workspace root for Read/Write when set or in server mode."""
+    explicit = os.getenv("SWARM_WORKSPACE_ROOT", "").strip() or os.getenv(
+        "SWARM_WRITE_SAFE_ROOT", ""
+    ).strip()
+    if explicit:
+        return Path(explicit).resolve()
+    # Server/production: confine to CWD by default
+    env = os.getenv("SWARM_ENV", "").strip().lower()
+    if env in {"prod", "production", "server"} or os.getenv(
+        "SWARM_SERVER_MODE", ""
+    ).strip().lower() in {"1", "true", "yes", "on"}:
+        return Path.cwd().resolve()
+    if os.getenv("SWARM_CONFINEMENT", "").strip().lower() in {"1", "true", "yes", "on"}:
+        return Path.cwd().resolve()
+    return None
 
 
-def _is_write_allowed(path: Path) -> tuple[bool, str]:
-    """Return (allowed, reason).  Reason is empty string when allowed."""
-    resolved = str(path.resolve())
-    for pattern in _WRITE_DENY_PATTERNS:
-        if pattern in resolved:
-            return False, f"Write denied: path matches sensitive pattern '{pattern}'"
-    if _SAFE_ROOT:
-        safe = str(Path(_SAFE_ROOT).resolve())
-        if not resolved.startswith(safe):
-            return False, f"Write denied: path is outside SWARM_WRITE_SAFE_ROOT ({safe})"
+def _is_path_allowed(path: Path, *, for_write: bool) -> tuple[bool, str]:
+    """Return (allowed, reason)."""
+    try:
+        resolved = path.resolve()
+    except OSError as exc:
+        return False, f"Path denied: {exc}"
+    resolved_s = str(resolved)
+    if for_write:
+        for pattern in _WRITE_DENY_PATTERNS:
+            if pattern in resolved_s:
+                return False, f"Write denied: path matches sensitive pattern '{pattern}'"
+    root = _workspace_root()
+    if root is not None:
+        try:
+            resolved.relative_to(root)
+        except ValueError:
+            return False, f"Path denied: outside workspace root ({root})"
     return True, ""
 
-
-# ---------------------------------------------------------------------------
-# Handlers
-# ---------------------------------------------------------------------------
 
 def read_file(path: str, offset: int = 1, limit: int = 500) -> str:
     """Read a file, returning up to *limit* lines starting at *offset* (1-based)."""
     try:
         p = Path(path)
+        allowed, reason = _is_path_allowed(p, for_write=False)
+        if not allowed:
+            return reason
         if not p.is_file():
             return f"Error: file not found: {path}"
         lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
         start = max(0, offset - 1)
         chunk = lines[start : start + limit]
-        header = f"[Lines {start + 1}–{start + len(chunk)} of {len(lines)}]\n" if len(lines) > limit else ""
+        header = (
+            f"[Lines {start + 1}–{start + len(chunk)} of {len(lines)}]\n"
+            if len(lines) > limit
+            else ""
+        )
         return header + "\n".join(chunk)
     except Exception as exc:
         return f"Error reading file: {exc}"
 
 
 def write_file(path: str, content: str = "") -> str:
-    """Write *content* to *path*, creating parent directories as needed.
-
-    ``content`` defaults to empty string so model calls that omit the field
-    still succeed (create/truncate) instead of raising TypeError.
-    """
+    """Write *content* to *path*, creating parent directories as needed."""
     try:
         if not path:
             return "Error: Write requires a non-empty 'path'"
         p = Path(str(path))
-        allowed, reason = _is_write_allowed(p)
+        allowed, reason = _is_path_allowed(p, for_write=True)
         if not allowed:
             return reason
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -90,10 +109,6 @@ def write_file(path: str, content: str = "") -> str:
     except Exception as exc:
         return f"Error writing file: {exc}"
 
-
-# ---------------------------------------------------------------------------
-# Self-registration
-# ---------------------------------------------------------------------------
 
 registry.register(
     name="Read",
@@ -127,24 +142,21 @@ registry.register(
 registry.register(
     name="Write",
     schema={
-        "description": (
-            "Write content to a file, creating parent directories as needed. "
-            "ALWAYS pass both 'path' (string) and 'content' (string) together."
-        ),
+        "description": "Write content to a file at the given path.",
         "input_schema": {
             "type": "object",
             "properties": {
                 "path": {
                     "type": "string",
-                    "description": "Absolute or relative path to the file to write.",
+                    "description": "Absolute or relative path to the file.",
                 },
                 "content": {
                     "type": "string",
-                    "description": "Full text content to write into the file.",
+                    "description": "Content to write.",
+                    "default": "",
                 },
             },
-            "required": ["path", "content"],
-            "additionalProperties": False,
+            "required": ["path"],
         },
     },
     handler=write_file,

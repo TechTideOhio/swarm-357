@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -62,23 +63,63 @@ class Agent:
         return text.strip()
 
     async def run(self, task: str) -> AgentResult:
-        """Execute task via Anthropic Messages API when API key is set; else deterministic stub."""
+        """Execute task via Anthropic Messages API when API key is set.
+
+        Missing credentials fail clearly unless ``SWARM_ALLOW_STUB=1`` or
+        ``SWARM_SIMULATE=1`` is set (explicit simulation).
+        """
         from techtide_swarm.llm import create_async_client, model_id as resolve_model_id, resolve_api_key
 
         api_key = resolve_api_key()
         if not api_key:
-            return self._stub_result(task)
+            allow_stub = os.getenv("SWARM_ALLOW_STUB", "").strip().lower() in {
+                "1",
+                "true",
+                "yes",
+                "on",
+            }
+            simulate = os.getenv("SWARM_SIMULATE", "").strip().lower() in {
+                "1",
+                "true",
+                "yes",
+                "on",
+            }
+            if allow_stub or simulate:
+                return self._stub_result(task, simulated=simulate or allow_stub)
+            return AgentResult(
+                agent_name=self.config.name,
+                output="",
+                cost_usd=0.0,
+                latency_ms=0,
+                status="error",
+                error=(
+                    "No OPENROUTER_API_KEY or ANTHROPIC_API_KEY configured. "
+                    "Set SWARM_SIMULATE=1 for explicit simulation."
+                ),
+            )
 
         started = time.perf_counter()
         total_cost = 0.0
         try:
             from techtide_swarm.tools import get_anthropic_tools, execute_tool
+            from techtide_swarm.memory import MemoryManager
 
             client = create_async_client()
             resolved_model = resolve_model_id(self.config.model)
             system_prompt = self._load_system_prompt()
 
-            messages: list[dict[str, Any]] = [{"role": "user", "content": task}]
+            # Layer-scoped memory recall on the hot path
+            mem = MemoryManager(swarm_root=Path.cwd())
+            try:
+                recalled = mem.recall(self.config.name, task[:200])
+            except Exception:
+                recalled = []
+            enriched_task = task
+            if recalled:
+                snippets = "\n".join(str(r)[:300] for r in recalled[:5])
+                enriched_task = f"{task}\n\nRelevant memory:\n{snippets}"
+
+            messages: list[dict[str, Any]] = [{"role": "user", "content": enriched_task}]
             # Eval harness can disable tools when explicitly requested.
             tool_names = (
                 []
@@ -168,8 +209,13 @@ class Agent:
                     "cost_usd": total_cost,
                     "latency_ms": elapsed_ms,
                     "status": "success",
+                    "model": resolved_model,
                 },
             )
+            try:
+                mem.log_interaction(self.config.name, task[:500], final_text[:2000])
+            except Exception:
+                pass
 
             return AgentResult(
                 agent_name=self.config.name,
@@ -204,17 +250,18 @@ class Agent:
                 error=str(exc),
             )
 
-    def _stub_result(self, task: str) -> AgentResult:
+    def _stub_result(self, task: str, *, simulated: bool = False) -> AgentResult:
         preview = task[:200].replace("\n", " ")
+        label = "simulated" if simulated else "stub"
         return AgentResult(
             agent_name=self.config.name,
             output=(
-                f"[stub] Agent {self.config.name} ({self.config.layer.value}) would process:\n"
+                f"[{label}] Agent {self.config.name} ({self.config.layer.value}) would process:\n"
                 f"{preview}"
             ),
             cost_usd=0.0,
             latency_ms=0,
-            status="success",
+            status="simulated" if simulated else "stub",
         )
 
     @staticmethod

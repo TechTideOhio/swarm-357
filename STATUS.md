@@ -1,63 +1,59 @@
 # TechTide Swarm 357 — Feature Status
 
-Feature maturity levels:
-- **Stable** — tested, documented, safe for production use
-- **Beta** — working but evolving, API may change
-- **Alpha** — functional but incomplete
-- **Planned** — designed but not yet implemented
+Maturity levels:
+- **Stable** — tested, documented, safe for production use under stated constraints
+- **Beta** — working but evolving; API may change
+- **Experimental** — functional but incomplete or opt-in
+- **Not implemented** — explicitly out of scope for the current release
 
-## Core Package (`packages/techtide-swarm/`)
+## Product framing
+
+Swarm 357 is a **357-role catalog plus orchestration runtime**, not a production-complete autonomous agent platform. Operators own API keys, budgets, and side-effect approvals.
+
+## Core package (`packages/techtide-swarm/`)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| `Agent` — single-agent runner | **Stable** | Stub mode (no key) and live Anthropic API mode |
-| `AgentConfig` — Pydantic config model | **Stable** | Validated via Pydantic v2 |
-| `Swarm` — multi-agent orchestration | **Beta** | Conductor-routes-to-roles pipeline. Sequential execution. |
-| `Swarm.execute_layer()` — layer-level parallel execution | **Beta** | `asyncio.gather` with semaphore-based concurrency cap |
-| `CostController` — per-layer budget tracking | **Beta** | In-memory tracking via `record_spend`; model downgrade at 80% utilization |
-| Per-agent `budget_limit_usd` enforcement | **Beta** | Enforced after each model turn (stops before further tool rounds when over budget) |
-| `MemoryManager` — flat-file memory | **Stable** | `.swarm/topics/*.json` share/recall with substring matching |
-| `MemoryManager` — Memvid `.mv2` backend | **Beta** | Requires `memvid-swarm-bridge` binary (Rust) |
-| `run_dream_cycle()` — contradiction detection | **Beta** | String-overlap heuristics; optional Haiku notes when `SWARM_DREAM_USE_LLM=1` |
-| `BashSecurityGate` — 13-pattern command validation | **Stable** | 50+ tests covering all patterns |
-| `UltraPlan` — Opus planning sessions | **Beta** | Single API call; stub when no key |
-| Telemetry — JSONL logging | **Beta** | Local file append; optional Supabase dual-write; HTTP API emits structured JSON logs + `X-Correlation-ID` |
-| Tool system (Read, Write, WebSearch) | **Beta** | WebSearch uses Exa/Firecrawl when installed and configured; otherwise explicit stub JSON (see `tools/web_search.py`) |
-| HTTP API (`techtide_swarm.server`) | **Beta** | GET routes public; POST routes optional `SWARM_API_KEY` + `X-SWARM-API-KEY`; per-IP rate limit; `budget_usd` capped by `SWARM_MAX_RUN_BUDGET_USD` |
+| `Agent` — single-agent runner | **Stable** | Live API when keyed; explicit `SWARM_SIMULATE` / `SWARM_ALLOW_STUB` otherwise (no silent success) |
+| `AgentConfig` | **Stable** | Pydantic v2 |
+| `Swarm` orchestration | **Beta** | Structured JSON routing; durable `RunState` + SQLite checkpoints |
+| `execute_layer()` | **Beta** | One-per-role default, hard agent cap; `full_fanout` / `SWARM_UNSAFE_FULL_FANOUT` opt-in |
+| Atomic `BudgetLedger` | **Beta** | Reserve/commit under asyncio lock |
+| `CostController` | **Beta** | Layer spend + 80% model downgrade |
+| `MemoryManager` flat files | **Stable** | Topics share/recall |
+| Memvid `.mv2` via bridge | **Beta** | Requires `memvid-swarm-bridge` (crates.io `memvid-core`) |
+| `run_dream_cycle()` | **Experimental** | Heuristics; not guaranteed consolidate/prune |
+| `BashSecurityGate` + argv policy | **Stable** | Server/prod denies Bash unless `SWARM_ALLOW_BASH=1` |
+| Read/Write workspace confinement | **Stable** | Server mode confines to workspace root |
+| HTTP API | **Beta** | Fail-closed auth in production; non-200 errors; SSE events |
+| HITL approvals | **Beta** | Approval records + approve/reject API/CLI stubs |
+| SSE event stream | **Beta** | Run/step/cost events |
+| Structured traces | **Beta** | `.swarm/traces.jsonl`; optional OTel via `SWARM_OTEL_EXPORT=1` |
+| UltraPlan | **Beta** | Opus-class planning when keyed |
 
-## CLI (`swarm` command)
+## CLI
 
 | Command | Status | Notes |
 |---------|--------|-------|
-| `swarm init` | **Stable** | Creates project structure + `.env` + memory index |
-| `swarm demo` | **Stable** | Architecture overview (no key) or live API call (with key) |
-| `swarm run <task>` | **Beta** | Full pipeline or `--layer` for single-layer execution |
-| `swarm boot` | **Beta** | Loads roster, validates, prints layer manifest |
-| `swarm agent [id]` | **Beta** | `--list`, `--info`, `--run TASK` |
-| `swarm status` | **Beta** | Reads from local telemetry JSONL |
-| `swarm cost` | **Beta** | Reads from local telemetry JSONL |
-| `swarm dream` | **Alpha** | Loads topics, runs contradiction detection |
-| `swarm plan <task>` | **Beta** | Stub (no key) or live Opus planning (with key) |
-| `swarm migrate` | **Beta** | Flat-file to Memvid `.mv2` migration |
+| `swarm init` | **Stable** | Installs bundled compact config + Support souls |
+| `swarm demo` | **Stable** | Explicit simulation without key |
+| `swarm boot` / `run` | **Beta** | Resolves bundled config from wheel installs |
+| `swarm inspect/resume/cancel/replay/fork` | **Beta** | Checkpoint control plane |
+| `swarm eval` | **Beta** | Separate single vs swarm reporting |
+| `swarm serve` | **Beta** | FastAPI |
 
 ## Infrastructure
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| CI (GitHub Actions) | **Stable** | [ci-standalone.yml](.github/workflows/ci-standalone.yml): python, roster, build-package, rust-bridge, docker health smoke, Next.js typecheck/build |
-| PyPI publishing | **Beta** | [`.github/workflows/publish.yml`](.github/workflows/publish.yml) on `v*` tags (OIDC) + GitHub Release with wheel/sdist |
-| Evaluation harness | **Beta** | 25-task catalog; keyword + optional Haiku judge; `$5` budget; baselines in `evals/baselines/` |
-| Landing page | **Beta** | Next.js 16 + `/about`; public GET-only data by default; optional `NEXT_PUBLIC_SWARM_WRITE_KEY` for demo POSTs |
-| Memvid bridge (Rust binary) | **Stable** | `create`, `put`, `search`, `verify` commands |
-| Claim verification | **Stable** | [docs/VERIFY.md](docs/VERIFY.md) + `scripts/generate_roster.py --compact --fix-counts` |
+| CI | **Stable** | `.github/workflows/ci.yml` — Python 3.10–3.13, roster, wheel smoke, Docker auth, Rust, docs ban check |
+| PyPI publish | **Beta** | `publish.yml` with attestations; CI gate before publish |
+| Landing site | **Beta** | Separate repo: [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) |
+| Branch protection / scanning | **Beta** | Operator-applied on GitHub (see RELEASE.md) |
 
-## What is NOT yet implemented
+## Not implemented
 
-- Real-time parallel agent execution across layers in `swarm run`
-- Sandboxed execution environments for untrusted agent code
-- Circuit breakers for external APIs
-- Persistent observability (Opik, Prometheus, etc.)
-- Human-in-the-loop gates
-- Agent-to-agent direct messaging
-- Durable execution / checkpointing (LangGraph-style)
-- SSO / multi-tenancy / data residency
+- Multi-tenant SaaS control plane / SSO
+- Distributed rate limiting across many replicas (single-process limiter ships)
+- Guaranteed dream-cycle consolidation quality
+- Full Opik cloud observability (local JSONL is source of truth)

@@ -2,6 +2,8 @@
 
 The Python package talks to **Memvid** through a small Rust binary so you do not need Python–Rust FFI to get a vertical slice working.
 
+Upstream library: [memvid/memvid](https://github.com/memvid/memvid) via crates.io [`memvid-core`](https://crates.io/crates/memvid-core) (see `packages/memvid-swarm-bridge/Cargo.toml`). This public repo does **not** vendor the Memvid source tree.
+
 ## Build
 
 ```bash

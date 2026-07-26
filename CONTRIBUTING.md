@@ -1,28 +1,30 @@
-# Contributing to TechTide Swarm 357
+# Contributing
 
-Thanks for helping improve Swarm 357. This repo is Python-first (`packages/techtide-swarm`) with an optional Next.js landing under `.ui_landin_sample/minimal/`.
+Thanks for helping improve Swarm 357. This repo is Python-first (`packages/techtide-swarm`) with an optional Rust Memvid bridge. The product landing page lives in a separate repository: [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site).
 
-## Quick setup
-
-From `Apps/swarm357`:
+## Setup
 
 ```bash
-pip install -e "packages/techtide-swarm[dev,supabase]"
-python -m ruff check packages/techtide-swarm/src
-cd packages/techtide-swarm && python -m mypy src && cd ../..
-python -m pytest packages/techtide-swarm/tests -v
+pip install -e "packages/techtide-swarm[dev]"
+make test   # or: cd packages/techtide-swarm && pytest -v -p no:schemathesis
 ```
 
-See [docs/VERIFY.md](docs/VERIFY.md) for the full verification scorecard.
+Optional bridge:
 
-## Pull requests
+```bash
+cd packages/memvid-swarm-bridge && cargo build
+export MEMVID_SWARM_BRIDGE="$(pwd)/target/debug/memvid-swarm-bridge"
+```
 
-1. Run **ruff**, **mypy** (from `packages/techtide-swarm`), and **pytest** before pushing.
-2. Keep claims aligned with [README.md](README.md): **357 agents** means 357 roster identities, not 357 parallel long-lived LLM sessions.
-3. For behavior changes, add or update tests under `packages/techtide-swarm/tests/`.
-4. Optional web search backends: install `techtide-swarm[web]` locally; CI does not require them.
+## Rules
 
-## Optional extras
+- Do not re-add scrubbed local trees (planning research dumps, vendored Memvid checkouts, or the old in-repo landing sample). Landing belongs in swarm-357-site.
+- Only workflow YAML (+ Dependabot) are allowed under `.github/`.
+- Keep claims in README/STATUS mechanically true; prefer CI gates over prose.
+- Conventional Commits for PR titles.
 
-- **Memvid bridge**: build `packages/memvid-swarm-bridge` and set `MEMVID_SWARM_BRIDGE`.
-- **Supabase**: apply [database/migrations/001_initial.sql](database/migrations/001_initial.sql); see [docs/DATA_PLANE.md](docs/DATA_PLANE.md).
+## Docs
+
+- Acceptance criteria: [docs/VERIFY.md](docs/VERIFY.md)
+- Maturity: [STATUS.md](STATUS.md)
+- Releases: [RELEASE.md](RELEASE.md)

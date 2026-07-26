@@ -9,6 +9,7 @@ from techtide_swarm.tools import execute_tool
 
 @pytest.mark.asyncio
 async def test_agent_stub_returns_success():
+    """With SWARM_ALLOW_STUB (conftest), missing keys yield an explicit stub/sim result."""
     config = AgentConfig(
         name="test-research-001",
         layer=LayerType.RESEARCH,
@@ -19,11 +20,28 @@ async def test_agent_stub_returns_success():
     )
     agent = Agent(config)
     result = await agent.run("List top 3 AI agent trends")
-    assert result.status == "success"
-    assert "[stub]" in result.output
+    assert result.status in {"stub", "simulated"}
+    assert "[stub]" in result.output or "[simulated]" in result.output
     assert config.name in result.output
     assert result.cost_usd == 0.0
     assert result.latency_ms == 0
+
+
+@pytest.mark.asyncio
+async def test_agent_without_stub_flag_errors(monkeypatch):
+    monkeypatch.delenv("SWARM_ALLOW_STUB", raising=False)
+    monkeypatch.delenv("SWARM_SIMULATE", raising=False)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    config = AgentConfig(
+        name="test-research-002",
+        layer=LayerType.RESEARCH,
+        role="market_researcher",
+        model="sonnet",
+    )
+    result = await Agent(config).run("ping")
+    assert result.status == "error"
+    assert result.error and "API_KEY" in result.error
 
 
 @pytest.mark.asyncio

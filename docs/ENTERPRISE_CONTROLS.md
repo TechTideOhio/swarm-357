@@ -47,4 +47,4 @@ Tests: [`tests/test_migration_scenario.py`](../packages/techtide-swarm/tests/tes
 
 ## 5. What is outside this repository
 
-SSO, multi-tenancy, data residency, retention policies, SLA/support tiers, and SOC 2 certification are **not in scope** for the open-source package. See [`.planning/research/ENTERPRISE-GAP.md`](../.planning/research/ENTERPRISE-GAP.md) for the full gap analysis and recommended language.
+SSO, multi-tenancy, data residency, retention policies, SLA/support tiers, and SOC 2 certification are **not in scope** for the open-source package. See [`docs/ENTERPRISE_CONTROLS.md`](../docs/ENTERPRISE_CONTROLS.md) for the full gap analysis and recommended language.

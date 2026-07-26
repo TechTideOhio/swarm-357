@@ -33,7 +33,7 @@ See [VERIFY.md](VERIFY.md) for the full scorecard.
 
 ## Landing (Next.js) on Railway (optional second service)
 
-- Root Directory: `Apps/swarm357/.ui_landin_sample/minimal` (or deploy landing from a split repo).
+- Root Directory: `Apps/swarm357/TechTideOhio/swarm-357-site` (or deploy landing from a split repo).
 - Build: `npm ci && npm run build`.
 - Env: `NEXT_PUBLIC_API_URL=https://<api-service>.up.railway.app`
 - If the API uses `SWARM_API_KEY`, set `NEXT_PUBLIC_SWARM_WRITE_KEY` to the **same** value only if you want the “Try it live” hero form to call POST `/api/swarm/run` from the browser (prefer restricting demo POSTs or using a server-side proxy in production).

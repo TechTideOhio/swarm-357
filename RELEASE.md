@@ -1,58 +1,45 @@
 # Release process
 
-## Version policy
+## Prerequisites
 
-Semantic Versioning (`MAJOR.MINOR.PATCH`) for the `techtide-swarm` PyPI package.
+- [ ] CI green on `main` (`.github/workflows/ci.yml`)
+- [ ] [docs/VERIFY.md](docs/VERIFY.md) acceptance criteria satisfied
+- [ ] [STATUS.md](STATUS.md) maturity matrix matches reality
+- [ ] Landing site CI green on [swarm-357-site](https://github.com/TechTideOhio/swarm-357-site)
+- [ ] CHANGELOG has a dated section for the release
 
-- **MAJOR** — breaking public API or CLI changes
-- **MINOR** — new features, backwards-compatible (e.g. 0.1.0 → 0.2.0)
-- **PATCH** — bug fixes and docs that ship with the package
+## Cut a release
 
-The GitHub tag is `v{version}` (example: `v0.2.0`).
-
-## Checklist (before tagging)
-
-1. Update `packages/techtide-swarm/pyproject.toml` version and `CHANGELOG.md`.
-2. Regenerate eval docs if baselines changed: `python scripts/render_eval_assets.py`.
-3. Local gates:
-   ```bash
-   cd packages/techtide-swarm
-   ruff check src
-   mypy src
-   python -m pytest tests -v -p no:schemathesis
-   python -m build
-   twine check dist/*
-   ```
-4. Fresh venv: `pip install dist/*.whl && swarm boot` (must report 357 agents).
-5. Landing: `cd .ui_landin_sample/minimal && npm run typecheck && npm run build`.
-6. Sweep for template leftovers: `rg -i "tldr|example\\.com|Add to Chrome|Your Site Name" .ui_landin_sample/minimal`.
-
-## Publish flow
-
-CI workflow [`.github/workflows/publish.yml`](.github/workflows/publish.yml):
-
-1. Push tag `v*` to `TechTideOhio/swarm-357`.
-2. Job builds wheel/sdist.
-3. Publishes to PyPI via `PYPI_API_TOKEN` (if set) or OIDC trusted publishing
-   (`environment: pypi`). Trusted publisher must be registered for
-   `TechTideOhio/swarm-357` / workflow `publish.yml` / environment `pypi`.
-4. Creates a GitHub Release with artifacts attached (even if PyPI fails, so the
-   tag is not silent).
+1. Bump `packages/techtide-swarm/pyproject.toml` version and fallback `__version__`.
+2. Update CHANGELOG + README correction notes if needed.
+3. Merge to `main` with squash PR; wait for CI.
+4. Tag and push:
 
 ```bash
-# From the public repo clone (swarm357-sync), after content is mirrored:
-git tag -a v0.2.0 -m "techtide-swarm 0.2.0"
-git push origin v0.2.0
+git tag -a v0.2.1 -m "techtide-swarm 0.2.1"
+git push origin v0.2.1
 ```
 
-## Verify after publish
+5. `publish.yml` runs CI gate → build → attestations → PyPI → GitHub Release.
+
+## Governance (operator checklist)
+
+Apply on `TechTideOhio/swarm-357`:
+
+- Branch protection on `main`: require PR, require CI status checks, squash merges, delete branch on merge
+- Dependabot enabled (`.github/dependabot.yml`)
+- Secret scanning + push protection
+- Code scanning (CodeQL or equivalent) when available for the org plan
+- PyPI trusted publisher: repo `TechTideOhio/swarm-357`, workflow `publish.yml`, environment `pypi`
+
+## Post-release verification
 
 ```bash
-pip index versions techtide-swarm
-pip install techtide-swarm==0.2.0
-swarm --help
-python -c "from techtide_swarm import __version__; print(__version__)"
-curl -s https://pypi.org/pypi/techtide-swarm/json | python -c "import sys,json; print(json.load(sys.stdin)['info']['version'])"
+python -m venv /tmp/swarm-verify && /tmp/swarm-verify/bin/pip install techtide-swarm==0.2.1
+/tmp/swarm-verify/bin/swarm boot
+curl -sf "$SWARM_API_URL/api/health"
 ```
 
-Confirm the GitHub Release page lists the wheel and sdist.
+## Landing deploy
+
+Deploy from `TechTideOhio/swarm-357-site` (Railway root = repo root). Point `NEXT_PUBLIC_API_URL` at the backend.

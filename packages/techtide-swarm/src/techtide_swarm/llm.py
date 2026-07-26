@@ -1,20 +1,21 @@
 # file: packages/techtide-swarm/src/techtide_swarm/llm.py
-# description: Resolve LLM API credentials and build Anthropic-compatible clients (Anthropic or OpenRouter).
+# description: Resolve LLM API credentials and map short model names without silent downgrades
 # reference: techtide_swarm.agent, techtide_swarm.ultra_plan, techtide_swarm.memory
-
 """LLM client helpers — Anthropic Messages API, optionally via OpenRouter."""
 
 from __future__ import annotations
 
+import logging
 import os
 from typing import Any
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api"
+_logger = logging.getLogger(__name__)
 
-# Cheap defaults when routing through OpenRouter (override with SWARM_MODEL_*).
-_OPENROUTER_CHEAP_DEFAULTS = {
-    "opus": "anthropic/claude-3-haiku",
-    "sonnet": "anthropic/claude-3-haiku",
+# Provider-faithful defaults. Never silently map opus/sonnet → haiku.
+_OPENROUTER_DEFAULTS = {
+    "opus": "anthropic/claude-opus-4",
+    "sonnet": "anthropic/claude-sonnet-4",
     "haiku": "anthropic/claude-3-haiku",
 }
 
@@ -22,6 +23,13 @@ _ANTHROPIC_DEFAULTS = {
     "opus": "claude-opus-4-6",
     "sonnet": "claude-sonnet-4-6",
     "haiku": "claude-haiku-4-5-20251001",
+}
+
+# Optional cost-saving overrides (must be explicit — never the silent default).
+_OPENROUTER_CHEAP_OVERRIDE = {
+    "opus": "anthropic/claude-3-haiku",
+    "sonnet": "anthropic/claude-3-haiku",
+    "haiku": "anthropic/claude-3-haiku",
 }
 
 
@@ -46,15 +54,46 @@ def uses_openrouter(api_key: str | None = None) -> bool:
     return key.startswith("sk-or-")
 
 
+def cheap_openrouter_mode() -> bool:
+    """True only when operator opts into cheap OpenRouter substitutions."""
+    raw = os.getenv("SWARM_OPENROUTER_CHEAP", "").strip().lower()
+    return raw in {"1", "true", "yes", "on"}
+
+
 def model_id(short: str) -> str:
-    """Map sonnet/opus/haiku short names to provider model IDs."""
-    defaults = _OPENROUTER_CHEAP_DEFAULTS if uses_openrouter() else _ANTHROPIC_DEFAULTS
+    """Map sonnet/opus/haiku short names to provider model IDs.
+
+    OpenRouter no longer silently remaps opus/sonnet to Haiku. Set
+    ``SWARM_OPENROUTER_CHEAP=1`` for explicit cheap defaults, or override
+    any short name with ``SWARM_MODEL_OPUS`` / ``SWARM_MODEL_SONNET`` /
+    ``SWARM_MODEL_HAIKU``.
+    """
+    key = (short or "sonnet").strip().lower()
+    if uses_openrouter() and cheap_openrouter_mode():
+        defaults = _OPENROUTER_CHEAP_OVERRIDE
+    elif uses_openrouter():
+        defaults = _OPENROUTER_DEFAULTS
+    else:
+        defaults = _ANTHROPIC_DEFAULTS
     env_map = {
         "opus": os.getenv("SWARM_MODEL_OPUS", defaults["opus"]),
         "sonnet": os.getenv("SWARM_MODEL_SONNET", defaults["sonnet"]),
         "haiku": os.getenv("SWARM_MODEL_HAIKU", defaults["haiku"]),
     }
-    return env_map.get(short.lower(), env_map["sonnet"])
+    resolved = env_map.get(key, env_map["sonnet"])
+    _logger.debug("model_id short=%s resolved=%s openrouter=%s", key, resolved, uses_openrouter())
+    return resolved
+
+
+def resolved_model_info(short: str) -> dict[str, Any]:
+    """Expose resolved model metadata for health/traces/evals."""
+    return {
+        "short": (short or "sonnet").strip().lower(),
+        "model_id": model_id(short),
+        "provider": "openrouter" if uses_openrouter() else "anthropic",
+        "cheap_mode": cheap_openrouter_mode() if uses_openrouter() else False,
+        "api_key_set": bool(resolve_api_key()),
+    }
 
 
 def create_async_client() -> Any:
@@ -71,7 +110,9 @@ def create_async_client() -> Any:
             api_key=api_key,
             base_url=base_url,
             default_headers={
-                "HTTP-Referer": os.getenv("OPENROUTER_HTTP_REFERER", "https://github.com/TechTideOhio/swarm-357"),
+                "HTTP-Referer": os.getenv(
+                    "OPENROUTER_HTTP_REFERER", "https://github.com/TechTideOhio/swarm-357"
+                ),
                 "X-OpenRouter-Title": os.getenv("OPENROUTER_APP_TITLE", "TechTide Swarm 357"),
             },
         )
