@@ -45,6 +45,7 @@ We aim to acknowledge reports within 72 hours and provide a remediation timeline
 - The Firecrawl and Exa scrape backends fetch through a third party. URL validation still applies, but the outbound request itself leaves their infrastructure, not yours.
 - Supabase migrations ship without row level security. `SUPABASE_SERVICE_KEY` is a service-role secret for a single-tenant server; do not place it in a client bundle or expose the database directly to browsers.
 - Eval and demo deployments should keep `SWARM_API_KEY` set and CORS origins restricted.
+- The Rust bridge carries one accepted low-severity advisory: `lru` 0.12.x (`IterMut` violates Stacked Borrows). It reaches us transitively through `tantivy` inside `memvid-core`, which pins `lru ^0.12`, so the 0.16.3 fix is blocked upstream. The issue is a Miri-observable soundness lint in an iterator we do not call, in an optional binary that never handles untrusted input. We will pick it up when `memvid-core` upgrades `tantivy`.
 - The interactive API explorer (`/docs`, `/redoc`, `/openapi.json`) is intentionally public. Every route it lists is already public in this repository, writes fail closed without the write key, and reads are redacted. Set `SWARM_DISABLE_API_DOCS=1` to remove the explorer on a deployment where route enumeration matters.
 
 ## Disclosure preference
