@@ -37,6 +37,8 @@ USER swarm
 EXPOSE 8000
 
 ENV PORT=8000
+ENV SWARM_CONFIG_PATH=/app/config/swarm-compact.yaml
+ENV SWARM_SERVER_MODE=1
 
 # Health check (uses PORT when set by the platform)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

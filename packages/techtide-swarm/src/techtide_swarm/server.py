@@ -182,8 +182,10 @@ def create_app(config_path: Path | None = None) -> FastAPI:
                 swarm = Swarm(cfg)
                 _roster = swarm._get_roster()
             else:
+                _server_logger.warning("Swarm config missing at %s", cfg)
                 _roster = []
-        except Exception:
+        except Exception as exc:  # noqa: BLE001
+            _server_logger.exception("Failed to load swarm roster from %s: %s", cfg, exc)
             _roster = []
         return _roster
 

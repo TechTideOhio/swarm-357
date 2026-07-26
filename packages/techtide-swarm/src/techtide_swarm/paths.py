@@ -91,7 +91,9 @@ def resolve_config_path(explicit: str | Path | None = None) -> Path:
         seen.add(key)
         if path.is_file():
             return path
-    # Prefer project compact path for error messages when nothing exists
+    # Prefer bundled wheel data when present (Docker/PyPI); else project path for errors
+    if bundled is not None:
+        return bundled
     return candidates[0] if candidates else Path("config/swarm-compact.yaml")
 
 

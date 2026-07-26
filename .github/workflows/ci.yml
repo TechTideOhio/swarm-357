@@ -154,9 +154,9 @@ jobs:
           PY
           # Unauthenticated execute must not be 200
           code=$(curl -s -o /tmp/unauth.json -w "%{http_code}" \
-            -X POST http://127.0.0.1:8000/api/execute \
+            -X POST http://127.0.0.1:8000/api/swarm/run \
             -H "Content-Type: application/json" \
-            -d '{"task":"ping","layer":"sales"}')
+            -d '{"task":"ping","layer":"sales","simulate":true}')
           echo "unauth status=$code body=$(cat /tmp/unauth.json)"
           test "$code" != "200"
 

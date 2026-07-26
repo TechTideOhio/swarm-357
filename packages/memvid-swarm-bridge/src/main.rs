@@ -54,11 +54,7 @@ fn run() -> Result<(), String> {
             Memvid::create(&path).map_err(|e| e.to_string())?;
             Ok(())
         }
-        Commands::Put {
-            path,
-            uri,
-            title,
-        } => {
+        Commands::Put { path, uri, title } => {
             let mut body = Vec::new();
             io::stdin()
                 .read_to_end(&mut body)
@@ -78,11 +74,7 @@ fn run() -> Result<(), String> {
             mem.commit().map_err(|e| e.to_string())?;
             Ok(())
         }
-        Commands::Search {
-            path,
-            query,
-            top_k,
-        } => {
+        Commands::Search { path, query, top_k } => {
             let mut mem = Memvid::open(&path).map_err(|e| e.to_string())?;
             let request = SearchRequest {
                 query,
