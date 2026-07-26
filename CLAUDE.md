@@ -18,7 +18,7 @@ TechTide Swarm 357 is a **357-role catalog plus orchestration runtime** across 6
 | `docs/` | VERIFY, EVALS, DEPLOY_RAILWAY, MEMVID_BRIDGE, DATA_PLANE, etc. |
 | `scripts/` | Roster generation, eval asset render, quickstart |
 
-**Landing site is a separate repo:** [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) - live docs at `https://swarm357fe.up.railway.app/docs`, API `https://swarm357be.up.railway.app`.
+**Landing site is a separate repo:** [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) - live docs at `https://swarm357.techtideai.io/docs`, API `https://swarm357be.up.railway.app`.
 
 Do **not** reference scrubbed or private local trees in public docs or commits. The CI `docs-links` job holds the ban list and fails on any of those path strings in markdown, so read the job in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) rather than restating the paths here.
 
@@ -121,7 +121,7 @@ SWARM_ALLOW_BASH=1
 SWARM_WORKSPACE_ROOT=/path
 SWARM_UNSAFE_FS=1
 SWARM_OPENROUTER_CHEAP=1
-ALLOWED_ORIGINS=https://swarm357fe.up.railway.app
+ALLOWED_ORIGINS=https://swarm357.techtideai.io
 ```
 
 Prefer OpenRouter with cheap tool-capable models for live tests/evals over expensive direct Anthropic spend.

@@ -4,7 +4,7 @@ The Swarm 357 design system lives with the product surface it describes, in the 
 
 **Canonical reference:** `DESIGN.md` at the root of [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site)
 
-**Reader-friendly summary:** [swarm357fe.up.railway.app/docs/resources/design](https://swarm357fe.up.railway.app/docs/resources/design)
+**Reader-friendly summary:** [swarm357.techtideai.io/docs/resources/design](https://swarm357.techtideai.io/docs/resources/design)
 
 ## Why the split
 

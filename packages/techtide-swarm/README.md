@@ -113,13 +113,13 @@ Also exported: `AgentResult`, `SwarmExecutionResult`, `SwarmStore`, `MemvidBridg
 
 | Resource | Link |
 |----------|------|
-| Documentation site | https://swarm357fe.up.railway.app/docs |
-| About and positioning | https://swarm357fe.up.railway.app/about |
-| Getting started | https://swarm357fe.up.railway.app/docs/getting-started/quickstart |
-| Feature maturity | https://swarm357fe.up.railway.app/docs/resources/status |
-| Eval methodology | https://swarm357fe.up.railway.app/docs/evals/methodology |
-| Security model | https://swarm357fe.up.railway.app/docs/security/security-model |
-| Design system | https://swarm357fe.up.railway.app/docs/resources/design |
+| Documentation site | https://swarm357.techtideai.io/docs |
+| About and positioning | https://swarm357.techtideai.io/about |
+| Getting started | https://swarm357.techtideai.io/docs/getting-started/quickstart |
+| Feature maturity | https://swarm357.techtideai.io/docs/resources/status |
+| Eval methodology | https://swarm357.techtideai.io/docs/evals/methodology |
+| Security model | https://swarm357.techtideai.io/docs/security/security-model |
+| Design system | https://swarm357.techtideai.io/docs/resources/design |
 | Core repository | [TechTideOhio/swarm-357](https://github.com/TechTideOhio/swarm-357) |
 | Landing repository | [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) |
 

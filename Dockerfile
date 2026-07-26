@@ -21,8 +21,8 @@ FROM python:3.12-slim AS runtime
 LABEL org.opencontainers.image.title="TechTide Swarm 357 API"
 LABEL org.opencontainers.image.description="357 Claude AI agents, HTTP API"
 LABEL org.opencontainers.image.source="https://github.com/TechTideOhio/swarm-357"
-LABEL org.opencontainers.image.url="https://swarm357fe.up.railway.app"
-LABEL org.opencontainers.image.documentation="https://swarm357fe.up.railway.app/docs"
+LABEL org.opencontainers.image.url="https://swarm357.techtideai.io"
+LABEL org.opencontainers.image.documentation="https://swarm357.techtideai.io/docs"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 WORKDIR /app

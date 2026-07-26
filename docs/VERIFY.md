@@ -1,6 +1,6 @@
 # Swarm 357 - Executable acceptance criteria
 
-> **Hosted docs:** https://swarm357fe.up.railway.app/docs/resources/verification
+> **Hosted docs:** https://swarm357.techtideai.io/docs/resources/verification
 
 This document is the **mechanical** gate list for releases. Every check must be backed by CI, a script, or a live probe - not marketing language.
 
