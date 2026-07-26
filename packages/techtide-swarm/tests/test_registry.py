@@ -280,17 +280,22 @@ class TestWebScrape:
         """Without API keys, Scrape falls back to httpx; should not crash."""
         monkeypatch.delenv("EXA_API_KEY", raising=False)
         monkeypatch.delenv("FIRECRAWL_API_KEY", raising=False)
-        # We don't make a real network call — just verify no ImportError / crash
-        # when the function is invoked with a mocked httpx
-        import httpx
+        # No real network call - just verify no ImportError / crash when the
+        # function is invoked against a mocked httpx client.
         from unittest.mock import MagicMock
 
         mock_response = MagicMock()
         mock_response.text = "<html><body>Hello world</body></html>"
         mock_response.headers = {"content-type": "text/html"}
+        mock_response.is_redirect = False
         mock_response.raise_for_status = MagicMock()
 
-        with patch("httpx.get", return_value=mock_response):
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        mock_client.get = MagicMock(return_value=mock_response)
+
+        with patch("httpx.Client", return_value=mock_client):
             from techtide_swarm.tools.web_scrape import web_scrape
             result = web_scrape("https://example.com")
         assert "Hello world" in result

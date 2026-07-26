@@ -182,6 +182,18 @@ jobs:
       - name: Eval baseline separation gate
         run: python scripts/check_eval_baseline.py
 
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Scan git history for secrets
+        run: >
+          docker run --rm -v "$PWD:/repo" -w /repo
+          zricethezav/gitleaks:v8.30.1
+          git /repo --config /repo/.gitleaks.toml --redact --no-banner --exit-code 1
+
   dependency-audit:
     runs-on: ubuntu-latest
     steps:
