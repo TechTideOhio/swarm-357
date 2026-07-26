@@ -135,24 +135,31 @@ flowchart LR
 
 ## Feature Maturity
 
-See [STATUS.md](STATUS.md). Summary:
+See [STATUS.md](STATUS.md) (source of truth). Summary for **0.2.2**:
 
 | Feature | Status |
 |---------|--------|
 | Agent + Swarm orchestration | Beta |
 | CLI | Stable/Beta |
-| Memory (flat-file + Memvid) | Beta |
+| Memory (flat-file) | Stable |
+| Memvid `.mv2` via bridge | Beta |
 | BashSecurityGate | Stable |
+| Bash HITL approvals | Beta |
+| SSE (auth + terminal close) | Beta |
 | Cost controls | Beta |
 | Eval harness | Beta |
 | HTTP API | Beta |
 | Dream cycle | Experimental |
+| Opik cloud | Not implemented |
+
+Reviewer checklist: [docs/VERIFY.md](docs/VERIFY.md) · [SECURITY.md](SECURITY.md) · [CLAUDE.md](CLAUDE.md).
 
 ## Why Not [X]?
 
 | Framework | Swarm 357 advantage | Their advantage |
 |-----------|--------------------|--------------------|
-| LangGraph | Portable `.mv2` memory; business-layer ontology; cost gates | Durable checkpointing; larger ecosystem |
+| LangGraph (Chase) | Portable `.mv2` memory; business-layer ontology; cost gates; real Bash HITL or none | Durable checkpointing; larger ecosystem |
+| OpenClaw / local-first (Steinberger) | Fail-closed auth; workspace FS confine; legible STATUS/VERIFY | Broader desktop agent surface |
 | CrewAI | Enforced cost controls; security gate; layered architecture | Faster time-to-first-value; YAML crew config |
 | OpenAI Agents SDK | Multi-agent orchestration; memory persistence | Input/output guardrails; simpler API surface |
 
@@ -197,9 +204,23 @@ GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 Landing CI lives in [swarm-357-site](https://github.com/TechTideOhio/swarm-357-site).  
 Publish: [`.github/workflows/publish.yml`](.github/workflows/publish.yml) on `v*` tags → attestations + PyPI + GitHub Release.
 
-## v0.2.1 correction
+## Landing site
 
-v0.2.0 over-claimed CI/frontend paths after the public history scrub. **0.2.1** restores workflows, crates.io Memvid, truthful docs, install-to-boot from a wheel, bounded fan-out, durable checkpoints, SSE, fail-closed auth, and explicit simulation.
+Product marketing, art carousel, and Try-it-live BFF live in **[TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site)** (landing **0.2.2**, same release train).
+
+| Surface | URL |
+|---------|-----|
+| Frontend | https://swarm357fe.up.railway.app |
+| Backend API | https://swarm357be.up.railway.app |
+| About / maturity mirror | https://swarm357fe.up.railway.app/about |
+
+## v0.2.2
+
+Closes the remaining critique gaps from **0.2.1**: real Bash HITL, SSE auth + `stream.end`, durable cancel, gold `CLAUDE.md`, CI security gates. See [CHANGELOG.md](CHANGELOG.md) and [RELEASE.md](RELEASE.md).
+
+### Earlier: v0.2.1 correction
+
+v0.2.0 over-claimed CI/frontend paths after the public history scrub. **0.2.1** restored workflows, crates.io Memvid, truthful docs, install-to-boot from a wheel, bounded fan-out, durable checkpoints, and fail-closed auth.
 
 ## Required Environment
 
