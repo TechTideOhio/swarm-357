@@ -127,13 +127,21 @@ class Swarm:
         self.config_path = Path(config_path)
         self.cost_controller = CostController()
         self._booted = False
-        self._checkpoint = checkpoint_store or default_checkpoint_store()
+        self._checkpoint_arg = checkpoint_store
+        self._checkpoint: CheckpointStore | None = checkpoint_store
         self._events = event_bus or get_event_bus()
         self._cancelled: set[str] = set()
         self._raw: dict[str, Any] = {}
         if self.config_path.is_file():
             self._raw = yaml.safe_load(self.config_path.read_text(encoding="utf-8")) or {}
         self._is_compact = "layers" in self._raw and "agents" not in self._raw
+
+    @property
+    def checkpoint(self) -> CheckpointStore:
+        """Lazy checkpoint store so Docker health/roster does not require a writable CWD."""
+        if self._checkpoint is None:
+            self._checkpoint = default_checkpoint_store()
+        return self._checkpoint
 
     @classmethod
     def from_config(cls, path: str | Path) -> Swarm:
@@ -263,10 +271,10 @@ class Swarm:
         self._cancelled.add(run_id)
 
     def inspect_run(self, run_id: str) -> RunState | None:
-        return self._checkpoint.load(run_id)
+        return self.checkpoint.load(run_id)
 
     def list_runs(self, limit: int = 50) -> list[dict[str, Any]]:
-        return self._checkpoint.list_runs(limit=limit)
+        return self.checkpoint.list_runs(limit=limit)
 
     async def _emit(self, event: SwarmEvent) -> None:
         await self._events.publish(event)
@@ -385,7 +393,7 @@ class Swarm:
                 state.run_id = run_id
 
         pipeline_id = state.run_id
-        self._checkpoint.save(state)
+        self.checkpoint.save(state)
         await self._emit(
             SwarmEvent(EventType.RUN_STARTED, pipeline_id, {"task": task[:200], "simulate": simulate})
         )
@@ -399,7 +407,7 @@ class Swarm:
             if simulate or (not resolve_api_key() and simulate):
                 state.status = RunStatus.SIMULATED
                 state.final_output = f"[simulated] {task}"
-                self._checkpoint.save(state)
+                self.checkpoint.save(state)
                 await self._emit(SwarmEvent(EventType.RUN_COMPLETED, pipeline_id, {"status": "simulated"}))
                 return SwarmExecutionResult(
                     pipeline_id=pipeline_id,
@@ -451,7 +459,7 @@ class Swarm:
                         model_resolved=model_id(conductor_cfg.model),
                     )
                 )
-                self._checkpoint.save(state)
+                self.checkpoint.save(state)
                 conductor_res = await conductor.run(prompt)
                 results.append(conductor_res)
                 total += conductor_res.cost_usd
@@ -466,7 +474,7 @@ class Swarm:
                     step.error = conductor_res.error
                     state.status = RunStatus.FAILED
                     state.error = f"Conductor failed: {conductor_res.error}"
-                    self._checkpoint.save(state)
+                    self.checkpoint.save(state)
                     await self._emit(
                         SwarmEvent(EventType.RUN_FAILED, pipeline_id, {"error": state.error})
                     )
@@ -487,7 +495,7 @@ class Swarm:
                     step.error = str(exc)
                     state.status = RunStatus.FAILED
                     state.error = f"Routing validation failed: {exc}"
-                    self._checkpoint.save(state)
+                    self.checkpoint.save(state)
                     await self._emit(
                         SwarmEvent(EventType.RUN_FAILED, pipeline_id, {"error": state.error})
                     )
@@ -503,7 +511,7 @@ class Swarm:
                 state.roles = decision.roles
                 state.metadata["routing_rationale"] = decision.rationale
                 state.metadata["conductor_model"] = resolved_model_info(conductor_cfg.model)
-                self._checkpoint.save(state)
+                self.checkpoint.save(state)
                 await self._emit(
                     SwarmEvent(
                         EventType.STEP_COMPLETED,
@@ -563,7 +571,7 @@ class Swarm:
                         model_resolved=model_id(agent_cfg.model),
                     )
                 )
-                self._checkpoint.save(state)
+                self.checkpoint.save(state)
                 await self._emit(
                     SwarmEvent(
                         EventType.STEP_STARTED,
@@ -587,7 +595,7 @@ class Swarm:
                 else:
                     step.status = StepStatus.FAILED
                     step.error = res.error
-                self._checkpoint.save(state)
+                self.checkpoint.save(state)
                 await self._emit(
                     SwarmEvent(
                         EventType.COST,
@@ -600,7 +608,7 @@ class Swarm:
                 state.status = RunStatus.COMPLETED
             state.final_output = "\n\n".join(final_chunks)
             state.spent_usd = total
-            self._checkpoint.save(state)
+            self.checkpoint.save(state)
             await self._emit(
                 SwarmEvent(
                     EventType.RUN_COMPLETED,
@@ -612,7 +620,7 @@ class Swarm:
             status = "error"
             state.status = RunStatus.FAILED
             state.error = str(exc)
-            self._checkpoint.save(state)
+            self.checkpoint.save(state)
             await self._emit(SwarmEvent(EventType.RUN_FAILED, pipeline_id, {"error": str(exc)}))
             raise
         finally:
@@ -639,7 +647,7 @@ class Swarm:
         )
 
     async def resume(self, run_id: str) -> SwarmExecutionResult:
-        state = self._checkpoint.load(run_id)
+        state = self.checkpoint.load(run_id)
         if state is None:
             raise KeyError(f"run not found: {run_id}")
         if state.status in {RunStatus.COMPLETED, RunStatus.SIMULATED}:
@@ -660,7 +668,7 @@ class Swarm:
 
     async def replay(self, run_id: str) -> SwarmExecutionResult:
         """Re-run a prior task as a new run, linking parent_run_id."""
-        state = self._checkpoint.load(run_id)
+        state = self.checkpoint.load(run_id)
         if state is None:
             raise KeyError(f"run not found: {run_id}")
         return await self.execute(state.task, budget_usd=state.budget_usd, simulate=state.simulate)
@@ -668,7 +676,7 @@ class Swarm:
     async def fork(self, run_id: str, *, edit_task: str | None = None) -> SwarmExecutionResult:
         from techtide_swarm.runtime.state import new_id
 
-        state = self._checkpoint.load(run_id)
+        state = self.checkpoint.load(run_id)
         if state is None:
             raise KeyError(f"run not found: {run_id}")
         new_state = RunState(

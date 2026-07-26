@@ -323,7 +323,7 @@ def create_app(config_path: Path | None = None) -> FastAPI:
         state.status = RunStatus.CANCELLED
         state.error = "cancelled via API"
         state.touch()
-        swarm._checkpoint.save(state)
+        swarm.checkpoint.save(state)
         return {"run_id": run_id, "status": "cancelled"}
 
     @app.post("/api/swarm/runs/{run_id}/replay")
@@ -404,7 +404,7 @@ def create_app(config_path: Path | None = None) -> FastAPI:
         appr.reason = body.reason
         appr.decided_at = datetime.now(timezone.utc)
         state.touch()
-        swarm._checkpoint.save(state)
+        swarm.checkpoint.save(state)
         return {
             "approval_id": approval_id,
             "run_id": state.run_id,
@@ -428,7 +428,7 @@ def create_app(config_path: Path | None = None) -> FastAPI:
         appr.reason = body.reason
         appr.decided_at = datetime.now(timezone.utc)
         state.touch()
-        swarm._checkpoint.save(state)
+        swarm.checkpoint.save(state)
         return {
             "approval_id": approval_id,
             "run_id": state.run_id,
