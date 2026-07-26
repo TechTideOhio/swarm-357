@@ -35,7 +35,7 @@ Apply on `TechTideOhio/swarm-357`:
 - Secret scanning + push protection
 - CodeQL workflow (`.github/workflows/codeql.yml`) + CODEOWNERS
 - PyPI trusted publisher: repo `TechTideOhio/swarm-357`, workflow `publish.yml`, environment `pypi`
-- Repo `homepage`: `https://swarm357fe.up.railway.app`
+- Repo `homepage`: `https://swarm357.techtideai.io`
 
 ## Post-release verification
 
@@ -49,7 +49,7 @@ curl -sf "$SWARM_API_URL/api/health"
 
 Deploy from `TechTideOhio/swarm-357-site` (Railway root = repo root).
 
-- Frontend: https://swarm357.techtideai.io (Railway domain https://swarm357fe.up.railway.app)
+- Frontend: https://swarm357.techtideai.io (Railway domain https://swarm357.techtideai.io)
 - Backend: https://swarm357be.up.railway.app (`NEXT_PUBLIC_API_URL=https://swarm357be.up.railway.app`)
 - Site BFF: set `SWARM_API_KEY` as a **runtime-only** variable on the site service. Never expose a write key with a `NEXT_PUBLIC_` prefix.
-- Backend CORS: `ALLOWED_ORIGINS=https://swarm357.techtideai.io,https://swarm357fe.up.railway.app`
+- Backend CORS: `ALLOWED_ORIGINS=https://swarm357.techtideai.io,https://swarm357.techtideai.io`

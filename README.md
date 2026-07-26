@@ -11,6 +11,8 @@
 
 Layered agent orchestration for business automation. 357 Claude agent roles across 6 business layers, backed by portable Memvid memory and honest cost controls.
 
+**[Live site](https://swarm357.techtideai.io)** · **[Documentation](https://swarm357.techtideai.io/docs)** · **[Blog](https://swarm357.techtideai.io/blog)** · **[PyPI](https://pypi.org/project/techtide-swarm/)** · **[Maturity matrix](STATUS.md)** · **[Security model](SECURITY.md)** · **[Landing repo](https://github.com/TechTideOhio/swarm-357-site)**
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/TechTideOhio/swarm-357/main/docs/assets/architecture.png" alt="Swarm 357 architecture" width="90%" />
 </p>
@@ -49,6 +51,7 @@ flowchart TB
 - [Development](#development)
 - [Continuous integration](#continuous-integration)
 - [Landing site and design](#landing-site-and-design)
+- [Engineering writing](#engineering-writing)
 - [Required environment](#required-environment)
 - [Deployment](#deployment)
 - [Releases](#releases)
@@ -70,7 +73,7 @@ swarm demo
 
 `swarm demo` works with or without an API key. Without a key it prints an architecture overview and an explicitly labeled stub. With `ANTHROPIC_API_KEY` or an OpenRouter key it runs a live agent. There is no silent success path.
 
-**Documentation:** https://swarm357fe.up.railway.app/docs covers guides, the API reference, evals, the changelog, and the full roster.
+**Documentation:** https://swarm357.techtideai.io/docs covers guides, the API reference, evals, the changelog, and the full roster.
 
 ## Container image
 
@@ -105,7 +108,7 @@ Swarm 357 is an organizational ontology for agents. It is not a claim that 357 O
 
 The design starts from the parts that break agent demos once real money and real filesystems are involved. Budgets are enforced per agent and per layer, with a logged downgrade rather than a silent one. Bash is policy-gated and denied outright in server and production modes unless explicitly enabled. Memory is a file you can copy, inspect, and verify rather than a managed service you rent. Runs checkpoint to SQLite so `inspect`, `resume`, `cancel`, `replay`, and `fork` mean something after a process dies.
 
-Built by [TechTide AI](https://techtide.ai) for Claude Code native workflows, and used on the studio's own production automation before anything ships here. The runtime is open core under Apache-2.0. The product surface lives in a separate repository, [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site), so the two release on independent trains. A longer version of this section, with linked stack and eval evidence, is published at [swarm357fe.up.railway.app/about](https://swarm357fe.up.railway.app/about).
+Built by [TechTide AI](https://techtide.ai) for Claude Code native workflows, and used on the studio's own production automation before anything ships here. The runtime is open core under Apache-2.0. The product surface lives in a separate repository, [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site), so the two release on independent trains. A longer version of this section, with linked stack and eval evidence, is published at [swarm357.techtideai.io/about](https://swarm357.techtideai.io/about).
 
 ## What 357 agents means
 
@@ -182,7 +185,7 @@ flowchart LR
 
 ## Evals
 
-Numbers come from [`evals/baselines/latest.json`](evals/baselines/latest.json) through [`scripts/render_eval_assets.py`](scripts/render_eval_assets.py). Full write-up: [docs/EVALS.md](docs/EVALS.md) and the hosted [eval methodology](https://swarm357fe.up.railway.app/docs/evals/methodology) page.
+Numbers come from [`evals/baselines/latest.json`](evals/baselines/latest.json) through [`scripts/render_eval_assets.py`](scripts/render_eval_assets.py). Full write-up: [docs/EVALS.md](docs/EVALS.md) and the hosted [eval methodology](https://swarm357.techtideai.io/docs/evals/methodology) page.
 
 ![Eval results by layer](https://raw.githubusercontent.com/TechTideOhio/swarm-357/main/docs/assets/eval-results.png)
 
@@ -286,12 +289,27 @@ Product marketing, the art carousel, and the try-it-live BFF live in [TechTideOh
 
 | Surface | URL |
 |---------|-----|
-| Frontend | https://swarm357fe.up.railway.app |
+| Frontend | https://swarm357.techtideai.io |
 | Backend API | https://swarm357be.up.railway.app |
-| About and maturity mirror | https://swarm357fe.up.railway.app/about |
-| Design system | https://swarm357fe.up.railway.app/docs/resources/design |
+| About and maturity mirror | https://swarm357.techtideai.io/about |
+| Design system | https://swarm357.techtideai.io/docs/resources/design |
 
 The design system is documented in the landing repository and summarized for this repository in [docs/DESIGN.md](docs/DESIGN.md), which also lists the brand assets sourced here under `docs/assets/`.
+
+## Engineering writing
+
+Long-form notes on the decisions behind this runtime. Full index at [swarm357.techtideai.io/blog](https://swarm357.techtideai.io/blog), feed at [/feed.xml](https://swarm357.techtideai.io/feed.xml).
+
+| Post | Covers |
+|------|--------|
+| [What an agent swarm actually means in production](https://swarm357.techtideai.io/blog/what-agent-swarm-means-in-production) | Definitions and the claims worth distrusting |
+| [pip install techtide-swarm: your first run](https://swarm357.techtideai.io/blog/pip-install-techtide-swarm-first-run) | Install through `swarm demo` and the first live run |
+| [Building a 357 role catalog for AI agents](https://swarm357.techtideai.io/blog/building-a-357-role-catalog) | Why roles are an ontology, not concurrent sessions |
+| [Cost control for LLM agent fleets](https://swarm357.techtideai.io/blog/cost-control-for-llm-agent-fleets) | Per-agent caps, layer budgets, logged downgrades |
+| [Why your agent needs a bash policy gate](https://swarm357.techtideai.io/blog/why-your-agent-needs-a-bash-policy-gate) | `BashSecurityGate` and what pattern matching cannot do |
+| [Portable agent memory with Memvid](https://swarm357.techtideai.io/blog/portable-agent-memory-with-memvid) | `.mv2` stores through the Rust bridge |
+| [Durable checkpoints: resume, cancel, replay, fork](https://swarm357.techtideai.io/blog/durable-checkpoints-resume-cancel-replay) | What survives a process dying mid-run |
+| [Swarm 357 mid-year status](https://swarm357.techtideai.io/blog/swarm-357-mid-year-status) | Prose mirror of [STATUS.md](STATUS.md) |
 
 ## Required environment
 
