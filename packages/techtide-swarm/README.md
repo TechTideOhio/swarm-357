@@ -111,9 +111,17 @@ Also exported: `AgentResult`, `SwarmExecutionResult`, `SwarmStore`, `MemvidBridg
 
 ## Docs
 
-- Full project: [TechTideOhio/swarm-357](https://github.com/TechTideOhio/swarm-357)
-- Evals: [docs/EVALS.md](https://github.com/TechTideOhio/swarm-357/blob/main/docs/EVALS.md)
-- Architecture notes: [CLAUDE.md](https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md)
+| Resource | Link |
+|----------|------|
+| Documentation site | https://swarm357fe.up.railway.app/docs |
+| About and positioning | https://swarm357fe.up.railway.app/about |
+| Getting started | https://swarm357fe.up.railway.app/docs/getting-started/quickstart |
+| Feature maturity | https://swarm357fe.up.railway.app/docs/resources/status |
+| Eval methodology | https://swarm357fe.up.railway.app/docs/evals/methodology |
+| Security model | https://swarm357fe.up.railway.app/docs/security/security-model |
+| Design system | https://swarm357fe.up.railway.app/docs/resources/design |
+| Core repository | [TechTideOhio/swarm-357](https://github.com/TechTideOhio/swarm-357) |
+| Landing repository | [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) |
 
 ## License
 

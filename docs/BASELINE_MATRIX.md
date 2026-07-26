@@ -1,6 +1,6 @@
 # VERIFY baseline matrix (Phase 0)
 
-Run from repo root (`Apps/swarm357`). Last validated with: `ruff`, `mypy` (from `packages/techtide-swarm`), `pytest`, roster scripts, optional Docker smoke.
+Run from the repository root. Last validated with: `ruff`, `mypy` (from `packages/techtide-swarm`), `pytest`, roster scripts, optional Docker smoke.
 
 | Category | Command / check | Expected |
 |----------|-------------------|----------|

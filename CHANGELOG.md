@@ -2,7 +2,7 @@
 
 All notable changes to TechTide Swarm 357 are documented here.
 
-## [0.2.2] — 2026-07-26
+## [0.2.2]: 2026-07-26
 
 ### Correction (v0.2.1 gaps)
 
@@ -28,7 +28,7 @@ v0.2.1 labeled HITL as Beta while approve/reject APIs never produced waiting Bas
 - Package version **0.2.1 → 0.2.2**.
 - Site demo writes move to same-origin BFF (server-only `SWARM_API_KEY`); no client write key.
 
-## [0.2.1] — 2026-07-25
+## [0.2.1]: 2026-07-25
 
 ### Correction (v0.2.0)
 
@@ -57,12 +57,12 @@ v0.2.0 public docs/CI badges still referenced scrubbed paths (`.github` workflow
 - Package version **0.2.0 → 0.2.1**.
 - Docs/STATUS/VERIFY rewritten as executable acceptance criteria (no “10/10” marketing).
 
-## [0.2.0] — 2026-07-24
+## [0.2.0]: 2026-07-24
 
 ### Added
 
 - OpenRouter provider support via [`llm.py`](packages/techtide-swarm/src/techtide_swarm/llm.py) (`OPENROUTER_API_KEY`, `ANTHROPIC_BASE_URL`).
-- Tool input normalization ([`tools/input_normalize.py`](packages/techtide-swarm/src/techtide_swarm/tools/input_normalize.py)) — alias coercion (`file_path` → `path`), JSON string inputs, unknown-kwarg filtering.
+- Tool input normalization ([`tools/input_normalize.py`](packages/techtide-swarm/src/techtide_swarm/tools/input_normalize.py)) - alias coercion (`file_path` → `path`), JSON string inputs, unknown-kwarg filtering.
 - Eval harness v2: LLM judge, `$5` hard budget, checkpoint/resume, burn passes, baseline compare ([`evals/run_evals.py`](evals/run_evals.py)).
 - Generated eval reporting: [`scripts/render_eval_assets.py`](scripts/render_eval_assets.py), [`docs/EVALS.md`](docs/EVALS.md), [`docs/assets/eval-results.svg`](docs/assets/eval-results.svg).
 - Brand + architecture assets under [`docs/assets/`](docs/assets/) (logo, banner, architecture, request lifecycle).
@@ -87,11 +87,11 @@ v0.2.0 public docs/CI badges still referenced scrubbed paths (`.github` workflow
 - Root README rewritten with badges, diagrams, and generated eval numbers (25-task catalog; not “5 tasks”).
 - Package README expanded for PyPI (API, CLI, HTTP routes, env vars).
 
-## [0.1.0] — 2026-07-24
+## [0.1.0]: 2026-07-24
 
 ### Added
 
-- `CostController.record_spend()` — layer spend now accumulates from `Swarm.execute` and `execute_layer`, enabling the 80% model-downgrade path.
+- `CostController.record_spend()` - layer spend now accumulates from `Swarm.execute` and `execute_layer`, enabling the 80% model-downgrade path.
 - Structured HTTP request logging (JSON) and `X-Correlation-ID` via ASGI middleware ([`structured_logging`](packages/techtide-swarm/src/techtide_swarm/structured_logging.py)).
 - Optional eval LLM judge (`SWARM_EVAL_LLM_JUDGE`) and optional dream-cycle Haiku notes (`SWARM_DREAM_USE_LLM`) in eval harness and `MemoryManager.run_dream_cycle`.
 - Docs: [docs/BASELINE_MATRIX.md](docs/BASELINE_MATRIX.md), [docs/DATA_PLANE.md](docs/DATA_PLANE.md), [docs/COMPARISON.md](docs/COMPARISON.md); extended [docs/DEPLOY_RAILWAY.md](docs/DEPLOY_RAILWAY.md) checklist and troubleshooting.

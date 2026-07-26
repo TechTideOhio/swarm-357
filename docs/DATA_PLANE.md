@@ -23,4 +23,4 @@ Supabase insert failures are logged with `logger.warning` and **do not** fail HT
 
 ## RLS
 
-The migration does not enable Row Level Security by default (server uses service role). If you expose Supabase directly to clients, add RLS policies separately—this project expects the Python service to be the only writer.
+The migration does not enable Row Level Security by default (server uses service role). If you expose Supabase directly to clients, add RLS policies separately. This project expects the Python service to be the only writer.

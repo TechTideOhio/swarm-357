@@ -14,7 +14,7 @@ Swarm 357 ships a budgeted evaluation suite under [`evals/`](../evals/). Numbers
 | Combined score | `0.55 * keyword + 0.45 * llm_judge` (keyword-only if judge skipped) |
 | Pass | `status=success` and combined ≥ 0.5 and length OK |
 | Budget | Hard cap (default `$5.00` via `SWARM_EVAL_BUDGET_USD`) |
-| Checkpoint | `evals/results/checkpoint_live.json` — resume with `--resume` |
+| Checkpoint | `evals/results/checkpoint_live.json` - resume with `--resume` |
 | Regression | `--compare` flags ≥ 0.15 combined-score drops vs baseline |
 
 ## Catalog
@@ -43,7 +43,7 @@ Burn passes (`{task_id}-burnN`) consume remaining budget with tool-enabled singl
 
 ### Honest caveats
 
-- **Swarm timeouts:** 8 of 12 swarm executions hit 150–180s wall-clock timeouts on OpenRouter. Single-agent + tools is the production demo path.
+- **Swarm timeouts:** 8 of 12 swarm executions hit 150-180s wall-clock timeouts on OpenRouter. Single-agent + tools is the production demo path.
 - **Tools on:** Eval agents use `Read`/`Write` with `SWARM_WRITE_SAFE_ROOT` sandboxing.
 - **Regenerate:** `python scripts/render_eval_assets.py` after a new baseline.
 

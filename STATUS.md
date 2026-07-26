@@ -1,10 +1,10 @@
-# TechTide Swarm 357 — Feature Status
+# TechTide Swarm 357: Feature Status
 
 Maturity levels:
-- **Stable** — tested, documented, safe for production use under stated constraints
-- **Beta** — working but evolving; API may change
-- **Experimental** — functional but incomplete or opt-in
-- **Not implemented** — explicitly out of scope for the current release
+- **Stable** - tested, documented, safe for production use under stated constraints
+- **Beta** - working but evolving; API may change
+- **Experimental** - functional but incomplete or opt-in
+- **Not implemented** - explicitly out of scope for the current release
 
 ## Product framing
 
@@ -14,7 +14,7 @@ Swarm 357 is a **357-role catalog plus orchestration runtime**, not a production
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| `Agent` — single-agent runner | **Stable** | Live API when keyed; explicit `SWARM_SIMULATE` / `SWARM_ALLOW_STUB` otherwise (no silent success) |
+| `Agent` - single-agent runner | **Stable** | Live API when keyed; explicit `SWARM_SIMULATE` / `SWARM_ALLOW_STUB` otherwise (no silent success) |
 | `AgentConfig` | **Stable** | Pydantic v2 |
 | `Swarm` orchestration | **Beta** | Structured JSON routing; durable `RunState` + SQLite checkpoints |
 | `execute_layer()` | **Beta** | One-per-role default, hard agent cap; `full_fanout` / `SWARM_UNSAFE_FULL_FANOUT` opt-in |
@@ -46,7 +46,7 @@ Swarm 357 is a **357-role catalog plus orchestration runtime**, not a production
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| CI | **Stable** | `.github/workflows/ci.yml` — Python 3.10–3.13, roster, wheel smoke, Docker auth, Rust, docs ban check |
+| CI | **Stable** | `.github/workflows/ci.yml` - Python 3.10-3.13, roster, wheel smoke, Docker auth, Rust, docs ban check |
 | PyPI publish | **Beta** | `publish.yml` with attestations; CI gate before publish |
 | Landing site | **Beta** | Docs at https://swarm357fe.up.railway.app/docs; source in [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) |
 | Branch protection / scanning | **Beta** | Operator-applied on GitHub (see RELEASE.md) |

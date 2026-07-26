@@ -46,7 +46,7 @@ curl -sf http://127.0.0.1:8000/api/health
 
 ## Definition: “357 agents”
 
-**357 agents** means **357 distinct agent identities** (YAML roster + soul templates) orchestrated by the runtime — not 357 parallel long-running LLM sessions. Default layer execution selects **one agent per role** with a configurable cap.
+**357 agents** means **357 distinct agent identities** (YAML roster + soul templates) orchestrated by the runtime - not 357 parallel long-running LLM sessions. Default layer execution selects **one agent per role** with a configurable cap.
 
 ## Maturity honesty
 

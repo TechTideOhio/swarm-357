@@ -40,6 +40,6 @@ When these vars are absent, the system falls back to local JSONL files in `.swar
 The bundled migration creates tables without RLS for simplicity. The Python server uses the **service role** key (`SUPABASE_SERVICE_KEY`), which bypasses RLS.
 
 - **Recommended**: keep service role secrets only on the API server (Railway), never in the browser.
-- If you need **read-only public access** (e.g. a dashboard), create a dedicated Postgres role or Supabase **anon** policies on views that expose only non-sensitive columns — do not expose the service key to clients.
+- If you need **read-only public access** (e.g. a dashboard), create a dedicated Postgres role or Supabase **anon** policies on views that expose only non-sensitive columns - do not expose the service key to clients.
 
 For a typical deployment, only the FastAPI backend talks to Supabase with the service key; end users call the REST API, which enforces `SWARM_API_KEY` on POST routes.

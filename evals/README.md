@@ -27,7 +27,7 @@ Budgeted quality harness for Swarm 357.
 ## Quick run
 
 ```bash
-# From Apps/swarm357 repo root
+# From the repository root
 python -u evals/run_evals.py --budget 5.0 --resume --save-baseline --compare
 ```
 

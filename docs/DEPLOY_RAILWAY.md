@@ -1,20 +1,20 @@
 # Deploy Swarm 357 on Railway
 
-## Monorepo (TechTide root on GitHub)
+## Backend service
 
-1. **New service** → connect repo → **Root Directory**: `Apps/swarm357`.
+1. **New service** → connect the [TechTideOhio/swarm-357](https://github.com/TechTideOhio/swarm-357) repository → **Root Directory**: `.` (the repository root).
 2. **Builder**: Dockerfile (see [railway.toml](../railway.toml)).
 3. **Variables** (minimum):
-   - `ANTHROPIC_API_KEY` — for live agents (omit only if you want stub responses).
-   - `SWARM_API_KEY` — long random string; required for securing POST routes in production.
-   - `PORT` — Railway sets automatically; [railway.toml](../railway.toml) uses `$PORT` in `startCommand`.
+   - `ANTHROPIC_API_KEY` - for live agents (omit only if you want stub responses).
+   - `SWARM_API_KEY` - long random string; required for securing POST routes in production.
+   - `PORT` - Railway sets automatically; [railway.toml](../railway.toml) uses `$PORT` in `startCommand`.
 
 Optional:
 
-- `ALLOWED_ORIGINS` — comma-separated origins for the Next.js marketing site.
-- `SUPABASE_URL` / `SUPABASE_SERVICE_KEY` — persistence; run [database/migrations/001_initial.sql](../database/migrations/001_initial.sql) in Supabase SQL first.
-- `SWARM_MAX_RUN_BUDGET_USD` — hard cap for JSON `budget_usd` (default `500`).
-- `SWARM_RATE_LIMIT_PER_MINUTE` — per-IP limit (default `120`; set `0` to disable).
+- `ALLOWED_ORIGINS` - comma-separated origins for the Next.js marketing site.
+- `SUPABASE_URL` / `SUPABASE_SERVICE_KEY` - persistence; run [database/migrations/001_initial.sql](../database/migrations/001_initial.sql) in Supabase SQL first.
+- `SWARM_MAX_RUN_BUDGET_USD` - hard cap for JSON `budget_usd` (default `500`).
+- `SWARM_RATE_LIMIT_PER_MINUTE` - per-IP limit (default `120`; set `0` to disable).
 
 ## Custom domain
 
@@ -48,17 +48,17 @@ See [VERIFY.md](VERIFY.md) for the full scorecard.
 
 ## Go-live checklist
 
-1. **Root directory** is `Apps/swarm357` when the GitHub repo is the TechTide monorepo (not `.` at monorepo root unless the service only contains swarm357).
+1. **Root directory** is `.`, the root of the [swarm-357](https://github.com/TechTideOhio/swarm-357) repository, which is where the Dockerfile lives.
 2. **Builder** = Dockerfile; confirm [railway.toml](../railway.toml) `startCommand` uses `$PORT` (Railway injects it).
 3. Set **`ANTHROPIC_API_KEY`**, **`SWARM_API_KEY`**, and optional **`ALLOWED_ORIGINS`** for your marketing origin.
 4. Run **`database/migrations/001_initial.sql`** in Supabase before setting `SUPABASE_*` env vars (see [DATA_PLANE.md](DATA_PLANE.md)).
-5. Deploy, then **`curl /api/health`** — expect `"agents":357` and `"status":"ok"`.
+5. Deploy, then **`curl /api/health`** - expect `"agents":357` and `"status":"ok"`.
 
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
 |--------|----------------|-----|
-| Build: `package.json` not found / Railpack errors | Wrong **Root Directory** | Set Root Directory to `Apps/swarm357` and builder to Dockerfile. |
+| Build: `package.json` not found / Railpack errors | Wrong **Root Directory** or builder | Set Root Directory to `.` and the builder to Dockerfile. |
 | Service starts then 502 / connection refused | `PORT` not bound | Keep `uvicorn ... --port $PORT` in Railway start command; do not hardcode `8000` in production. |
 | `/api/health` shows `agents: 0` | Config path missing in image | Ensure [Dockerfile](../Dockerfile) copies `config/` and `templates/`; or set `SWARM_CONFIG_PATH`. |
 | POST returns 401 | `SWARM_API_KEY` set | Send header `X-SWARM-API-KEY` with the same secret. |
