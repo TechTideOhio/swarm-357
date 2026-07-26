@@ -45,6 +45,7 @@ We aim to acknowledge reports within 72 hours and provide a remediation timeline
 - The Firecrawl and Exa scrape backends fetch through a third party. URL validation still applies, but the outbound request itself leaves their infrastructure, not yours.
 - Supabase migrations ship without row level security. `SUPABASE_SERVICE_KEY` is a service-role secret for a single-tenant server; do not place it in a client bundle or expose the database directly to browsers.
 - Eval and demo deployments should keep `SWARM_API_KEY` set and CORS origins restricted.
+- The interactive API explorer (`/docs`, `/redoc`, `/openapi.json`) is intentionally public. Every route it lists is already public in this repository, writes fail closed without the write key, and reads are redacted. Set `SWARM_DISABLE_API_DOCS=1` to remove the explorer on a deployment where route enumeration matters.
 
 ## Disclosure preference
 

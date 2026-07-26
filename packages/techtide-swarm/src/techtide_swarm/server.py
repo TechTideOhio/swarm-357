@@ -192,11 +192,23 @@ def create_app(config_path: Path | None = None) -> FastAPI:
 
     from techtide_swarm import __version__ as _pkg_version
 
+    # The explorer only lists routes that are already public in this repository,
+    # but deployments that care about route enumeration can turn it off.
+    docs_disabled = os.getenv("SWARM_DISABLE_API_DOCS", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
     app = FastAPI(
         title="TechTide Swarm 357 API",
         description="357 Claude AI agents organized into 6 business layers",
         version=_pkg_version,
         lifespan=_make_lifespan(cfg),
+        docs_url=None if docs_disabled else "/docs",
+        redoc_url=None if docs_disabled else "/redoc",
+        openapi_url=None if docs_disabled else "/openapi.json",
     )
 
     # Innermost (closest to routes): correlation id + structured JSON logs.

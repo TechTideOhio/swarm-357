@@ -151,6 +151,27 @@ async def test_authenticated_run_inspect_keeps_detail(app, monkeypatch: pytest.M
     assert resp.json()["task"] == SECRET_TASK
 
 
+@pytest.mark.asyncio
+async def test_api_docs_can_be_disabled(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SWARM_DISABLE_API_DOCS", "1")
+    from techtide_swarm.server import create_app
+
+    root = Path(__file__).resolve().parent.parent.parent.parent
+    disabled = create_app(config_path=root / "config" / "swarm-compact.yaml")
+
+    async with AsyncClient(
+        transport=ASGITransport(app=disabled), base_url="http://test"
+    ) as client:
+        for path in ("/docs", "/redoc", "/openapi.json"):
+            assert (await client.get(path)).status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_api_docs_are_served_by_default(app) -> None:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        assert (await client.get("/openapi.json")).status_code == 200
+
+
 def test_cors_allowlist_covers_production_origins() -> None:
     from techtide_swarm.server import _CORS_ORIGINS
 
