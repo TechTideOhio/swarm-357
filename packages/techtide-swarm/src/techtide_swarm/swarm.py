@@ -17,8 +17,13 @@ from techtide_swarm.agent import Agent, AgentConfig, AgentResult
 from techtide_swarm.budget import BudgetLedger
 from techtide_swarm.core.types import LayerType
 from techtide_swarm.llm import model_id, resolve_api_key, resolved_model_info
-from techtide_swarm.runtime.checkpoint import CheckpointStore, default_checkpoint_store
+from techtide_swarm.runtime.checkpoint import (
+    CheckpointStore,
+    default_checkpoint_store,
+    set_default_store,
+)
 from techtide_swarm.runtime.events import EventBus, EventType, SwarmEvent, get_event_bus
+from techtide_swarm.runtime.hitl import set_current_run_id
 from techtide_swarm.runtime.routing import RoutingError, parse_routing_decision, routing_prompt
 from techtide_swarm.runtime.state import RunState, RunStatus, StepState, StepStatus
 from techtide_swarm.telemetry import log_telemetry
@@ -141,6 +146,7 @@ class Swarm:
         """Lazy checkpoint store so Docker health/roster does not require a writable CWD."""
         if self._checkpoint is None:
             self._checkpoint = default_checkpoint_store()
+        set_default_store(self._checkpoint)
         return self._checkpoint
 
     @classmethod
@@ -268,7 +274,20 @@ class Swarm:
             await self.boot()
 
     def cancel_run(self, run_id: str) -> None:
+        """Request cancel in-memory and durably on the checkpoint."""
         self._cancelled.add(run_id)
+        state = self.checkpoint.load(run_id)
+        if state is not None:
+            state.cancel_requested = True
+            state.status = RunStatus.CANCELLED
+            state.touch()
+            self.checkpoint.save(state)
+
+    def _is_cancelled(self, run_id: str) -> bool:
+        if run_id in self._cancelled:
+            return True
+        state = self.checkpoint.load(run_id)
+        return bool(state and (state.cancel_requested or state.status == RunStatus.CANCELLED))
 
     def inspect_run(self, run_id: str) -> RunState | None:
         return self.checkpoint.load(run_id)
@@ -520,10 +539,15 @@ class Swarm:
                     )
                 )
 
+            set_current_run_id(pipeline_id)
             for role in state.roles:
-                if pipeline_id in self._cancelled:
+                if self._is_cancelled(pipeline_id):
+                    state.cancel_requested = True
                     state.status = RunStatus.CANCELLED
                     status = "cancelled"
+                    await self._emit(
+                        SwarmEvent(EventType.RUN_CANCELLED, pipeline_id, {})
+                    )
                     break
                 if role in completed_roles:
                     continue
@@ -552,7 +576,18 @@ class Swarm:
                     raise RoutingError(f"role '{role}' has no agent in roster")
 
                 if self.cost_controller.should_downgrade_model(agent_cfg.layer.value):
+                    prior = agent_cfg.model
                     agent_cfg = agent_cfg.model_copy(update={"model": "haiku"})
+                    log_telemetry(
+                        "model_downgrade",
+                        {
+                            "pipeline_id": pipeline_id,
+                            "layer": agent_cfg.layer.value,
+                            "from_model": prior,
+                            "to_model": "haiku",
+                            "reason": "layer_spend_threshold_80pct",
+                        },
+                    )
 
                 max_turns = min(int(getattr(agent_cfg, "max_turns", 10) or 10), 5)
                 agent = Agent(agent_cfg.model_copy(update={"max_turns": max_turns}))
@@ -624,6 +659,8 @@ class Swarm:
             await self._emit(SwarmEvent(EventType.RUN_FAILED, pipeline_id, {"error": str(exc)}))
             raise
         finally:
+            set_current_run_id(None)
+            await self._events.close(pipeline_id)
             log_telemetry(
                 "swarm_run",
                 {

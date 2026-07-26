@@ -34,21 +34,19 @@ _WRITE_DENY_PATTERNS: list[str] = [
 
 
 def _workspace_root() -> Path | None:
-    """Immutable workspace root for Read/Write when set or in server mode."""
+    """Immutable workspace root for Read/Write.
+
+    Default: confine to CWD (Steinberger local-first). Escape with SWARM_UNSAFE_FS=1.
+    """
+    if os.getenv("SWARM_UNSAFE_FS", "").strip().lower() in {"1", "true", "yes", "on"}:
+        return None
     explicit = os.getenv("SWARM_WORKSPACE_ROOT", "").strip() or os.getenv(
         "SWARM_WRITE_SAFE_ROOT", ""
     ).strip()
     if explicit:
         return Path(explicit).resolve()
-    # Server/production: confine to CWD by default
-    env = os.getenv("SWARM_ENV", "").strip().lower()
-    if env in {"prod", "production", "server"} or os.getenv(
-        "SWARM_SERVER_MODE", ""
-    ).strip().lower() in {"1", "true", "yes", "on"}:
-        return Path.cwd().resolve()
-    if os.getenv("SWARM_CONFINEMENT", "").strip().lower() in {"1", "true", "yes", "on"}:
-        return Path.cwd().resolve()
-    return None
+    # Default confine for CLI and server unless explicitly disabled
+    return Path.cwd().resolve()
 
 
 def _is_path_allowed(path: Path, *, for_write: bool) -> tuple[bool, str]:

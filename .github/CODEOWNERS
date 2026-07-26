@@ -1,0 +1,5 @@
+# file: .github/CODEOWNERS
+# description: Default reviewers for TechTideOhio/swarm-357
+# reference: RELEASE.md
+
+* @Alexi5000

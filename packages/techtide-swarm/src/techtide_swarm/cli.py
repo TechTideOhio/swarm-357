@@ -874,7 +874,6 @@ def cmd_resume(args: argparse.Namespace) -> None:
 def cmd_cancel(args: argparse.Namespace) -> None:
     """Cancel a running (or resumable) checkpointed run."""
     print_banner()
-    from techtide_swarm.runtime.state import RunStatus
 
     run_id = args.run_id
     try:
@@ -884,13 +883,55 @@ def cmd_cancel(args: argparse.Namespace) -> None:
             console.print(f"[red]Run not found: {run_id}[/red]")
             sys.exit(1)
         swarm.cancel_run(run_id)
-        state.status = RunStatus.CANCELLED
-        state.error = "cancelled via CLI"
-        state.touch()
-        swarm._checkpoint.save(state)
         console.print(f"[bold green]Cancelled run {run_id}[/bold green]\n")
     except Exception as exc:
         console.print(f"[red]Cancel failed: {exc}[/red]")
+        sys.exit(1)
+
+
+def cmd_approve(args: argparse.Namespace) -> None:
+    """Approve a pending Bash HITL approval."""
+    print_banner()
+    from techtide_swarm.runtime.hitl import get_approval_gate
+
+    try:
+        swarm = _resolve_swarm(args)
+        ok = get_approval_gate().resolve(
+            args.approval_id,
+            status="approved",
+            decided_by=getattr(args, "decided_by", "") or "cli",
+            reason=getattr(args, "reason", "") or "",
+            store=swarm.checkpoint,
+        )
+        if not ok:
+            console.print(f"[red]Approval not found: {args.approval_id}[/red]")
+            sys.exit(1)
+        console.print(f"[bold green]Approved {args.approval_id}[/bold green]\n")
+    except Exception as exc:
+        console.print(f"[red]Approve failed: {exc}[/red]")
+        sys.exit(1)
+
+
+def cmd_reject(args: argparse.Namespace) -> None:
+    """Reject a pending Bash HITL approval."""
+    print_banner()
+    from techtide_swarm.runtime.hitl import get_approval_gate
+
+    try:
+        swarm = _resolve_swarm(args)
+        ok = get_approval_gate().resolve(
+            args.approval_id,
+            status="rejected",
+            decided_by=getattr(args, "decided_by", "") or "cli",
+            reason=getattr(args, "reason", "") or "",
+            store=swarm.checkpoint,
+        )
+        if not ok:
+            console.print(f"[red]Approval not found: {args.approval_id}[/red]")
+            sys.exit(1)
+        console.print(f"[bold yellow]Rejected {args.approval_id}[/bold yellow]\n")
+    except Exception as exc:
+        console.print(f"[red]Reject failed: {exc}[/red]")
         sys.exit(1)
 
 
@@ -1356,6 +1397,16 @@ def main() -> None:
     cancel_parser.add_argument("run_id", help="Run UUID to cancel")
     cancel_parser.add_argument("--config", default=None)
 
+    approve_parser = subparsers.add_parser("approve", help="Approve a pending Bash HITL request")
+    approve_parser.add_argument("approval_id", help="Approval UUID")
+    approve_parser.add_argument("--reason", default="", help="Decision reason")
+    approve_parser.add_argument("--config", default=None)
+
+    reject_parser = subparsers.add_parser("reject", help="Reject a pending Bash HITL request")
+    reject_parser.add_argument("approval_id", help="Approval UUID")
+    reject_parser.add_argument("--reason", default="", help="Decision reason")
+    reject_parser.add_argument("--config", default=None)
+
     replay_parser = subparsers.add_parser("replay", help="Replay a prior run as a new execution")
     replay_parser.add_argument("run_id", help="Run UUID to replay")
     replay_parser.add_argument("--config", default=None)
@@ -1432,6 +1483,10 @@ def main() -> None:
         cmd_resume(args)
     elif args.command == "cancel":
         cmd_cancel(args)
+    elif args.command == "approve":
+        cmd_approve(args)
+    elif args.command == "reject":
+        cmd_reject(args)
     elif args.command == "replay":
         cmd_replay(args)
     elif args.command == "fork":

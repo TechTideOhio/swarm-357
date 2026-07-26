@@ -36,7 +36,7 @@ Burn passes (`{task_id}-burnN`) consume remaining budget with tool-enabled singl
 | Provider | `openrouter` |
 | Agent model | `anthropic/claude-sonnet-4` |
 | Judge model | `anthropic/claude-3-haiku` |
-| Single-agent pass | 141/142 |
+| Single-agent pass | 142/142 |
 | Swarm pass | 4/12 |
 
 ### Honest caveats

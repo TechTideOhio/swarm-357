@@ -41,7 +41,7 @@ jobs:
         run: >
           python -m pytest tests -v -p no:schemathesis
           --cov=techtide_swarm --cov-report=term-missing
-          --cov-fail-under=25
+          --cov-fail-under=40
       - name: Clean-wheel boot smoke (3.12 only)
         if: matrix.python-version == '3.12'
         run: |
@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
         with:
           toolchain: stable
           components: rustfmt, clippy
@@ -172,7 +172,8 @@ jobs:
           set -euo pipefail
           if rg -n --glob '!**/CHANGELOG*' --glob '!**/HISTORY*' \
             -e '\.planning/' -e '\.repos and items/' -e '\.ui_landin_sample/' \
-            README.md STATUS.md CONTRIBUTING.md RELEASE.md docs/ packages/*/README.md \
+            README.md STATUS.md CONTRIBUTING.md RELEASE.md CLAUDE.md SECURITY.md \
+            docs/ packages/*/README.md *.md \
             2>/dev/null; then
             echo "Banned-path references found in public docs"
             exit 1
@@ -193,4 +194,4 @@ jobs:
           pip install -e "packages/techtide-swarm[dev]"
           pip install pip-audit
       - name: Audit Python deps
-        run: pip-audit || true
+        run: pip-audit

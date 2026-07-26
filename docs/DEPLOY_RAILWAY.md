@@ -24,8 +24,15 @@ Optional:
 
 ## Smoke checks
 
+Public production URLs (Railway project `swarm-357`):
+
+| Surface | Service | Public URL |
+|--------|---------|------------|
+| Frontend | `frontend` | https://swarm357fe.up.railway.app |
+| Backend | `backend` | https://swarm357be.up.railway.app |
+
 ```bash
-curl -sSf "https://<your-service>.up.railway.app/api/health"
+curl -sSf "https://swarm357be.up.railway.app/api/health"
 # Expect: "status":"ok","agents":357,...
 ```
 
@@ -33,9 +40,10 @@ See [VERIFY.md](VERIFY.md) for the full scorecard.
 
 ## Landing (Next.js) on Railway (optional second service)
 
-- Root Directory: `Apps/swarm357/TechTideOhio/swarm-357-site` (or deploy landing from a split repo).
-- Build: `npm ci && npm run build`.
-- Env: `NEXT_PUBLIC_API_URL=https://<api-service>.up.railway.app`
+- Deploy from `TechTideOhio/swarm-357-site` (Railway root = repo root).
+- Build: `bun install && bun run build` (or `npm ci && npm run build`).
+- Env: `NEXT_PUBLIC_API_URL=https://swarm357be.up.railway.app`
+- Backend CORS: `ALLOWED_ORIGINS=https://swarm357fe.up.railway.app` (plus any custom domains).
 - If the API uses `SWARM_API_KEY`, set `NEXT_PUBLIC_SWARM_WRITE_KEY` to the **same** value only if you want the “Try it live” hero form to call POST `/api/swarm/run` from the browser (prefer restricting demo POSTs or using a server-side proxy in production).
 
 ## Go-live checklist

@@ -13,7 +13,7 @@ Live mode (with API key): 3 real Claude API calls, real output, real cost.
 Usage:
     python scripts/quickstart.py
     ANTHROPIC_API_KEY=sk-ant-... python scripts/quickstart.py
-    python scripts/quickstart.py --output .planning/benchmarks/quickstart-result.json
+    python scripts/quickstart.py --output .swarm/benchmarks/quickstart-result.json
 """
 
 from __future__ import annotations
@@ -179,7 +179,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="TechTide Swarm 357 Quickstart")
     parser.add_argument(
         "--output", default=None,
-        help="Write result JSON to this path (e.g. .planning/benchmarks/quickstart-result.json)"
+        help="Write result JSON to this path (e.g. .swarm/benchmarks/quickstart-result.json)"
     )
     args = parser.parse_args()
 

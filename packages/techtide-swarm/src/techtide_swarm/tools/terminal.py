@@ -1,7 +1,7 @@
 # file: packages/techtide-swarm/src/techtide_swarm/tools/terminal.py
-# description: Bash tool with explicit argv execution policy (no shell=True by default)
-# reference: techtide_swarm.bash_gate, techtide_swarm.tools.registry
-"""Bash execution tool, gated by BashSecurityGate and execution policy.
+# description: Bash tool with explicit argv execution policy and optional HITL
+# reference: techtide_swarm.bash_gate, techtide_swarm.runtime.hitl
+"""Bash execution tool, gated by BashSecurityGate, execution policy, and HITL.
 
 Registers:
   - Bash  (toolset: core_tools)
@@ -14,6 +14,11 @@ import shlex
 import subprocess
 
 from techtide_swarm.bash_gate import BashSecurityGate
+from techtide_swarm.runtime.hitl import (
+    current_run_id,
+    get_approval_gate,
+    hitl_bash_enabled,
+)
 from techtide_swarm.tools.registry import registry
 
 
@@ -42,11 +47,7 @@ def allow_shell_true() -> bool:
 
 
 def run_bash(command: str, timeout: int = 30) -> str:
-    """Execute a command after BashSecurityGate validation.
-
-    Default: argv list via shlex.split (no shell). Production/server denies Bash
-    unless SWARM_ALLOW_BASH=1. SWARM_ALLOW_UNSAFE_BASH=1 restores shell=True.
-    """
+    """Execute a command after BashSecurityGate validation and optional HITL."""
     if bash_denied():
         return (
             "BLOCKED by execution policy: Bash is disabled in server/production. "
@@ -55,6 +56,18 @@ def run_bash(command: str, timeout: int = 30) -> str:
     safe, reason = BashSecurityGate.validate(command)
     if not safe:
         return f"BLOCKED by BashSecurityGate: {reason}"
+
+    if hitl_bash_enabled():
+        approval_id, decision = get_approval_gate().request_bash_approval(
+            command=command,
+            run_id=current_run_id(),
+        )
+        if decision != "approved":
+            return (
+                f"BLOCKED by HITL: Bash approval {approval_id} "
+                f"status={decision}. Use `swarm approve {approval_id}` to allow."
+            )
+
     try:
         if allow_shell_true():
             result = subprocess.run(
@@ -96,7 +109,8 @@ registry.register(
     schema={
         "description": (
             "Execute a shell command. Commands are validated by BashSecurityGate "
-            "and an explicit execution policy before execution."
+            "and an explicit execution policy before execution. Side-effecting "
+            "calls may require human approval when HITL is enabled."
         ),
         "input_schema": {
             "type": "object",

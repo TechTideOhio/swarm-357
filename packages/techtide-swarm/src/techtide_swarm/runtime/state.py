@@ -86,6 +86,7 @@ class RunState(BaseModel):
     spent_usd: float = 0.0
     layer: str | None = None
     simulate: bool = False
+    cancel_requested: bool = False
     parent_run_id: str | None = None
     roles: list[str] = Field(default_factory=list)
     steps: list[StepState] = Field(default_factory=list)

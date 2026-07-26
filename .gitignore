@@ -64,6 +64,11 @@ evals/results/
 !.github/workflows/
 !.github/workflows/**
 !.github/dependabot.yml
+!.github/CODEOWNERS
 .planning/
 .repos and items/
 .ui_landin_sample/
+
+.coverage
+**/coverage.xml
+htmlcov/

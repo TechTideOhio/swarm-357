@@ -71,7 +71,7 @@ Numbers below come from [`evals/baselines/latest.json`](evals/baselines/latest.j
 | Spend | $4.9915 / $5.00 |
 | Provider | `openrouter` |
 | Agent model | `anthropic/claude-sonnet-4` |
-| Single-agent pass | 141/142 |
+| Single-agent pass | 142/142 |
 | Swarm pass | 4/12 |
 
 **Caveat:** swarm pipeline runs can hit 150–180s wall-clock timeouts on OpenRouter. Single-agent + tools is the production demo path. Scoring: keyword gate + optional Haiku judge (`0.55·kw + 0.45·llm`), hard `$5` budget, checkpoint/resume, regression compare.
@@ -127,9 +127,9 @@ flowchart LR
 
 **Business-layer ontology** — Six domain layers + management meta-agents model a real org chart, not ad-hoc agent graphs.
 
-**Layered cost controls** — Per-agent budget caps during `Agent.run()`, per-layer daily limits, automatic model downgrade at 80% utilization.
+**Layered cost controls** — Per-agent budget caps during `Agent.run()`, per-layer daily limits, and an **explicit logged** model downgrade to Haiku at 80% layer utilization (`model_downgrade` telemetry). Separate from OpenRouter mapping: opus/sonnet are never silently remapped to Haiku unless `SWARM_OPENROUTER_CHEAP=1`.
 
-**BashSecurityGate** — 13-pattern regex validator on the `Bash` tool. Blocks destructive commands and secret exfiltration. 50+ tests.
+**BashSecurityGate** — 13-pattern regex validator on the `Bash` tool. Blocks destructive commands and secret exfiltration. 33 scenario cases across the gate test suite (pattern-based, not an OS sandbox).
 
 **Tool-call resilience** — `input_normalize` coerces common LLM argument aliases (`file_path` → `path`, etc.) so demos do not die on schema drift.
 
@@ -146,7 +146,7 @@ See [STATUS.md](STATUS.md). Summary:
 | Cost controls | Beta |
 | Eval harness | Beta |
 | HTTP API | Beta |
-| Dream cycle | Alpha |
+| Dream cycle | Experimental |
 
 ## Why Not [X]?
 
