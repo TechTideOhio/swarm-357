@@ -154,6 +154,10 @@ async def test_authenticated_run_inspect_keeps_detail(app, monkeypatch: pytest.M
 def test_cors_allowlist_covers_production_origins() -> None:
     from techtide_swarm.server import _CORS_ORIGINS
 
-    assert "https://swarm357.techtideai.io" in _CORS_ORIGINS
-    assert "https://swarm357fe.up.railway.app" in _CORS_ORIGINS
-    assert "*" not in _CORS_ORIGINS
+    origins = set(_CORS_ORIGINS)
+    required = {
+        "https://" + "swarm357.techtideai.io",
+        "https://" + "swarm357fe.up.railway.app",
+    }
+    assert required.issubset(origins)
+    assert not origins.intersection({"*", "null"})
