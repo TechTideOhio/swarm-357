@@ -33,6 +33,7 @@ flowchart TB
 ## Contents
 
 - [Install](#install)
+- [Container image](#container-image)
 - [About](#about)
 - [What 357 agents means](#what-357-agents-means)
 - [What this does](#what-this-does)
@@ -70,6 +71,33 @@ swarm demo
 `swarm demo` works with or without an API key. Without a key it prints an architecture overview and an explicitly labeled stub. With `ANTHROPIC_API_KEY` or an OpenRouter key it runs a live agent. There is no silent success path.
 
 **Documentation:** https://swarm357fe.up.railway.app/docs covers guides, the API reference, evals, the changelog, and the full roster.
+
+## Container image
+
+The HTTP API is published to GitHub Container Registry for `linux/amd64` and `linux/arm64`.
+
+```bash
+docker run --rm -p 8000:8000 \
+  -e ANTHROPIC_API_KEY=sk-ant-... \
+  ghcr.io/techtideohio/swarm-357:latest
+curl http://127.0.0.1:8000/api/health
+```
+
+| Tag | Points at |
+|-----|-----------|
+| `latest` | Most recent version tag |
+| `0.2.2`, `0.2` | Exact and minor version series |
+| `edge` | Current `main`, rebuilt on every push |
+| `sha-<commit>` | A specific commit |
+
+Images carry build provenance attestations, verifiable with the GitHub CLI:
+
+```bash
+gh attestation verify oci://ghcr.io/techtideohio/swarm-357:latest \
+  --repo TechTideOhio/swarm-357
+```
+
+Set `SWARM_API_KEY` and `SWARM_REQUIRE_AUTH=1` before exposing the container beyond localhost. See [Required environment](#required-environment).
 
 ## About
 
