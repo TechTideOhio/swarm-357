@@ -16,7 +16,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from techtide_swarm.http_security import max_run_budget_usd, require_swarm_write_key
+from techtide_swarm.http_security import (
+    max_run_budget_usd,
+    optional_swarm_write_key,
+    require_swarm_write_key,
+)
 from techtide_swarm.llm import resolve_api_key, resolved_model_info
 from techtide_swarm.paths import resolve_config_path
 from techtide_swarm.rate_limit import SwarmRateLimitMiddleware
@@ -41,13 +45,8 @@ _EXTRA_ORIGINS = [
 _CORS_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "https://swarm357.techtideai.io",
     "https://swarm357fe.up.railway.app",
-    "https://swarm357.com",
-    "https://www.swarm357.com",
-    "https://swarm357.techtide.ai",
-    "https://www.swarm357.techtide.ai",
-    "https://techtide.ai",
-    "https://www.techtide.ai",
     *_EXTRA_ORIGINS,
 ]
 
@@ -56,6 +55,47 @@ _CORS_ORIGINS = [
 def default_config_path() -> Path:
     """Resolve swarm config via unified path search (env, project, Docker, bundled)."""
     return resolve_config_path()
+
+
+# Run records carry the operator's task text and the model's output. Those are
+# business content, so unauthenticated callers get metrics only. Anything not
+# listed here is dropped rather than redacted, so a new field cannot leak by
+# being forgotten.
+_PUBLIC_RUN_FIELDS = frozenset({
+    "run_id",
+    "type",
+    "status",
+    "layer",
+    "simulate",
+    "agent_name",
+    "agent",
+    "model",
+    "cost_usd",
+    "spent_usd",
+    "budget_usd",
+    "latency_ms",
+    "duration_ms",
+    "timestamp",
+    "created_at",
+    "updated_at",
+})
+
+
+def _redact_run(run: dict[str, Any]) -> dict[str, Any]:
+    """Strip task text, outputs, and errors from a public run record."""
+    public = {k: v for k, v in run.items() if k in _PUBLIC_RUN_FIELDS}
+    public["redacted"] = True
+    return public
+
+
+def _redact_run_state(state: dict[str, Any]) -> dict[str, Any]:
+    """Public view of an inspected run: shape and counters, no content."""
+    public = {k: v for k, v in state.items() if k in _PUBLIC_RUN_FIELDS}
+    public["steps"] = len(state.get("steps") or [])
+    public["approvals"] = len(state.get("approvals") or [])
+    public["roles"] = len(state.get("roles") or [])
+    public["redacted"] = True
+    return public
 
 
 def _auth_required() -> bool:
@@ -200,18 +240,24 @@ def create_app(config_path: Path | None = None) -> FastAPI:
     # ── Routes ───────────────────────────────────────────────────────────────
 
     @app.get("/api/health")
-    async def health() -> dict[str, Any]:
+    async def health(
+        privileged: Annotated[bool, Depends(optional_swarm_write_key)],
+    ) -> dict[str, Any]:
         from techtide_swarm import __version__ as _pkg_version
 
-        return {
+        # Public probe stays minimal. Provider, model routing, and filesystem
+        # layout are reconnaissance material, so they need the write key.
+        payload: dict[str, Any] = {
             "status": "ok",
             "version": _pkg_version,
             "agents": len(_get_roster()),
-            "api_key_set": bool(resolve_api_key()),
             "auth_required": _auth_required(),
-            "model": resolved_model_info("sonnet"),
-            "config_path": str(cfg),
         }
+        if privileged:
+            payload["api_key_set"] = bool(resolve_api_key())
+            payload["model"] = resolved_model_info("sonnet")
+            payload["config_path"] = str(cfg)
+        return payload
 
     @app.get("/api/swarm/status")
     async def swarm_status() -> dict[str, Any]:
@@ -278,18 +324,29 @@ def create_app(config_path: Path | None = None) -> FastAPI:
         }
 
     @app.get("/api/swarm/runs")
-    async def swarm_runs(limit: int = 10) -> dict[str, Any]:
+    async def swarm_runs(
+        privileged: Annotated[bool, Depends(optional_swarm_write_key)],
+        limit: int = 10,
+    ) -> dict[str, Any]:
         from techtide_swarm.telemetry import get_recent_runs
-        runs = get_recent_runs(limit=limit)
-        return {"runs": runs, "total": len(runs)}
+        runs = get_recent_runs(limit=max(1, min(limit, 100)))
+        if not privileged:
+            runs = [_redact_run(r) for r in runs]
+        return {"runs": runs, "total": len(runs), "redacted": not privileged}
 
     @app.get("/api/swarm/runs/{run_id}")
-    async def swarm_run_inspect(run_id: str) -> dict[str, Any]:
+    async def swarm_run_inspect(
+        run_id: str,
+        privileged: Annotated[bool, Depends(optional_swarm_write_key)],
+    ) -> dict[str, Any]:
         swarm = _swarm_or_503(cfg)
         state = swarm.inspect_run(run_id)
         if state is None:
             raise HTTPException(status_code=404, detail=f"Run not found: {run_id}")
-        return cast("dict[str, Any]", state.model_dump(mode="json"))
+        dumped = cast("dict[str, Any]", state.model_dump(mode="json"))
+        if not privileged:
+            return _redact_run_state(dumped)
+        return dumped
 
     @app.post("/api/swarm/runs/{run_id}/resume")
     async def swarm_run_resume(

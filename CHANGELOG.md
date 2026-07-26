@@ -112,5 +112,5 @@ v0.2.0 public docs/CI badges still referenced scrubbed paths (`.github` workflow
 
 ### Changed
 
-- Landing: `NEXT_PUBLIC_SWARM_WRITE_KEY` documented for protected POST demos; Live Numbers links to `/api/health`.
+- Landing: `NEXT_PUBLIC_SWARM_WRITE_KEY` documented for protected POST demos; Live Numbers links to `/api/health`. **Superseded in 0.2.1**: demo writes go through a same-origin BFF with a server-only `SWARM_API_KEY`. Do not use a `NEXT_PUBLIC_` write key.
 - GitHub links updated to `TechTideOhio/swarm-357`.

@@ -1,0 +1,26 @@
+# file: .gitleaks.toml
+# description: Secret scanning config with allowlists for documented placeholders
+# reference: .github/workflows/ci.yml, .env.example
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = """
+Historical .env.example placeholder. The value is the base64 of the public JWT
+header {"alg":"HS256","typ":"JWT"} followed by an ellipsis: no payload, no
+signature, no secret. Replaced with `replace-me` in current revisions.
+"""
+commits = ["7556f22b2086328a748b5f5882036eae2cf648d9"]
+paths = ['''^\.env\.example$''']
+
+[[allowlists]]
+description = "Documented placeholder values in the tracked example env file"
+paths = ['''^\.env\.example$''']
+regexes = [
+  '''replace-me''',
+  '''sk-ant-\.\.\.''',
+  '''sk-or-v1-\.\.\.''',
+  '''xxxx''',
+  '''your-project''',
+]

@@ -23,6 +23,10 @@ We aim to acknowledge reports within 72 hours and provide a remediation timeline
 | Control | Behavior |
 |---------|----------|
 | HTTP write auth | When `SWARM_API_KEY` is set, POST routes require `X-SWARM-API-KEY` |
+| Read redaction | Unauthenticated `GET /api/swarm/runs` and `GET /api/swarm/runs/{id}` return counters and status only. Task text, outputs, errors, and step detail require the write key |
+| Health disclosure | Public `/api/health` returns `status`, `version`, `agents`, `auth_required`. Provider, model routing, and config path require the write key |
+| CORS | Fail-closed allowlist, never `*`. Extend with `ALLOWED_ORIGINS` |
+| Outbound SSRF guard | The `Scrape` tool rejects non-HTTP schemes and any host resolving to loopback, private, link-local, reserved, multicast, or unspecified addresses, and re-validates every redirect hop |
 | Rate limiting | Per-IP sliding window via `SWARM_RATE_LIMIT_PER_MINUTE` (`0` disables) |
 | Run budget cap | Request `budget_usd` capped by `SWARM_MAX_RUN_BUDGET_USD` |
 | BashSecurityGate | 13-pattern regex validator on the `Bash` tool - blocks destructive and exfiltration-shaped commands |
@@ -37,6 +41,9 @@ We aim to acknowledge reports within 72 hours and provide a remediation timeline
 - BashSecurityGate is **pattern-based**, not a sandboxed OS. Do not treat it as a container or seccomp jail.
 - API key auth is a **shared secret**, not multi-tenant IAM / SSO.
 - Agents that can call external tools inherit those tools' trust boundaries (Exa, Firecrawl, MCP servers).
+- The SSRF guard resolves DNS before the request and again inside the HTTP client, so it does not fully defeat DNS rebinding. Run the API with egress restrictions if that is in your threat model.
+- The Firecrawl and Exa scrape backends fetch through a third party. URL validation still applies, but the outbound request itself leaves their infrastructure, not yours.
+- Supabase migrations ship without row level security. `SUPABASE_SERVICE_KEY` is a service-role secret for a single-tenant server; do not place it in a client bundle or expose the database directly to browsers.
 - Eval and demo deployments should keep `SWARM_API_KEY` set and CORS origins restricted.
 
 ## Disclosure preference

@@ -43,8 +43,16 @@ See [VERIFY.md](VERIFY.md) for the full scorecard.
 - Deploy from `TechTideOhio/swarm-357-site` (Railway root = repo root).
 - Build: `bun install && bun run build` (or `npm ci && npm run build`).
 - Env: `NEXT_PUBLIC_API_URL=https://swarm357be.up.railway.app`
-- Backend CORS: `ALLOWED_ORIGINS=https://swarm357fe.up.railway.app` (plus any custom domains).
-- If the API uses `SWARM_API_KEY`, set `NEXT_PUBLIC_SWARM_WRITE_KEY` to the **same** value only if you want the “Try it live” hero form to call POST `/api/swarm/run` from the browser (prefer restricting demo POSTs or using a server-side proxy in production).
+- Backend CORS: `ALLOWED_ORIGINS=https://swarm357.techtideai.io,https://swarm357fe.up.railway.app` (plus any other custom domains).
+- Demo writes: the site proxies POST `/api/swarm/run` through its own same-origin route and attaches the write key server side. Set `SWARM_API_KEY` on the **site** service as a runtime-only variable with the same value as the API. Never expose a write key as `NEXT_PUBLIC_*`; anything with that prefix is inlined into the client bundle at build time.
+
+### Build-time versus runtime variables
+
+| Variable | Where it is needed | Notes |
+|----------|--------------------|-------|
+| `NEXT_PUBLIC_API_URL` | Build and runtime | Inlined into the client bundle. Public value only. |
+| `NEXT_PUBLIC_SITE_URL` | Build and runtime | Inlined into the client bundle. Public value only. |
+| `SWARM_API_KEY` | Runtime only | Read by the server route on each request. Mark it as not available during build so it never reaches the bundler or build logs. |
 
 ## Go-live checklist
 

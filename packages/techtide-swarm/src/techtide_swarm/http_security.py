@@ -45,6 +45,20 @@ def require_swarm_write_key(x_swarm_api_key: str | None = Header(default=None)) 
     return True
 
 
+def optional_swarm_write_key(x_swarm_api_key: str | None = Header(default=None)) -> bool:
+    """True when the caller presented the write key. Never raises.
+
+    Read routes stay open so the public site can render live counts, but they
+    use this to decide whether the caller may see run contents.
+    """
+    expected = os.getenv("SWARM_API_KEY", "").strip()
+    if not expected:
+        # No key configured means no privileged tier exists; outside production
+        # this is a local dev box, so treat callers as trusted.
+        return not _is_production()
+    return hmac.compare_digest((x_swarm_api_key or "").strip(), expected)
+
+
 def max_run_budget_usd() -> float:
     """Upper bound for POST /api/swarm/run budget_usd (abuse protection)."""
     raw = os.getenv("SWARM_MAX_RUN_BUDGET_USD", "500").strip()
