@@ -32,7 +32,7 @@ def resolve_soul_path(soul: str) -> Path | None:
 
     candidates = [
         Path.cwd() / soul,
-        _PKG_DIR.parent.parent.parent.parent / soul,  # Apps/swarm357 when editable
+        _PKG_DIR.parent.parent.parent.parent / soul,  # repo root when installed editable
         _PKG_DIR.parent.parent.parent / soul,
         _DATA_DIR / soul.removeprefix("templates/"),
         _DATA_DIR / "soul" / Path(soul).name,

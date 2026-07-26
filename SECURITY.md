@@ -25,7 +25,7 @@ We aim to acknowledge reports within 72 hours and provide a remediation timeline
 | HTTP write auth | When `SWARM_API_KEY` is set, POST routes require `X-SWARM-API-KEY` |
 | Rate limiting | Per-IP sliding window via `SWARM_RATE_LIMIT_PER_MINUTE` (`0` disables) |
 | Run budget cap | Request `budget_usd` capped by `SWARM_MAX_RUN_BUDGET_USD` |
-| BashSecurityGate | 13-pattern regex validator on the `Bash` tool — blocks destructive and exfiltration-shaped commands |
+| BashSecurityGate | 13-pattern regex validator on the `Bash` tool - blocks destructive and exfiltration-shaped commands |
 | Bash HITL | When Bash is enabled, `SWARM_HITL_BASH` (default on in server/production) requires approve/reject before execution |
 | Write sandbox | Workspace root confinement for Read/Write (CWD by default; `SWARM_UNSAFE_FS=1` opt-out) |
 | File deny-list | Path deny patterns in file ops |
