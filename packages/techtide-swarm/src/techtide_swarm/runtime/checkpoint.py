@@ -36,10 +36,15 @@ class SqliteCheckpointStore(CheckpointStore):
     def __init__(self, db_path: str | Path | None = None) -> None:
         if db_path is None:
             root = Path(os.getenv("SWARM_CHECKPOINT_DIR", ".swarm"))
-            root.mkdir(parents=True, exist_ok=True)
             db_path = root / "checkpoints.db"
         self.db_path = Path(db_path)
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            # Non-writable CWD (e.g. Docker USER without /app write) — fall back to /tmp
+            fallback = Path(os.getenv("TMPDIR", "/tmp")) / "swarm357" / "checkpoints.db"
+            fallback.parent.mkdir(parents=True, exist_ok=True)
+            self.db_path = fallback
         self._init_db()
 
     def _connect(self) -> sqlite3.Connection:

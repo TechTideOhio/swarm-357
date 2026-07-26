@@ -29,8 +29,11 @@ COPY --from=builder /install /usr/local
 COPY --from=builder /build/config ./config
 COPY --from=builder /build/templates ./templates
 
-# Create a non-root user
-RUN adduser --disabled-password --gecos "" swarm
+# Create a non-root user with a writable runtime directory
+RUN adduser --disabled-password --gecos "" swarm \
+    && mkdir -p /app/.swarm /tmp/swarm357 \
+    && chown -R swarm:swarm /app/.swarm /tmp/swarm357
+ENV SWARM_CHECKPOINT_DIR=/app/.swarm
 USER swarm
 
 # Expose the API port
