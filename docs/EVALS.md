@@ -1,6 +1,8 @@
 # Eval harness
 
-Swarm 357 ships a budgeted evaluation suite under [`evals/`](../evals/). Numbers in this document are generated from [`evals/baselines/latest.json`](../evals/baselines/latest.json) via [`scripts/render_eval_assets.py`](../scripts/render_eval_assets.py) — do not hand-edit metrics.
+> **Hosted docs:** https://swarm357fe.up.railway.app/docs/evals/methodology
+
+Swarm 357 ships a budgeted evaluation suite under [`evals/`](../evals/). Numbers in this document are generated from [`evals/baselines/latest.json`](../evals/baselines/latest.json) via [`scripts/render_eval_assets.py`](../scripts/render_eval_assets.py) - do not hand-edit metrics.
 
 ## Methodology
 

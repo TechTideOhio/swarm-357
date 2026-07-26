@@ -44,7 +44,9 @@ pip install -e "packages/techtide-swarm[dev]"
 swarm demo
 ```
 
-`swarm demo` works with or without an API key — architecture overview + stub without a key; live agent when `ANTHROPIC_API_KEY` (or OpenRouter) is set.
+`swarm demo` works with or without an API key - architecture overview + stub without a key; live agent when `ANTHROPIC_API_KEY` (or OpenRouter) is set.
+
+**Documentation:** https://swarm357fe.up.railway.app/docs (full guides, API reference, evals, changelog, and roster).
 
 ## About
 
@@ -58,7 +60,7 @@ Built by [TechTide AI](https://techtide.ai) for Claude Code–native workflows. 
 
 ## Evals
 
-Numbers below come from [`evals/baselines/latest.json`](evals/baselines/latest.json) via [`scripts/render_eval_assets.py`](scripts/render_eval_assets.py). Full write-up: [docs/EVALS.md](docs/EVALS.md).
+Numbers below come from [`evals/baselines/latest.json`](evals/baselines/latest.json) via [`scripts/render_eval_assets.py`](scripts/render_eval_assets.py). Full write-up: [docs/EVALS.md](docs/EVALS.md) and the hosted [eval methodology](https://swarm357fe.up.railway.app/docs/evals/methodology) page.
 
 ![Eval results by layer](https://raw.githubusercontent.com/TechTideOhio/swarm-357/main/docs/assets/eval-results.png)
 
