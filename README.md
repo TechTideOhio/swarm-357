@@ -147,7 +147,7 @@ Built by [TechTide AI](https://techtide.ai) for Claude Code native workflows, an
 |-------|-----------|------|
 | Language | [Python 3.10+](https://www.python.org/downloads/) | Package, CLI, and server |
 | Validation | [Pydantic v2](https://docs.pydantic.dev/) | `AgentConfig`, payloads, and roster schemas |
-| HTTP | [FastAPI](https://fastapi.tiangolo.com/) with [Uvicorn](https://www.uvicorn.org/) | `swarm serve`, SSE event stream |
+| HTTP | [FastAPI](https://fastapi.tiangolo.com/) with [Uvicorn](https://uvicorn.dev/) | `swarm serve`, SSE event stream |
 | Persistence | [SQLite](https://www.sqlite.org/docs.html) | Durable run checkpoints for inspect, resume, and fork |
 | Memory | [memvid-core](https://crates.io/crates/memvid-core) via a [Rust](https://www.rust-lang.org/) bridge | Single-file `.mv2` stores with WAL, lexical and vector indexes |
 | Models | [Anthropic Claude](https://docs.anthropic.com/), optionally [OpenRouter](https://openrouter.ai/docs) | Default provider and the provider used for eval baselines |
