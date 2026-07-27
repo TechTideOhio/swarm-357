@@ -5,7 +5,9 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/TechTideOhio/swarm-357/blob/main/LICENSE)
 [![CI](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci.yml/badge.svg)](https://github.com/TechTideOhio/swarm-357/actions/workflows/ci.yml)
 
-Python package for **Swarm 357**: layered orchestration of 357 Claude agent roles across six business layers, portable Memvid memory, cost controls, and a FastAPI HTTP surface.
+**A Python multi-agent orchestration framework for Claude agents.** Swarm 357 is an agent runtime built around a 357-role catalog spanning six business layers, with portable agent memory, enforced LLM cost control, human-in-the-loop approvals on shell commands, durable checkpoints, and a FastAPI HTTP surface.
+
+**[Documentation](https://swarm357.techtideai.io/docs)** · **[Quickstart](https://swarm357.techtideai.io/docs/getting-started/quickstart)** · **[Engineering blog](https://swarm357.techtideai.io/blog)** · **[Source](https://github.com/TechTideOhio/swarm-357)**
 
 ## Install
 

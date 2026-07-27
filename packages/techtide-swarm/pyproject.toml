@@ -5,22 +5,44 @@ build-backend = "hatchling.build"
 [project]
 name = "techtide-swarm"
 version = "0.2.2"
-description = "TechTide Swarm 357 - layered orchestration, durable memory bridge, and observability hooks."
+description = "Python multi-agent orchestration framework: a 357-role Claude agent catalog across six business layers, with portable memory, enforced cost caps, and human-in-the-loop approvals."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 license-files = ["LICENSE"]
 authors = [{ name = "TechTide AI", email = "ai@techtide.ai" }]
-keywords = ["claude", "ai", "agents", "swarm", "anthropic", "llm", "orchestration", "multi-agent", "ai-agents"]
+keywords = [
+  "agents",
+  "ai",
+  "ai-agents",
+  "agent-framework",
+  "agent-memory",
+  "agent-orchestration",
+  "agentic-ai",
+  "anthropic",
+  "autonomous-agents",
+  "claude",
+  "cost-control",
+  "fastapi",
+  "human-in-the-loop",
+  "llm",
+  "llmops",
+  "multi-agent",
+  "orchestration",
+  "swarm",
+]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
+  "Intended Audience :: System Administrators",
   "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Framework :: FastAPI",
   "Topic :: Software Development :: Libraries :: Application Frameworks",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
@@ -54,11 +76,12 @@ supabase = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/TechTideOhio/swarm-357"
+Homepage = "https://swarm357.techtideai.io"
+Documentation = "https://swarm357.techtideai.io/docs"
 Repository = "https://github.com/TechTideOhio/swarm-357"
-Documentation = "https://github.com/TechTideOhio/swarm-357/blob/main/docs/EVALS.md"
-Changelog = "https://github.com/TechTideOhio/swarm-357/blob/main/CHANGELOG.md"
-"Bug Tracker" = "https://github.com/TechTideOhio/swarm-357/issues"
+Changelog = "https://swarm357.techtideai.io/changelog"
+Issues = "https://github.com/TechTideOhio/swarm-357/issues"
+Blog = "https://swarm357.techtideai.io/blog"
 
 [project.scripts]
 swarm = "techtide_swarm.cli:main"

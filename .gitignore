@@ -57,14 +57,19 @@ evals/results/
 # ---------------------------------------------------------------------------
 # Permanently excluded from this public mirror (do not re-add)
 # Scrubbed from history 2026-07-24 — keep local copies only outside this repo
-# Approved exception: .github/workflows/ only (CI + publish). Other .github/*
-# content stays banned. Landing lives in TechTideOhio/swarm-357-site.
+# Approved exceptions only, listed one by one below: CI and publish workflows,
+# plus the public issue and pull request templates GitHub reads for community
+# standards. Everything else under .github/* stays banned, including anything
+# internal. Landing lives in TechTideOhio/swarm-357-site.
 # ---------------------------------------------------------------------------
 .github/*
 !.github/workflows/
 !.github/workflows/**
 !.github/dependabot.yml
 !.github/CODEOWNERS
+!.github/PULL_REQUEST_TEMPLATE.md
+!.github/ISSUE_TEMPLATE/
+!.github/ISSUE_TEMPLATE/*.yml
 .planning/
 .repos and items/
 .ui_landin_sample/
