@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+title: "TechTide Swarm 357"
+message: "If you reference this software, please cite it using these metadata."
+type: software
+abstract: >-
+  A Python multi-agent orchestration framework for Claude agents, organised as a
+  357-role catalog across six business layers, with portable agent memory,
+  enforced LLM cost control, human-in-the-loop approvals on shell commands, and
+  durable checkpoints that can be resumed, cancelled, and replayed.
+authors:
+  - name: "TechTide AI"
+    website: "https://swarm357.techtideai.io"
+repository-code: "https://github.com/TechTideOhio/swarm-357"
+url: "https://swarm357.techtideai.io"
+license: Apache-2.0
+version: 0.2.2
+date-released: "2026-07-26"
+keywords:
+  - multi-agent orchestration
+  - AI agents
+  - agent framework
+  - agent memory
+  - LLM cost control
+  - human-in-the-loop
+  - Claude
+  - Python

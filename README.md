@@ -9,7 +9,9 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://pypi.org/project/techtide-swarm/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-Layered agent orchestration for business automation. 357 Claude agent roles across 6 business layers, backed by portable Memvid memory and honest cost controls.
+**A Python multi-agent orchestration framework for Claude agents.** Swarm 357 is an agent runtime organised as a 357-role catalog across 6 business layers, with portable agent memory, enforced LLM cost control, human-in-the-loop approvals on shell commands, and durable checkpoints you can resume, cancel, and replay.
+
+It is an organisational ontology for AI agents, not 357 models running at once. Roles are the unit of design; the runtime decides which ones actually execute.
 
 **[Live site](https://swarm357.techtideai.io)** · **[Documentation](https://swarm357.techtideai.io/docs)** · **[Blog](https://swarm357.techtideai.io/blog)** · **[PyPI](https://pypi.org/project/techtide-swarm/)** · **[Maturity matrix](STATUS.md)** · **[Security model](SECURITY.md)** · **[Landing repo](https://github.com/TechTideOhio/swarm-357-site)**
 

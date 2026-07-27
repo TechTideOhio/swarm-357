@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://swarm357.techtideai.io/docs
+    about: Guides, CLI reference, HTTP API, and the security model.
+  - name: Security vulnerability
+    url: https://github.com/TechTideOhio/swarm-357/security/advisories/new
+    about: Report privately. Do not open a public issue for a vulnerability.
+  - name: Maturity matrix
+    url: https://github.com/TechTideOhio/swarm-357/blob/main/STATUS.md
+    about: Check whether the subsystem you hit is shipped, beta, or experimental.
