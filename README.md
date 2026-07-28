@@ -110,7 +110,7 @@ Swarm 357 is an organizational ontology for agents. It is not a claim that 357 O
 
 The design starts from the parts that break agent demos once real money and real filesystems are involved. Budgets are enforced per agent and per layer, with a logged downgrade rather than a silent one. Bash is policy-gated and denied outright in server and production modes unless explicitly enabled. Memory is a file you can copy, inspect, and verify rather than a managed service you rent. Runs checkpoint to SQLite so `inspect`, `resume`, `cancel`, `replay`, and `fork` mean something after a process dies.
 
-Built by [TechTide AI](https://techtide.ai) for Claude Code native workflows, and used on the studio's own production automation before anything ships here. The runtime is open core under Apache-2.0. The product surface lives in a separate repository, [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site), so the two release on independent trains. A longer version of this section, with linked stack and eval evidence, is published at [swarm357.techtideai.io/about](https://swarm357.techtideai.io/about).
+Built by [TechTide AI](https://techtideai.io) and created by [Alex Cinovoj](https://alexcinovoj.com) for Claude Code native workflows, and used on the studio's own production automation before anything ships here. The runtime is open core under Apache-2.0. The product surface lives in a separate repository, [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site), so the two release on independent trains. A longer version of this section, with linked stack and eval evidence, is published at [swarm357.techtideai.io/about](https://swarm357.techtideai.io/about).
 
 ## What 357 agents means
 
@@ -335,6 +335,11 @@ See [docs/DEPLOY_RAILWAY.md](docs/DEPLOY_RAILWAY.md).
 ## Releases
 
 Current version is 0.2.2, which closes the remaining critique gaps from 0.2.1: real Bash HITL, SSE auth with `stream.end`, durable cancel, a gold `CLAUDE.md`, and CI security gates. Full history, including the 0.2.1 correction, is in [CHANGELOG.md](CHANGELOG.md). The cut, protect, and publish procedure is in [RELEASE.md](RELEASE.md).
+
+## Contributors
+
+- [Alex Cinovoj (@Alexi5000)](https://github.com/Alexi5000)
+- [Sakshar Dhawan (@sakshar2303)](https://github.com/sakshar2303)
 
 ## License
 
