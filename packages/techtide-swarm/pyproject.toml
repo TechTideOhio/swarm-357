@@ -65,7 +65,7 @@ dev = [
   "mypy>=1.13",
   "types-PyYAML>=6.0",
   "build>=1.0",
-  "twine>=5.0",
+  "twine>=7.0.0",
 ]
 web = [
   "exa-py>=1.0",
