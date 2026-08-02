@@ -69,7 +69,7 @@ dev = [
 ]
 web = [
   "exa-py>=1.0",
-  "firecrawl-py>=0.0.20",
+  "firecrawl-py>=4.33.1",
 ]
 supabase = [
   "supabase>=2.0",
