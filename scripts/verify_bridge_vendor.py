@@ -9,6 +9,9 @@ ROOT = Path(__file__).resolve().parents[1]
 VENDOR = ROOT / "packages/memvid-swarm-bridge/vendor"
 CHANGES = {
     "memvid-core": {
+        '[dependencies.calamine]\nversion = "0.22"': '[dependencies.calamine]\nversion = "0.37"',
+        '[dependencies.quick-xml]\nversion = "0.31"': '[dependencies.quick-xml]\nversion = "0.42"',
+        '[dependencies.zip]\nversion = "7.1"': '[dependencies.zip]\nversion = "9.0.5"',
         '[dependencies.lopdf]\nversion = "0.39"': '[dependencies.lopdf]\nversion = "0.42"',
         '[dependencies.pdf-extract]\nversion = "0.10"': '[dependencies.pdf-extract]\nversion = "0.12.1"',
     },
@@ -20,6 +23,7 @@ OMITTED = {"Cargo.lock", ".cargo_vcs_info.json"}
 
 
 def main():
+    source_patches = json.loads((VENDOR / "source-patches.json").read_text())
     for entry in json.loads((VENDOR / "provenance.json").read_text()):
         name = entry["crate"] + "-" + entry["version"]
         with urllib.request.urlopen(entry["download"], timeout=60) as response:
@@ -52,6 +56,13 @@ def main():
                         raise ValueError("Unexpected upstream synthetic key fixture")
                     content = content.replace(before, after)
                 local = VENDOR / name / relative
+                patch = source_patches.get(f"{name}/{relative}")
+                if patch is not None:
+                    if hashlib.sha256(content).hexdigest() != patch["upstream_sha256"]:
+                        raise ValueError(f"Unexpected upstream source: {name}/{relative}")
+                    if local.is_symlink() or not local.is_file() or hashlib.sha256(local.read_bytes()).hexdigest() != patch["patched_sha256"]:
+                        raise ValueError(f"Unexpected migrated reader: {name}/{relative}")
+                    continue
                 if local.is_symlink() or not local.is_file() or local.read_bytes() != content:
                     raise ValueError(f"Unexpected vendor change: {name}/{relative}")
         actual = {p.relative_to(VENDOR / name) for p in (VENDOR / name).rglob("*") if p.is_file() or p.is_symlink()}

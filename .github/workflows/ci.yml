@@ -105,6 +105,9 @@ jobs:
       - name: Cargo clippy
         working-directory: packages/memvid-swarm-bridge
         run: cargo clippy -- -D warnings
+      - name: Document reader metadata regressions
+        working-directory: packages/memvid-swarm-bridge
+        run: cargo test --locked --test document_readers
       - name: Cargo build memvid-swarm-bridge
         working-directory: packages/memvid-swarm-bridge
         run: cargo build
@@ -195,6 +198,19 @@ jobs:
           docker run --rm -v "$PWD:/repo" -w /repo
           zricethezav/gitleaks:v8.30.1
           git /repo --config /repo/.gitleaks.toml --redact --no-banner --exit-code 1
+
+  rust-dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
+        with:
+          toolchain: stable
+      - name: Install pinned Rust audit tool
+        run: cargo install cargo-audit --version 0.22.2 --locked
+      - name: Audit Rust dependencies
+        working-directory: packages/memvid-swarm-bridge
+        run: cargo audit
 
   dependency-audit:
     runs-on: ubuntu-latest

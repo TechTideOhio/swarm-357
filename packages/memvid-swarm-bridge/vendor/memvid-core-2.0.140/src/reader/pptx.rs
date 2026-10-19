@@ -46,7 +46,7 @@ impl PptxReader {
                 out.push_str("\n\n");
             }
             out.push_str(&format!("Slide {}:\n", idx + 1));
-            out.push_str(&extract_plain_text(xml, b"p"));
+            out.push_str(&extract_plain_text(xml, "p"));
         }
 
         Ok(out.trim().to_string())
@@ -105,15 +105,25 @@ impl DocumentReader for PptxReader {
     }
 }
 
-fn extract_plain_text(xml: &str, block_suffix: &[u8]) -> String {
+fn extract_plain_text(xml: &str, block_suffix: &str) -> String {
     let mut reader = XmlReader::from_str(xml);
-    reader.trim_text(true);
     let mut buf = Vec::new();
     let mut text = String::new();
     let mut first_block = true;
+    let mut pending = String::new();
 
     loop {
-        match reader.read_event_into(&mut buf) {
+        let event = reader.read_event_into(&mut buf);
+        if !matches!(&event, Ok(Event::Text(_) | Event::GeneralRef(_))) {
+            if let Ok(content) = quick_xml::escape::unescape(&pending) {
+                if !content.trim().is_empty() {
+                    text.push_str(content.trim());
+                    text.push(' ');
+                }
+            }
+            pending.clear();
+        }
+        match event {
             Ok(Event::Start(e)) => {
                 if e.name().as_ref().ends_with(block_suffix) {
                     if !first_block {
@@ -122,13 +132,11 @@ fn extract_plain_text(xml: &str, block_suffix: &[u8]) -> String {
                     first_block = false;
                 }
             }
-            Ok(Event::Text(t)) => {
-                if let Ok(content) = t.unescape() {
-                    if !content.trim().is_empty() {
-                        text.push_str(content.trim());
-                        text.push(' ');
-                    }
-                }
+            Ok(Event::Text(t)) => pending.push_str(t.as_ref()),
+            Ok(Event::GeneralRef(reference)) => {
+                pending.push('&');
+                pending.push_str(reference.as_ref());
+                pending.push(';');
             }
             Ok(Event::Eof) => break,
             Err(_) => break,

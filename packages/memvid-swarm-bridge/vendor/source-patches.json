@@ -1,0 +1,22 @@
+{
+  "memvid-core-2.0.140/src/reader/docx.rs": {
+    "upstream_sha256": "6353ce5489da196e2669c04d3fbf71d26f8a8088fc2c29714a2f302a698e7f30",
+    "patched_sha256": "fc86ef5d2b66cea468c247ab36830a83a94a8fadc8acf6010b396789b3f6e185"
+  },
+  "memvid-core-2.0.140/src/reader/pptx.rs": {
+    "upstream_sha256": "88d1b35394cc4140dd7ff2d1233171f1595c8dae760d2d73b82609bbaccaac14",
+    "patched_sha256": "a645d05d64facad855f715d0e99ee6de2a0dd21507242d2ac2eae4dbdc78a827"
+  },
+  "memvid-core-2.0.140/src/reader/xls.rs": {
+    "upstream_sha256": "55c85a6c082b59fe962d67ffa0667273eb470f096a533f3c010412ee7cb008b2",
+    "patched_sha256": "71cf443e29ea8675d49baa1629bf5582f7821d6a84a157dbf910360c299f9d65"
+  },
+  "memvid-core-2.0.140/src/reader/xlsx.rs": {
+    "upstream_sha256": "61ec61100f37e04c19ab54b01da39f17b439f95d1fd042dc254d2f586d380053",
+    "patched_sha256": "2211ecb2da170e16e4c71d51f797cf58a6fbd4916aa8470d74095423e32262af"
+  },
+  "memvid-core-2.0.140/src/reader/xlsx_ooxml.rs": {
+    "upstream_sha256": "dbb2b55b1d7741d9e76ce203e3b233696594dba790a528ae3deee8d4b818c695",
+    "patched_sha256": "e9738419f50ea2631814db220a3d9a7f38acb7a88b82e3ad0e13f6c5078d0981"
+  }
+}

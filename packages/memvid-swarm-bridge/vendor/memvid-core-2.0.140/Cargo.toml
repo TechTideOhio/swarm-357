@@ -155,7 +155,7 @@ version = "1.5"
 optional = true
 
 [dependencies.calamine]
-version = "0.22"
+version = "0.37"
 
 [dependencies.candle-core]
 version = "0.9"
@@ -269,7 +269,7 @@ version = "0.8.28"
 optional = true
 
 [dependencies.quick-xml]
-version = "0.31"
+version = "0.42"
 
 [dependencies.rand]
 version = "0.8"
@@ -398,7 +398,7 @@ version = "1.7"
 optional = true
 
 [dependencies.zip]
-version = "7.1"
+version = "9.0.5"
 features = ["deflate"]
 default-features = false
 
