@@ -63,10 +63,8 @@ def _scrape_firecrawl(url: str) -> str:
     fc_mod = importlib.import_module("firecrawl")
     FirecrawlApp = cast(Any, getattr(fc_mod, "FirecrawlApp"))
     app = FirecrawlApp(api_key=os.environ["FIRECRAWL_API_KEY"])
-    result = app.scrape_url(url, formats=["markdown"])
-    if isinstance(result, dict):
-        return (result.get("markdown") or result.get("content") or "")[:_MAX_CHARS]
-    return str(result)[:_MAX_CHARS]
+    result = app.scrape(url, formats=["markdown"])
+    return (result.markdown or "")[:_MAX_CHARS]
 
 
 def _scrape_exa(url: str) -> str:

@@ -77,7 +77,9 @@ def test_bash_tool_allows_safe_commands():
     assert "BLOCKED" not in result
 
 
-def test_websearch_tool_identifies_as_stub():
+def test_websearch_tool_identifies_as_stub(monkeypatch):
+    monkeypatch.delenv("EXA_API_KEY", raising=False)
+    monkeypatch.delenv("FIRECRAWL_API_KEY", raising=False)
     result = execute_tool("web_search", {"query": "test query"})
     assert "stub" in result.lower()
 
