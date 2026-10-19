@@ -1,0 +1,18 @@
+[
+  {
+    "crate": "memvid-core",
+    "version": "2.0.140",
+    "registry_sha256": "c1d781d355751509b0a845a9203eb2db5a4e2b9750f193380439378a61080f85",
+    "download": "https://crates.io/api/v1/crates/memvid-core/2.0.140/download",
+    "changes": "Three dependency bounds in normalized Cargo.toml plus equivalent compile-time concatenation of synthetic PII test key; production Rust source unchanged",
+    "license_files_preserved": true
+  },
+  {
+    "crate": "tantivy",
+    "version": "0.25.0",
+    "registry_sha256": "502915c7381c5cb2d2781503962610cb880ad8f1a0ca95df1bae645d5ebf2545",
+    "download": "https://crates.io/api/v1/crates/tantivy/0.25.0/download",
+    "changes": "Only dependency bounds in normalized Cargo.toml; all Rust source unchanged",
+    "license_files_preserved": true
+  }
+]
