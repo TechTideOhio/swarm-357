@@ -41,11 +41,10 @@ def _search_exa(query: str, num_results: int) -> str:
     exa_mod = importlib.import_module("exa_py")
     Exa = cast(Any, getattr(exa_mod, "Exa"))
     client = Exa(api_key=os.environ["EXA_API_KEY"])
-    response = client.search_and_contents(
+    response = client.search(
         query,
         num_results=num_results,
-        use_autoprompt=True,
-        text={"max_characters": 1500},
+        contents={"text": {"max_characters": 1500}},
     )
     results: list[str] = []
     for i, r in enumerate(response.results, 1):
@@ -61,12 +60,12 @@ def _search_firecrawl(query: str, num_results: int) -> str:
     FirecrawlApp = cast(Any, getattr(fc_mod, "FirecrawlApp"))
     app = FirecrawlApp(api_key=os.environ["FIRECRAWL_API_KEY"])
     response = app.search(query, limit=num_results)
-    data = response if isinstance(response, list) else (response.get("data") or [])
+    data = response.web or []
     results: list[str] = []
     for i, item in enumerate(data[:num_results], 1):
-        title = item.get("title", "")
-        url = item.get("url", "")
-        snippet = (item.get("description") or item.get("markdown") or "")[:500]
+        title = item.title or ""
+        url = item.url or ""
+        snippet = (getattr(item, "description", None) or getattr(item, "markdown", None) or "")[:500]
         results.append(f"{i}. **{title}**\n   URL: {url}\n   {snippet}")
     return "\n\n".join(results) if results else "No results found."
 

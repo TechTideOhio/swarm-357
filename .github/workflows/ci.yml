@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install techtide-swarm
-        run: pip install -e "packages/techtide-swarm[dev]"
+        run: pip install -e "packages/techtide-swarm[dev,web]"
       - name: Ruff lint
         working-directory: packages/techtide-swarm
         run: ruff check src
