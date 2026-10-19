@@ -105,6 +105,9 @@ jobs:
       - name: Cargo clippy
         working-directory: packages/memvid-swarm-bridge
         run: cargo clippy -- -D warnings
+      - name: Document reader metadata regressions
+        working-directory: packages/memvid-swarm-bridge
+        run: cargo test --locked --test document_readers
       - name: Cargo build memvid-swarm-bridge
         working-directory: packages/memvid-swarm-bridge
         run: cargo build

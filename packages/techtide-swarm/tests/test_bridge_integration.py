@@ -1,6 +1,8 @@
 """Integration test: full put/search cycle via MemvidBridge (skipped if binary missing)."""
 
 import json
+import io
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -70,3 +72,53 @@ def test_pdf_extraction_survives_dependency_upgrade(tmp_path: Path):
     results = bridge.search("Orchard compatibility", top_k=5)
     assert "Orchard compatibility invoice" in json.dumps(results)
     assert isinstance(bridge.verify(deep=True), dict)
+
+
+def office_archive(files):
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w", zipfile.ZIP_DEFLATED) as archive:
+        for name, body in files.items():
+            archive.writestr(name, body)
+    return stream.getvalue()
+
+
+@pytest.mark.skipif(not bridge_available, reason=skip_reason)
+@pytest.mark.parametrize("extension,files", [
+    ("docx", {"word/document.xml": '<w:document xmlns:w="urn:word"><w:body><w:p><w:r><w:t>Orchard A&amp;B &#65;&#x42; &lt;C&gt;</w:t></w:r><w:r><w:t xml:space="preserve"> inline tail </w:t></w:r></w:p></w:body></w:document>'}),
+    ("pptx", {"ppt/slides/slide1.xml": '<p:sld xmlns:p="urn:presentation" xmlns:a="urn:drawing"><a:p><a:r><a:t>Orchard A&amp;B &#65;&#x42; &lt;C&gt;</a:t></a:r><a:r><a:t> inline tail </a:t></a:r></a:p></p:sld>'}),
+])
+def test_office_xml_entities(tmp_path: Path, extension, files):
+    bridge = MemvidBridge(tmp_path / f"{extension}.mv2")
+    bridge.create()
+    bridge.put(uri=f"file:///document.{extension}", title="Office document", body=office_archive(files))
+    results = json.dumps(bridge.search("Orchard", top_k=5))
+    assert "Orchard A&B AB <C> inline tail" in results
+
+
+@pytest.mark.skipif(not bridge_available, reason=skip_reason)
+def test_legacy_xls_values(tmp_path: Path):
+    bridge = MemvidBridge(tmp_path / "xls.mv2")
+    bridge.create()
+    bridge.put(uri="file:///ledger.xls", title="Legacy workbook", body=(Path(__file__).parent / "fixtures/reader-compat.xls").read_bytes())
+    results = json.dumps(bridge.search("Orchard", top_k=5))
+    for expected in ["1234.5", "true", "45292", "1.5"]:
+        assert expected in results
+
+
+@pytest.mark.skipif(not bridge_available, reason=skip_reason)
+def test_xlsx_values_and_metadata(tmp_path: Path):
+    files = {
+        "_rels/.rels": '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
+        "[Content_Types].xml": '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/></Types>',
+        "xl/workbook.xml": '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Orchard &amp; Ledger" sheetId="1" r:id="rId1"/></sheets></workbook>',
+        "xl/_rels/workbook.xml.rels": '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>',
+        "xl/sharedStrings.xml": '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1" uniqueCount="1"><si><r><t xml:space="preserve">Shared </t></r><r><t>A&amp;B</t></r></si></sst>',
+        "xl/styles.xml": '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="yyyy-mm-dd"/></numFmts><cellXfs count="2"><xf numFmtId="0"/><xf numFmtId="164"/></cellXfs></styleSheet>',
+        "xl/worksheets/sheet1.xml": '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData><row r="1"><c r="A1" t="inlineStr"><is><t>Orchard A&amp;B</t></is></c><c r="B1"><v>1234.5</v></c><c r="C1" t="b"><v>1</v></c><c r="D1" s="1"><v>45292</v></c><c r="E1" t="s"><v>0</v></c></row></sheetData><mergeCells count="1"><mergeCell ref="A2:B2"/></mergeCells></worksheet>',
+    }
+    bridge = MemvidBridge(tmp_path / "xlsx.mv2")
+    bridge.create()
+    bridge.put(uri="file:///ledger.xlsx", title="Modern workbook", body=office_archive(files))
+    results = json.dumps(bridge.search("Orchard", top_k=5))
+    for expected in ["Orchard", "A&B", "1234.5", "true", "45292", "Shared A&B"]:
+        assert expected in results

@@ -33,7 +33,7 @@ impl DocxReader {
                 reason: format!("failed to read document.xml: {err}").into(),
             })?;
 
-        Ok(extract_plain_text(&xml, b"w:p"))
+        Ok(extract_plain_text(&xml, "w:p"))
     }
 }
 
@@ -89,15 +89,25 @@ impl DocumentReader for DocxReader {
     }
 }
 
-fn extract_plain_text(xml: &str, block_tag: &[u8]) -> String {
+fn extract_plain_text(xml: &str, block_tag: &str) -> String {
     let mut reader = XmlReader::from_str(xml);
-    reader.trim_text(true);
     let mut buf = Vec::new();
     let mut text = String::new();
     let mut first_block = true;
+    let mut pending = String::new();
 
     loop {
-        match reader.read_event_into(&mut buf) {
+        let event = reader.read_event_into(&mut buf);
+        if !matches!(&event, Ok(Event::Text(_) | Event::GeneralRef(_))) {
+            if let Ok(content) = quick_xml::escape::unescape(&pending) {
+                if !content.trim().is_empty() {
+                    text.push_str(content.trim());
+                    text.push(' ');
+                }
+            }
+            pending.clear();
+        }
+        match event {
             Ok(Event::Start(e)) => {
                 if e.name().as_ref().ends_with(block_tag) {
                     if !first_block {
@@ -106,13 +116,11 @@ fn extract_plain_text(xml: &str, block_tag: &[u8]) -> String {
                     first_block = false;
                 }
             }
-            Ok(Event::Text(t)) => {
-                if let Ok(content) = t.unescape() {
-                    if !content.trim().is_empty() {
-                        text.push_str(content.trim());
-                        text.push(' ');
-                    }
-                }
+            Ok(Event::Text(t)) => pending.push_str(t.as_ref()),
+            Ok(Event::GeneralRef(reference)) => {
+                pending.push('&');
+                pending.push_str(reference.as_ref());
+                pending.push(';');
             }
             Ok(Event::Eof) => break,
             Err(_) => break,

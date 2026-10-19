@@ -286,7 +286,8 @@ fn collect_sheet_filenames(archive: &mut ZipArchive<Cursor<&[u8]>>) -> Vec<(Stri
     // Match sheet names to worksheet files
     for i in 0..archive.len() {
         if let Ok(file) = archive.by_index(i) {
-            let name = file.name().to_string();
+            let Ok(name) = file.name() else { continue };
+            let name = name.into_owned();
             if name.starts_with("xl/worksheets/sheet") && name.ends_with(".xml") {
                 // Extract sheet number from filename (e.g., "sheet1.xml" -> 0)
                 let num_str = name
@@ -309,28 +310,28 @@ fn collect_sheet_filenames(archive: &mut ZipArchive<Cursor<&[u8]>>) -> Vec<(Stri
 /// Parse workbook.xml to extract sheet display names in order.
 fn parse_workbook_sheet_names(xml: &str) -> Vec<String> {
     let mut reader = XmlReader::from_str(xml);
-    reader.trim_text(true);
+    reader.config_mut().trim_text(true);
     let mut names = Vec::new();
     let mut buf = Vec::new();
     let mut in_sheets = false;
 
     loop {
         match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(ref e) | Event::Empty(ref e)) if e.name().as_ref() == b"sheets" => {
+            Ok(Event::Start(ref e) | Event::Empty(ref e)) if e.name().as_ref() == "sheets" => {
                 in_sheets = true;
             }
             Ok(Event::Start(ref e) | Event::Empty(ref e))
-                if in_sheets && e.name().as_ref() == b"sheet" =>
+                if in_sheets && e.name().as_ref() == "sheet" =>
             {
                 for attr in e.attributes().flatten() {
-                    if attr.key.as_ref() == b"name" {
-                        if let Ok(val) = attr.decode_and_unescape_value(&reader) {
+                    if attr.key.as_ref() == "name" {
+                        if let Ok(val) = quick_xml::escape::unescape(attr.value.as_ref()) {
                             names.push(val.to_string());
                         }
                     }
                 }
             }
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"sheets" => {
+            Ok(Event::End(ref e)) if e.name().as_ref() == "sheets" => {
                 in_sheets = false;
             }
             Ok(Event::Eof) => break,
@@ -346,7 +347,7 @@ fn parse_workbook_sheet_names(xml: &str) -> Vec<String> {
 /// Parse styles.xml to extract numFmt definitions and cellXfs mappings.
 fn parse_styles_xml(xml: &str, metadata: &mut OoxmlMetadata) {
     let mut reader = XmlReader::from_str(xml);
-    reader.trim_text(true);
+    reader.config_mut().trim_text(true);
     let mut buf = Vec::new();
     let mut in_num_fmts = false;
     let mut in_cell_xfs = false;
@@ -356,20 +357,22 @@ fn parse_styles_xml(xml: &str, metadata: &mut OoxmlMetadata) {
             Ok(Event::Start(ref e) | Event::Empty(ref e)) => {
                 let tag = e.name();
                 match tag.as_ref() {
-                    b"numFmts" => in_num_fmts = true,
-                    b"cellXfs" => in_cell_xfs = true,
-                    b"numFmt" if in_num_fmts => {
+                    "numFmts" => in_num_fmts = true,
+                    "cellXfs" => in_cell_xfs = true,
+                    "numFmt" if in_num_fmts => {
                         let mut fmt_id = None;
                         let mut fmt_code = None;
                         for attr in e.attributes().flatten() {
                             match attr.key.as_ref() {
-                                b"numFmtId" => {
-                                    if let Ok(v) = attr.decode_and_unescape_value(&reader) {
+                                "numFmtId" => {
+                                    if let Ok(v) = quick_xml::escape::unescape(attr.value.as_ref())
+                                    {
                                         fmt_id = v.parse::<u32>().ok();
                                     }
                                 }
-                                b"formatCode" => {
-                                    if let Ok(v) = attr.decode_and_unescape_value(&reader) {
+                                "formatCode" => {
+                                    if let Ok(v) = quick_xml::escape::unescape(attr.value.as_ref())
+                                    {
                                         fmt_code = Some(v.to_string());
                                     }
                                 }
@@ -380,11 +383,11 @@ fn parse_styles_xml(xml: &str, metadata: &mut OoxmlMetadata) {
                             metadata.num_fmts.insert(id, classify_format_code(&code));
                         }
                     }
-                    b"xf" if in_cell_xfs => {
+                    "xf" if in_cell_xfs => {
                         let mut num_fmt_id = 0u32;
                         for attr in e.attributes().flatten() {
-                            if attr.key.as_ref() == b"numFmtId" {
-                                if let Ok(v) = attr.decode_and_unescape_value(&reader) {
+                            if attr.key.as_ref() == "numFmtId" {
+                                if let Ok(v) = quick_xml::escape::unescape(attr.value.as_ref()) {
                                     num_fmt_id = v.parse::<u32>().unwrap_or(0);
                                 }
                             }
@@ -395,8 +398,8 @@ fn parse_styles_xml(xml: &str, metadata: &mut OoxmlMetadata) {
                 }
             }
             Ok(Event::End(ref e)) => match e.name().as_ref() {
-                b"numFmts" => in_num_fmts = false,
-                b"cellXfs" => in_cell_xfs = false,
+                "numFmts" => in_num_fmts = false,
+                "cellXfs" => in_cell_xfs = false,
                 _ => {}
             },
             Ok(Event::Eof) => break,
@@ -410,22 +413,22 @@ fn parse_styles_xml(xml: &str, metadata: &mut OoxmlMetadata) {
 /// Parse a worksheet XML for `<mergeCells>` regions.
 fn parse_merge_cells_xml(xml: &str) -> Vec<MergedRegion> {
     let mut reader = XmlReader::from_str(xml);
-    reader.trim_text(true);
+    reader.config_mut().trim_text(true);
     let mut buf = Vec::new();
     let mut regions = Vec::new();
     let mut in_merge_cells = false;
 
     loop {
         match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"mergeCells" => {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == "mergeCells" => {
                 in_merge_cells = true;
             }
             Ok(Event::Start(ref e) | Event::Empty(ref e))
-                if in_merge_cells && e.name().as_ref() == b"mergeCell" =>
+                if in_merge_cells && e.name().as_ref() == "mergeCell" =>
             {
                 for attr in e.attributes().flatten() {
-                    if attr.key.as_ref() == b"ref" {
-                        if let Ok(val) = attr.decode_and_unescape_value(&reader) {
+                    if attr.key.as_ref() == "ref" {
+                        if let Ok(val) = quick_xml::escape::unescape(attr.value.as_ref()) {
                             if let Some(((tr, lc), (br, rc))) = parse_range_ref(&val) {
                                 regions.push(MergedRegion {
                                     top_row: tr,
@@ -438,7 +441,7 @@ fn parse_merge_cells_xml(xml: &str) -> Vec<MergedRegion> {
                     }
                 }
             }
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"mergeCells" => {
+            Ok(Event::End(ref e)) if e.name().as_ref() == "mergeCells" => {
                 in_merge_cells = false;
             }
             Ok(Event::Eof) => break,
