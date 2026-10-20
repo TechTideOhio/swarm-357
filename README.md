@@ -15,6 +15,21 @@ It is an organisational ontology for AI agents, not 357 models running at once. 
 
 **[Live site](https://swarm357.techtideai.io)** · **[Documentation](https://swarm357.techtideai.io/docs)** · **[Blog](https://swarm357.techtideai.io/blog)** · **[PyPI](https://pypi.org/project/techtide-swarm/)** · **[Maturity matrix](STATUS.md)** · **[Security model](SECURITY.md)** · **[Landing repo](https://github.com/TechTideOhio/swarm-357-site)**
 
+## Why this exists
+
+**What it does.** Swarm 357 is a Python runtime that materializes agents from a 357-role YAML catalog across six business layers plus management meta-agents, runs them under per-agent and per-layer budget caps, gates shell commands behind a pattern validator and human approvals, checkpoints every run to SQLite so it can be inspected, resumed, cancelled, replayed, and forked, and keeps memory in portable single-file Memvid `.mv2` stores. It is an organizational ontology for agents, not 357 model sessions running at once. Each role is a YAML identity plus a soul template, for example `sales-outreach-specialist-015`, materialized at runtime by the Conductor, and layer execution uses bounded concurrency with a hard agent cap. Objective checks live in [docs/VERIFY.md](docs/VERIFY.md) and in `python scripts/generate_roster.py --compact --fix-counts`.
+
+**Who it serves.** Operators and small engineering teams building Claude Code native workflows who need multi-agent runs with enforced cost limits, approval gates on side effects, and durable state, and who want to own the API keys, budgets, and memory files rather than rent a managed agent service. [STATUS.md](STATUS.md) states the contract: operators own API keys, budgets, and side-effect approvals.
+
+**Why Alex built it.** The initial open-source release (commit `7556f22`, 2026-04-09: "feat: TechTide Swarm 357 v0.1.0 - initial open-source release", described as a "357-agent Claude AI orchestration system across 6 business layers" shipping the CLI, soul templates, `BashSecurityGate`, `MemoryManager`, `CostController`, FastAPI server, Dockerfile, and eval harness) started from the parts that break agent demos once real money and real filesystems are involved. Budgets are enforced per agent and per layer, with a logged downgrade rather than a silent one. Bash is policy-gated and denied outright in server and production modes unless explicitly enabled. Memory is a file you can copy, inspect, and verify. Runs checkpoint to SQLite so `inspect`, `resume`, `cancel`, `replay`, and `fork` mean something after a process dies. The 0.2.2 release was framed as a correction of 0.2.1 claims that outran the code (commit `ce74fd4`, 2026-07-24: "feat: local hardening pass - security, observability, data plane, launch docs"; [CHANGELOG.md](CHANGELOG.md) 0.2.2, 2026-07-26), which is why this README, [STATUS.md](STATUS.md), and [SECURITY.md](SECURITY.md) are kept in lockstep. Built by [TechTide AI](https://techtideai.io) ([LinkedIn](https://www.linkedin.com/company/techtide-ai/)) and created by [Alex Cinovoj](https://alexcinovoj.com), Founder & CTO of TechTide AI, for Claude Code native workflows. The runtime is open core under Apache-2.0. The product surface lives in a separate repository, [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site), so the two release on independent trains. A longer version of this section, with linked stack and eval evidence, is published at [swarm357.techtideai.io/about](https://swarm357.techtideai.io/about).
+
+**Real-world use case (2025-2026 evidence).** **Verified in this repository.** Running a bounded, budget-capped evaluation of role agents before promoting a change: `swarm eval` executes the 25-task catalog under a hard $5 cap with a keyword gate plus an optional LLM judge, checkpoints so an interrupted run resumes, and compares against the committed baseline. The baseline in [`evals/baselines/latest.json`](evals/baselines/latest.json), the rendered figures in [Evals](#evals), and the CI `docker` job that asserts `agents == 357` and a non-200 response without an API key are the evidence that this path has been run. The approach matches what Anthropic published about agent evaluation in 2025 and 2026: start with roughly 20 representative tasks, grade free-form output with an LLM judge against a rubric, and accept that multi-agent runs take different valid paths to the same outcome[^1]; separate tasks, trials, graders, transcripts, and the evaluation harness so regressions are attributable[^2]; reserve multi-agent orchestration for cases where context pollution, parallelism, or specialization justify the coordination cost, which is why the Conductor selects a bounded set of roles rather than fanning out[^3]; and give long-running agents durable artifacts so work survives a session ending, which is what the SQLite checkpoints are for[^4].
+
+[^1]: Anthropic, "How we built our multi-agent research system", <https://www.anthropic.com/engineering/multi-agent-research-system>, published 2025-06-13.
+[^2]: Anthropic, "Demystifying evals for AI agents", <https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents>, published 2026-01-09.
+[^3]: Anthropic, "Building multi-agent systems: When and how to use them", <https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them>, published 2026-01-23.
+[^4]: Anthropic, "Effective harnesses for long-running agents", <https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents>, published 2025-11-26.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/TechTideOhio/swarm-357/main/docs/assets/architecture.png" alt="Swarm 357 architecture" width="90%" />
 </p>
@@ -36,10 +51,9 @@ flowchart TB
 
 ## Contents
 
+- [Why this exists](#why-this-exists)
 - [Install](#install)
 - [Container image](#container-image)
-- [About](#about)
-- [What 357 agents means](#what-357-agents-means)
 - [What this does](#what-this-does)
 - [Architecture](#architecture)
 - [Tech stack](#tech-stack)
@@ -47,7 +61,7 @@ flowchart TB
 - [Key differentiators](#key-differentiators)
 - [Evals](#evals)
 - [Feature maturity](#feature-maturity)
-- [Why not another framework](#why-not-another-framework)
+- [Comparison with other frameworks](#comparison-with-other-frameworks)
 - [HTTP API](#http-api)
 - [Memvid bridge](#memvid-bridge)
 - [Development](#development)
@@ -103,18 +117,6 @@ gh attestation verify oci://ghcr.io/techtideohio/swarm-357:latest \
 ```
 
 Set `SWARM_API_KEY` and `SWARM_REQUIRE_AUTH=1` before exposing the container beyond localhost. See [Required environment](#required-environment).
-
-## About
-
-Swarm 357 is an organizational ontology for agents. It is not a claim that 357 Opus sessions run in parallel. Each role is a YAML identity plus a soul template, for example `sales-outreach-specialist-015`, materialized at runtime by the Conductor. Layer execution uses bounded concurrency with a hard agent cap, so a task that touches six layers does not turn into an unbounded fan-out.
-
-The design starts from the parts that break agent demos once real money and real filesystems are involved. Budgets are enforced per agent and per layer, with a logged downgrade rather than a silent one. Bash is policy-gated and denied outright in server and production modes unless explicitly enabled. Memory is a file you can copy, inspect, and verify rather than a managed service you rent. Runs checkpoint to SQLite so `inspect`, `resume`, `cancel`, `replay`, and `fork` mean something after a process dies.
-
-Built by [TechTide AI](https://techtideai.io) ([LinkedIn](https://www.linkedin.com/company/techtide-ai/)) and created by [Alex Cinovoj](https://alexcinovoj.com) for Claude Code native workflows, and used on the studio's own production automation before anything ships here. The runtime is open core under Apache-2.0. The product surface lives in a separate repository, [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site), so the two release on independent trains. A longer version of this section, with linked stack and eval evidence, is published at [swarm357.techtideai.io/about](https://swarm357.techtideai.io/about).
-
-## What 357 agents means
-
-357 agents means 357 distinct agent identities, defined by the YAML roster and soul templates, materialized at runtime. It is not 357 simultaneous long-running model sessions. Objective checks live in [docs/VERIFY.md](docs/VERIFY.md) and in `python scripts/generate_roster.py --compact --fix-counts`.
 
 ## What this does
 
@@ -234,7 +236,7 @@ Do not hand-edit these figures. Regenerate them with `python scripts/render_eval
 
 Reviewer checklist: [docs/VERIFY.md](docs/VERIFY.md), [SECURITY.md](SECURITY.md), [CLAUDE.md](CLAUDE.md).
 
-## Why not another framework
+## Comparison with other frameworks
 
 | Framework | Swarm 357 advantage | Their advantage |
 |-----------|--------------------|--------------------|
