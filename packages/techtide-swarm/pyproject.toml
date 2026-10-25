@@ -51,7 +51,7 @@ dependencies = [
   "pydantic>=2.5",
   "pyyaml>=6.0.3",
   "httpx>=0.28.1",
-  "rich>=13",
+  "rich>=15.0.0",
   "fastapi>=0.115",
   "uvicorn[standard]>=0.30",
 ]
