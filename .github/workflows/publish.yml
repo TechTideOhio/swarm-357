@@ -44,7 +44,7 @@ jobs:
 
       - name: Publish to PyPI (API token)
         if: env.PYPI_TOKEN != ''
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
         with:
           packages-dir: packages/techtide-swarm/dist/
           password: ${{ env.PYPI_TOKEN }}
@@ -53,7 +53,7 @@ jobs:
         if: env.PYPI_TOKEN == ''
         id: pypi_oidc
         continue-on-error: true
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
         with:
           packages-dir: packages/techtide-swarm/dist/
 
