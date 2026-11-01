@@ -14,6 +14,7 @@ CHANGES = {
         '[dependencies.zip]\nversion = "7.1"': '[dependencies.zip]\nversion = "9.0.5"',
         '[dependencies.lopdf]\nversion = "0.39"': '[dependencies.lopdf]\nversion = "0.42"',
         '[dependencies.pdf-extract]\nversion = "0.10"': '[dependencies.pdf-extract]\nversion = "0.12.1"',
+        '[dependencies.zstd]\nversion = "0.13.1"': '[dependencies.zstd]\nversion = "0.14.3"',
     },
     "tantivy": {
         '[dependencies.lru]\nversion = "0.12.0"': '[dependencies.lru]\nversion = "0.18.2"',

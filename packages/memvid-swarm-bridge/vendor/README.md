@@ -1,6 +1,6 @@
 # Security dependency patches
 
-Published memvid-core2.0.140 and Tantivy0.25.0 constrain PDF, XML, ZIP and LRU dependencies to vulnerable versions. These registry sources preserve upstream features, index format, license metadata and included license files. Normalized manifest bounds now select lopdf0.42, pdf-extract0.12.1, lru0.18.2+, Calamine0.37, quick-xml0.42 and ZIP9.0.5+.
+Published memvid-core2.0.140 and Tantivy0.25.0 constrain PDF, XML, ZIP, zstd and LRU dependencies to vulnerable versions. These registry sources preserve upstream features, index format, license metadata and included license files. Normalized manifest bounds now select lopdf0.42, pdf-extract0.12.1, lru0.18.2+, Calamine0.37, quick-xml0.42, ZIP9.0.5+ and zstd0.14.3+ (memvid-core only calls the one-shot `encode_all`/`decode_all`, whose API and frame format are unchanged; zstd-sys/libzstd 1.5.7 is unchanged).
 
 Five Memvid reader files adapt the modern document APIs. DOCX/PPTX aggregate text and entity-reference events before unescaping, preserving named/numeric references and inline runs. Excel dates/durations retain numeric serial values through ExcelDateTime.as_f64. The synthetic PII-test key uses compile-time concat with identical runtime bytes and assertions, avoiding a false secret-scanner match. No runtime feature or validation gate is disabled.
 
