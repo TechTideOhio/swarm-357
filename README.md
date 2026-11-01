@@ -330,7 +330,7 @@ Railway runs two services:
 | Service | Build | Root | Health |
 |---------|-------|------|--------|
 | `backend` | Dockerfile | `/` | `/api/health` |
-| `frontend` | Nixpacks with Next.js 16 | [swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) | `/` |
+| `frontend` | Dockerfile (Next.js 16; only `NEXT_PUBLIC_*` build args, `SWARM_API_KEY` runtime-only) | [swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) | `/` |
 
 See [docs/DEPLOY_RAILWAY.md](docs/DEPLOY_RAILWAY.md).
 
