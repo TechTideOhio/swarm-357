@@ -63,7 +63,7 @@ dev = [
   "pytest-cov>=7.1.0",
   "ruff>=0.17.1",
   "mypy>=1.13",
-  "types-PyYAML>=6.0",
+  "types-PyYAML>=6.0.12.20261103",
   "build>=1.0",
   "twine>=7.0.0",
 ]
